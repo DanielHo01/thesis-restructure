@@ -1,0 +1,21 @@
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!  Copyright notice
+!  This PAF and its content is copyright of Qualisys AB © 2012-2018. All rights reserved. 
+!  The PAF script is only to be used in conjunction with a Qualisys Motion Capture System. 
+!  Only legal PAF owners are entitled to use the script and only in relation with related PAF.
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 
+
+Recalc_Gait
+/model_used									= CAST 
+/left_foot_normalized						= TRUE 
+/right_foot_normalized						= TRUE 
+/includes_thorax							= TRUE 
+/includes_OFM								= FALSE 
+/event_mode									= Multiple forceplates 
+;
+
+ 
+	MAP_Gait
+	/model_used								= CAST 
+	;

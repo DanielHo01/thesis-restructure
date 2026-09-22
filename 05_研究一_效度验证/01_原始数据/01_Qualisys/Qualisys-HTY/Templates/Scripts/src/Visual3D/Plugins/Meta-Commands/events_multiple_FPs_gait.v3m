@@ -1,0 +1,115 @@
+! BEGIN_META
+! META_CMD_NAME	= Events_Multiple_FPs_Gait
+! END_META
+
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!  Copyright notice
+!  This PAF and its content is copyright of Qualisys AB © 2012-2017. All rights reserved. 
+!  The PAF script is only to be used in conjunction with a Qualisys Motion Capture System. 
+!  Only legal PAF owners are entitled to use the script and only in relation with related PAF.
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+!=========================================
+!Event detection
+!=========================================
+!Note: a single file has to be selected to set pipeline parameter
+Select_Active_File
+/FILE_NAME=0
+! /QUERY=
+;
+
+Set_Pipeline_Parameter_To_Data_Value
+/PARAMETER_NAME=WINDOW
+/SIGNAL_TYPES=METRIC
+/SIGNAL_NAMES=WINDOW
+/SIGNAL_FOLDER=PROCESSED
+! /SIGNAL_COMPONENTS=ALL_COMPONENTS
+;
+
+Select_Active_File
+/FILE_NAME=ALL_FILES
+! /QUERY=
+;
+
+Automatic_Gait_Events
+/FRAME_WINDOW=::WINDOW
+/USE_TPR=TRUE
+;
+
+!=======================================
+!Remove events before and after contact with the FP
+!The current version assumes one of the following two sequences will be required for the report:
+!1. RON/RHS - LON/LHS- ROFF/RTO - RHS -LOFF/LTO - LHS
+!2. LON/LHS - RON/RHS- LOFF/LTO - LHS -ROFF/RTO - RHS
+!=======================================
+
+Event_Explicit
+/EVENT_NAME=start
+/FRAME=1
+! /TIME=
+;
+
+Event_Explicit
+/EVENT_NAME=end
+/FRAME=EOF
+! /TIME=
+;
+
+!Variant 1 (RON is first)
+Event_Copy
+/EVENT_NAME=RON
+/NEW_EVENT_NAME=RANGESTART
+/FRAME_OFFSET=-1
+/TIME_OFFSET=0
+/PERCENT_OFFSET=0
+/EVENT_INSTANCE=-1
+! /RANGE_INSTANCE=0
+/EVENT_SEQUENCE=START+LON
+! /EXCLUDE_EVENTS=
+! /START_AT_EVENT=
+! /END_AT_EVENT=
+;
+
+Event_Copy
+/EVENT_NAME=RTO
+/NEW_EVENT_NAME=RANGEEND
+/FRAME_OFFSET=+1
+/TIME_OFFSET=0
+/PERCENT_OFFSET=0
+/EVENT_INSTANCE=1
+! /RANGE_INSTANCE=0
+/EVENT_SEQUENCE=LOFF+END
+/EXCLUDE_EVENTS=ROFF
+! /START_AT_EVENT=
+! /END_AT_EVENT=
+;
+
+!Variant 2 (LON is first)
+Event_Copy
+/EVENT_NAME=LON
+/NEW_EVENT_NAME=RANGESTART
+/FRAME_OFFSET=-1
+/TIME_OFFSET=0
+/PERCENT_OFFSET=0
+/EVENT_INSTANCE=-1
+! /RANGE_INSTANCE=0
+/EVENT_SEQUENCE=START+RON
+! /EXCLUDE_EVENTS=
+! /START_AT_EVENT=
+! /END_AT_EVENT=
+;
+
+Event_Copy
+/EVENT_NAME=LTO
+/NEW_EVENT_NAME=RANGEEND
+/FRAME_OFFSET=+1
+/TIME_OFFSET=0
+/PERCENT_OFFSET=0
+/EVENT_INSTANCE=1
+! /RANGE_INSTANCE=0
+/EVENT_SEQUENCE=ROFF+END
+/EXCLUDE_EVENTS=LOFF
+! /START_AT_EVENT=
+! /END_AT_EVENT=
+;

@@ -1,0 +1,19 @@
+! BEGIN_META
+! META_CMD_NAME	= Replace_Recalc_Pipeline_Gait
+! META_PARAM	= working_directory  :   string ::yes						
+! END_META
+
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!  Copyright notice
+!  This PAF and its content is copyright of Qualisys AB © 2012-2017. All rights reserved. 
+!  The PAF script is only to be used in conjunction with a Qualisys Motion Capture System. 
+!  Only legal PAF owners are entitled to use the script and only in relation with related PAF.
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+! ==================================
+! Update the Recalc pipeline
+! ==================================
+
+Replace_Recalc_Pipeline
+/RECALC_PIPELINE=&::working_directory&recalc.v3s
+;

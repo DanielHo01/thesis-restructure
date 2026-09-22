@@ -1,0 +1,128 @@
+! BEGIN_META
+! META_CMD_NAME	= Events_Instrumented_Treadmill_Gait
+! META_PARAM	= window_size_divisor  :   string ::yes						
+! END_META
+
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!  Copyright notice
+!  This PAF and its content is copyright of Qualisys AB © 2012-2017. All rights reserved. 
+!  The PAF script is only to be used in conjunction with a Qualisys Motion Capture System. 
+!  Only legal PAF owners are entitled to use the script and only in relation with related PAF.
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+!=========================================
+!Event detection
+!=========================================
+!Calculate the size of the window that will be used for the event detection. This changes depending on the frame rate.
+!=========================================
+!Note: a single file has to be selected to set pipeline parameter
+Select_Active_File
+/FILE_NAME=0
+! /QUERY=
+;
+
+Set_Pipeline_Parameter_To_Data_Value
+/PARAMETER_NAME=WINDOW
+/SIGNAL_TYPES=METRIC
+/SIGNAL_NAMES=WINDOW
+/SIGNAL_FOLDER=PROCESSED
+! /SIGNAL_COMPONENTS=ALL_COMPONENTS
+;
+
+Select_Active_File
+/FILE_NAME=ALL_FILES
+! /QUERY=
+;
+
+Evaluate_Expression
+/EXPRESSION=PARAMETERS::POINT::RATE/&::window_size_divisor
+/RESULT_NAME=WINDOW
+/RESULT_TYPE=METRIC
+! /RESULT_FOLDER=PROCESSED
+;
+
+!Note: a single file has to be selected to set pipeline parameter
+Select_Active_File
+/FILE_NAME=0
+! /QUERY=
+;
+
+Set_Pipeline_Parameter_To_Data_Value
+/PARAMETER_NAME=WINDOW
+/SIGNAL_TYPES=METRIC
+/SIGNAL_NAMES=WINDOW
+/SIGNAL_FOLDER=PROCESSED
+! /SIGNAL_COMPONENTS=ALL_COMPONENTS
+;
+
+Select_Active_File
+/FILE_NAME=ALL_FILES
+! /QUERY=
+;
+
+Automatic_Gait_Events
+! /SELECT_X=FALSE
+! /SELECT_Y=FALSE
+/SELECT_Z=TRUE
+/THRESHOLD=5.000000
+/RADIUS=::WINDOW
+/USE_TPR=FALSE
+;
+
+Event_Copy
+/EVENT_NAME=RON
+/NEW_EVENT_NAME=RHS
+/FRAME_OFFSET=0
+! /TIME_OFFSET=
+! /PERCENT_OFFSET=
+! /EVENT_INSTANCE=0
+! /RANGE_INSTANCE=0
+! /EVENT_SEQUENCE=
+! /EXCLUDE_EVENTS=
+! /START_AT_EVENT=
+! /END_AT_EVENT=
+;
+
+Event_Copy
+/EVENT_NAME=LON
+/NEW_EVENT_NAME=LHS
+/FRAME_OFFSET=0
+! /TIME_OFFSET=
+! /PERCENT_OFFSET=
+! /EVENT_INSTANCE=0
+! /RANGE_INSTANCE=0
+! /EVENT_SEQUENCE=
+! /EXCLUDE_EVENTS=
+! /START_AT_EVENT=
+! /END_AT_EVENT=
+;
+
+Event_Copy
+/EVENT_NAME=ROFF
+/NEW_EVENT_NAME=RTO
+/FRAME_OFFSET=0
+! /TIME_OFFSET=
+! /PERCENT_OFFSET=
+! /EVENT_INSTANCE=0
+! /RANGE_INSTANCE=0
+! /EVENT_SEQUENCE=
+! /EXCLUDE_EVENTS=
+! /START_AT_EVENT=
+! /END_AT_EVENT=
+;
+
+
+Event_Copy
+/EVENT_NAME=LOFF
+/NEW_EVENT_NAME=LTO
+/FRAME_OFFSET=0
+! /TIME_OFFSET=
+! /PERCENT_OFFSET=
+! /EVENT_INSTANCE=0
+! /RANGE_INSTANCE=0
+! /EVENT_SEQUENCE=
+! /EXCLUDE_EVENTS=
+! /START_AT_EVENT=
+! /END_AT_EVENT=
+;

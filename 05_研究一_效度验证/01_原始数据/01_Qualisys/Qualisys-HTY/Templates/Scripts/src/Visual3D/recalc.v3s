@@ -1,0 +1,79 @@
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!  Copyright notice
+!  This PAF and its content is copyright of Qualisys AB © 2012-2018. All rights reserved. 
+!  The PAF script is only to be used in conjunction with a Qualisys Motion Capture System. 
+!  Only legal PAF owners are entitled to use the script and only in relation with related PAF.
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+<?php
+// Include php variables.
+include_once($template_directory . 'Scripts\\src\\Visual3D\\prepare_variables.php');
+?> 
+
+Recalc_Gait
+/model_used									= <?=$model_used;?> 
+/left_foot_normalized						= <?=$left_foot_normalized;?> 
+/right_foot_normalized						= <?=$right_foot_normalized;?> 
+/includes_thorax							= <?=$includes_thorax;?> 
+/includes_OFM								= <?=$includes_OFM;?> 
+/event_mode									= <?=$event_mode;?> 
+;
+
+<?php
+if ($includes_noraxon || $includes_delsys_trigno || $includes_mega_me6000 || $includes_analog_EMG) {
+	if ($analysis_name !== "Internal Compare sessions") { //not required when comparing sessions
+		?> 
+		EMG_Filter_Gait
+		/normativeDirectory					= <?=$normativeDirectory;?> 
+		/noraxon_exists 					= <?=$noraxon_exists;?> 
+		/mega_me6000_exists					= <?=$mega_me6000_exists;?> 
+		/delsys_trigno_exists				= <?=$delsys_trigno_exists;?> 
+		/analog_EMG_exists					= <?=$analog_EMG_exists;?> 
+		/normative_non_noraxon_file_exists	= <?=$normative_non_noraxon_file_exists;?> 
+		/EMG_signal_names					= <?=$EMG_signal_names;?> 
+		/EMG_high_pass_filter				= <?=$EMG_high_pass_filter;?> 
+		/EMG_high_pass_bidir_pass			= <?=$EMG_high_pass_bidir_pass;?> 
+		/EMG_low_pass_filter				= <?=$EMG_low_pass_filter;?> 
+		/EMG_low_pass_bidir_pass			= <?=$EMG_low_pass_bidir_pass;?> 
+		/EMG_rectify						= <?=$EMG_rectify;?> 
+		/EMG_rms_window						= <?=$EMG_rms_window;?> 
+		/EMG_unit_multiply					= <?=$EMG_unit_multiply;?> 
+		;
+	<?php
+	}?> 
+	
+	EMG_Normatives_Gait
+	/analysis_name							= <?=$analysis_name;?> 
+	/EMG_names_array_left_exists			= <?=$EMG_names_array_left_exists;?> 
+	/EMG_names_array_right_exists			= <?=$EMG_names_array_right_exists;?> 
+	/EMG_names_list							= <?=$EMG_names_list;?> 
+	/EMG_graph_signals_name_left			= <?=$EMG_graph_signals_name_left;?> 
+	/EMG_graph_signals_name_right			= <?=$EMG_graph_signals_name_right;?> 
+	/EMG_units_pct							= <?=$EMG_units_pct;?> 
+	/noraxon_exists 						= <?=$noraxon_exists;?> 
+	/normative_non_noraxon_file_exists		= <?=$normative_non_noraxon_file_exists;?> 
+	/hide_messages							= <?=$hide_messages;?> 
+	/EMG_valid_names_list					= <?=$EMG_valid_names_list;?> 
+	/p2d_signal_names_list					= <?=$p2d_signal_names_list;?> 
+	;
+	
+	EMG_Set_Y_Axes_Gait
+	/page_number							= <?=$page_number;?> 
+	/first_EMG_page							= <?=$first_EMG_page;?> 
+	/EMG_names_array_left_exists			= <?=$EMG_names_array_left_exists;?> 
+	/EMG_names_array_right_exists			= <?=$EMG_names_array_right_exists;?> 
+	/EMG_graph_signals_name_left			= <?=$EMG_graph_signals_name_left;?> 
+	/EMG_graph_signals_name_right			= <?=$EMG_graph_signals_name_right;?> 
+	/count_EMG_signals_left					= <?=$count_EMG_signals_left;?> 
+	/count_EMG_signals_right				= <?=$count_EMG_signals_right;?> 
+	;
+
+<?php
+}
+
+if (strpos($normative_file_exists, 'TRUE') !== false && strpos($analysis_name, "Internal Compare sessions") === false)  {  //this will avoid warning if only one motion trial exists
+?> 
+	MAP_Gait
+	/model_used								= <?=$model_used;?> 
+	;
+<?php
+}

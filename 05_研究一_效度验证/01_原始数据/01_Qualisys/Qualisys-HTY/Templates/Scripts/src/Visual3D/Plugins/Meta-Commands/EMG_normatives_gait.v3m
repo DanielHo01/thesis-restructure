@@ -1,0 +1,531 @@
+! BEGIN_META
+! META_CMD_NAME	= EMG_Normatives_Gait
+! META_PARAM	= analysis_name  :   string ::yes						
+! META_PARAM	= EMG_names_array_left_exists  :   string ::yes						
+! META_PARAM	= EMG_names_array_right_exists  :   string ::yes						
+! META_PARAM	= EMG_graph_signals_name_left  :   string ::yes						
+! META_PARAM	= EMG_graph_signals_name_right  :   string ::yes						
+! META_PARAM	= EMG_names_list  :   string ::yes						
+! META_PARAM	= EMG_units_pct  :   string ::yes						
+! META_PARAM	= noraxon_exists  :   string ::yes						
+! META_PARAM	= normative_non_noraxon_file_exists  :   string ::yes						
+! META_PARAM	= hide_messages  :   string ::yes						
+! META_PARAM	= EMG_valid_names_list  :   string ::yes						
+! META_PARAM	= p2d_signal_names_list  :   string ::yes						
+! END_META
+
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!  Copyright notice
+!  This PAF and its content is copyright of Qualisys AB © 2012-2017. All rights reserved. 
+!  The PAF script is only to be used in conjunction with a Qualisys Motion Capture System. 
+!  Only legal PAF owners are entitled to use the script and only in relation with related PAF.
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+**__Add_a_Comment__**
+! /COMMENT=
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(STRING_FIND("&::analysis_name&","Compare",0) = -1)
+! /AS_INTEGER=TRUE
+;
+
+	Select_Active_File
+	/FILE_NAME=Dynamic
+	! /QUERY=
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(STRING_FIND("&::analysis_name&","Compare",0) <> -1)
+! /AS_INTEGER=TRUE
+;
+
+	Select_Active_File
+	/FILE_NAME=Dynamic_pre
+	! /QUERY=
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+!Prepare scaling of reference curves
+! It is assumed at least two motion files exist
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::EMG_names_array_left_exists&" = "TRUE")
+! /AS_INTEGER=TRUE
+;
+
+	For_Each
+	/ITERATION_PARAMETER_NAME=EMG_graph_signal_name_left
+	! /ITERATION_PARAMETER_COUNT_NAME=
+	/ITEMS=::EMG_graph_signals_name_left
+	;
+
+		Metric_Maximum
+		/RESULT_METRIC_NAME=&::EMG_graph_signal_name_left&_signal
+		!/APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+		/RESULT_METRIC_FOLDER=EMG
+		/SIGNAL_TYPES=ANALOG
+		/SIGNAL_NAMES=&::EMG_graph_signal_name_left
+		/SIGNAL_FOLDER=EMG_PROCESSED
+		! /SIGNAL_COMPONENTS=ALL_COMPONENTS
+		/EVENT_SEQUENCE=LHS+LHS
+		/EXCLUDE_EVENTS=
+		! /GENERATE_MEAN_AND_STDDEV=TRUE
+		! /APPEND_TO_EXISTING_VALUES=FALSE
+		/CREATE_GLOBAL_MAXIMUM=TRUE
+		;
+		
+		Metric_Maximum
+		/RESULT_METRIC_NAME=&::EMG_graph_signal_name_left&_signal_raw
+		!/APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+		/RESULT_METRIC_FOLDER=EMG
+		/SIGNAL_TYPES=ANALOG
+		/SIGNAL_NAMES=&::EMG_graph_signal_name_left
+		/SIGNAL_FOLDER=EMG_RAW
+		! /SIGNAL_COMPONENTS=ALL_COMPONENTS
+		/EVENT_SEQUENCE=LHS+LHS
+		/EXCLUDE_EVENTS=
+		! /GENERATE_MEAN_AND_STDDEV=TRUE
+		! /APPEND_TO_EXISTING_VALUES=FALSE
+		/CREATE_GLOBAL_MAXIMUM=TRUE
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=("&::EMG_units_pct&" = "TRUE")
+		! /AS_INTEGER=TRUE
+		;
+
+			Evaluate_Expression
+			/EXPRESSION=(ANALOG::EMG_PROCESSED::&::EMG_graph_signal_name_left& / GLOBAL::METRIC::EMG::&::EMG_graph_signal_name_left&_signal_MAX) * 100
+			/RESULT_NAME=&::EMG_graph_signal_name_left
+			/RESULT_TYPE=ANALOG
+			/RESULT_FOLDER=EMG_PROCESSED
+			;
+		
+			Evaluate_Expression
+			/EXPRESSION=(ANALOG::EMG_RAW::&::EMG_graph_signal_name_left& / GLOBAL::METRIC::EMG::&::EMG_graph_signal_name_left&_signal_raw_MAX) * 100
+			/RESULT_NAME=&::EMG_graph_signal_name_left
+			/RESULT_TYPE=ANALOG
+			/RESULT_FOLDER=EMG_RAW
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+		
+	End_For_Each
+	/ITERATION_PARAMETER_NAME=EMG_graph_signal_name_left
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::EMG_names_array_right_exists&" = "TRUE")
+! /AS_INTEGER=TRUE
+;
+
+	For_Each
+	/ITERATION_PARAMETER_NAME=EMG_graph_signal_name_right
+	! /ITERATION_PARAMETER_COUNT_NAME=
+	/ITEMS=::EMG_graph_signals_name_right
+	;
+
+		Metric_Maximum
+		/RESULT_METRIC_NAME=&::EMG_graph_signal_name_right&_signal
+		!/APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+		/RESULT_METRIC_FOLDER=EMG
+		/SIGNAL_TYPES=ANALOG
+		/SIGNAL_NAMES=&::EMG_graph_signal_name_right
+		/SIGNAL_FOLDER=EMG_PROCESSED
+		! /SIGNAL_COMPONENTS=ALL_COMPONENTS
+		/EVENT_SEQUENCE=RHS+RHS
+		/EXCLUDE_EVENTS=
+		! /GENERATE_MEAN_AND_STDDEV=TRUE
+		! /APPEND_TO_EXISTING_VALUES=FALSE
+		/CREATE_GLOBAL_MAXIMUM=TRUE
+		;
+		
+		Metric_Maximum
+		/RESULT_METRIC_NAME=&::EMG_graph_signal_name_right&_signal_raw
+		!/APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+		/RESULT_METRIC_FOLDER=EMG
+		/SIGNAL_TYPES=ANALOG
+		/SIGNAL_NAMES=&::EMG_graph_signal_name_right
+		/SIGNAL_FOLDER=EMG_RAW
+		! /SIGNAL_COMPONENTS=ALL_COMPONENTS
+		/EVENT_SEQUENCE=RHS+RHS
+		/EXCLUDE_EVENTS=
+		! /GENERATE_MEAN_AND_STDDEV=TRUE
+		! /APPEND_TO_EXISTING_VALUES=FALSE
+		/CREATE_GLOBAL_MAXIMUM=TRUE
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=("&::EMG_units_pct&" = "TRUE")
+		! /AS_INTEGER=TRUE
+		;
+
+			Evaluate_Expression
+			/EXPRESSION=(ANALOG::EMG_PROCESSED::&::EMG_graph_signal_name_right& / GLOBAL::METRIC::EMG::&::EMG_graph_signal_name_right&_signal_MAX) * 100
+			/RESULT_NAME=&::EMG_graph_signal_name_right
+			/RESULT_TYPE=ANALOG
+			/RESULT_FOLDER=EMG_PROCESSED
+			;
+		
+			Evaluate_Expression
+			/EXPRESSION=(ANALOG::EMG_RAW::&::EMG_graph_signal_name_right& / GLOBAL::METRIC::EMG::&::EMG_graph_signal_name_right&_signal_raw_MAX) * 100
+			/RESULT_NAME=&::EMG_graph_signal_name_right
+			/RESULT_TYPE=ANALOG
+			/RESULT_FOLDER=EMG_RAW
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+		
+	End_For_Each
+	/ITERATION_PARAMETER_NAME=EMG_graph_signal_name_right
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+!Calculate Mean
+For_Each
+/ITERATION_PARAMETER_NAME=EMG_graph_signal_name_left
+! /ITERATION_PARAMETER_COUNT_NAME=
+/ITEMS=::EMG_graph_signals_name_left
+;
+
+	Global_Normalized_Signal_Mean
+	/SIGNAL_TYPES=ANALOG
+	/SIGNAL_NAMES=&::EMG_graph_signal_name_left&
+	/SIGNAL_FOLDER=EMG_PROCESSED
+	! /SIGNAL_COMPONENTS=
+	! /COMPONENT_SEQUENCE=
+	! /START_LABEL=
+	! /END_LABEL=
+	/EVENT_SEQUENCE=LHS+LHS
+	! /EXCLUDE_EVENTS=
+	/RESULT_NAME=&::EMG_graph_signal_name_left&_MEAN
+	/RESULT_FOLDER=TIMESERIES 
+	/NORMALIZE_POINTS=101
+	! /CREATE_STANDARD_DEVIATION=FALSE
+	! /CALCULATE_PER_FILE=FALSE
+	;
+
+End_For_Each
+/ITERATION_PARAMETER_NAME=EMG_graph_signal_name_left
+;
+
+For_Each
+/ITERATION_PARAMETER_NAME=EMG_graph_signal_name_right
+! /ITERATION_PARAMETER_COUNT_NAME=
+/ITEMS=::EMG_graph_signals_name_right
+;
+
+	Global_Normalized_Signal_Mean
+	/SIGNAL_TYPES=ANALOG
+	/SIGNAL_NAMES=&::EMG_graph_signal_name_right
+	/SIGNAL_FOLDER=EMG_PROCESSED
+	! /SIGNAL_COMPONENTS=
+	! /COMPONENT_SEQUENCE=
+	! /START_LABEL=
+	! /END_LABEL=
+	/EVENT_SEQUENCE=RHS+RHS
+	! /EXCLUDE_EVENTS=
+	/RESULT_NAME=&::EMG_graph_signal_name_right&_MEAN
+	/RESULT_FOLDER=TIMESERIES 
+	/NORMALIZE_POINTS=101
+	! /CREATE_STANDARD_DEVIATION=FALSE
+	! /CALCULATE_PER_FILE=FALSE
+	;
+
+End_For_Each
+/ITERATION_PARAMETER_NAME=EMG_graph_signal_name_right
+;
+
+Select_Active_File
+/FILE_NAME=GLOBAL
+! /QUERY=
+;
+
+!Find max value of mean signal (will be used in Word report to normalize y axis of EMG graphs)
+For_Each
+/ITERATION_PARAMETER_NAME=EMG_name
+! /ITERATION_PARAMETER_COUNT_NAME=
+/ITEMS=::EMG_names_list
+;
+
+	Metric_Maximum
+	/RESULT_METRIC_NAME=&::EMG_name&_MEAN_MAX
+	!/APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+	/RESULT_METRIC_FOLDER=EMG
+	/SIGNAL_TYPES=P2D
+	/SIGNAL_NAMES=&::EMG_name&_MEAN
+	/SIGNAL_FOLDER=TIMESERIES
+	/SIGNAL_COMPONENTS=Y
+	/EVENT_SEQUENCE=
+	/EXCLUDE_EVENTS=
+	/GENERATE_MEAN_AND_STDDEV=FALSE
+	! /APPEND_TO_EXISTING_VALUES=FALSE
+	/CREATE_GLOBAL_MAXIMUM=TRUE
+	;
+	
+	Conditional_Statement
+	/ITERATION_PARAMETER_NAME=cond
+	/EXPRESSION=("&::EMG_units_pct&" = "TRUE")
+	! /AS_INTEGER=TRUE
+	;
+
+		Evaluate_Expression
+		/EXPRESSION=P2D::TIMESERIES::&::EMG_name&_MEAN::Y / METRIC::EMG::&::EMG_name&_MEAN_MAX * 100
+		/RESULT_NAME=&::EMG_name&_MEAN_temp
+		/RESULT_TYPE=P2D
+		/RESULT_FOLDER=TIMESERIES
+		;
+
+		!overwrite mean signal with normalized values
+		Evaluate_Expression
+		/EXPRESSION=vector(P2D::TIMESERIES::&::EMG_name&_MEAN::X,P2D::TIMESERIES::&::EMG_name&_MEAN_temp::X)
+		/RESULT_NAME=&::EMG_name&_MEAN
+		/RESULT_TYPE=P2D
+		/RESULT_FOLDER=TIMESERIES
+		;
+
+		Remove_Signals
+		/SIGNAL_TYPES=P2D
+		/SIGNAL_FOLDER=TIMESERIES
+		/SIGNAL_NAMES=&::EMG_name&_MEAN_temp
+		! /INCLUDE_MODELS=FALSE
+		;
+
+	Conditional_Statement_End
+	/ITERATION_PARAMETER_NAME=cond
+	;
+
+End_For_Each
+/ITERATION_PARAMETER_NAME=EMG_name
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=((("&::noraxon_exists&" = "TRUE") | (("&::noraxon_exists&" = "FALSE") &::AMP& ("&::normative_non_noraxon_file_exists&" = "TRUE")) | ("&::hide_messages&" = "FALSE")) > 0)
+! /AS_INTEGER=TRUE
+;
+
+	For_Each
+	/ITERATION_PARAMETER_NAME=EMG_signal_name
+	/ITERATION_PARAMETER_COUNT_NAME=inc
+	/ITEMS=::EMG_valid_names_list
+	;
+
+		Get_Pipeline_Parameter_Index_Value
+		/PARAMETER_NAME=p2d_signal_name
+		/PARAMETER_VALUE=::p2d_signal_names_list
+		/INDEX=::inc
+		;
+		
+		Evaluate_Expression
+		/EXPRESSION=P2D::PROCESSED::&::p2d_signal_name&:&:&Y + P2D::PROCESSED::&::p2d_signal_name&:&:&Z
+		! /SIGNAL_TYPES=
+		! /SIGNAL_FOLDER=ORIGINAL
+		! /SIGNAL_NAMES=
+		/RESULT_TYPES=P2D
+		/RESULT_FOLDERS=PROCESSED
+		/RESULT_NAME=&::p2d_signal_name&_reference4max
+		! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+		;
+
+		Metric_Maximum
+		/RESULT_METRIC_NAME=&::EMG_signal_name&_reference
+		!/APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+		/RESULT_METRIC_FOLDER=EMG
+		/SIGNAL_TYPES=P2D
+		/SIGNAL_NAMES=&::p2d_signal_name&_reference4max
+		/SIGNAL_FOLDER=PROCESSED
+		/SIGNAL_COMPONENTS=X
+		/EVENT_SEQUENCE=
+		/EXCLUDE_EVENTS=
+		/GENERATE_MEAN_AND_STDDEV=FALSE
+		! /APPEND_TO_EXISTING_VALUES=FALSE
+		! /CREATE_GLOBAL_MAXIMUM=FALSE
+		;
+		
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=("&::EMG_units_pct&" = "TRUE")
+		! /AS_INTEGER=TRUE
+		;
+
+			Evaluate_Expression
+			/EXPRESSION=P2D::PROCESSED::&::p2d_signal_name& / METRIC::EMG::&::EMG_signal_name&_reference * 100
+			! /SIGNAL_TYPES=
+			! /SIGNAL_FOLDER=ORIGINAL
+			! /SIGNAL_NAMES=
+			/RESULT_TYPES=P2D
+			/RESULT_FOLDERS=EMG
+			/RESULT_NAME=&::EMG_signal_name& 
+			! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+		
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond2
+		/EXPRESSION=("&::EMG_units_pct&" = "FALSE")
+		! /AS_INTEGER=TRUE
+		;
+
+			Evaluate_Expression
+			/EXPRESSION=P2D::PROCESSED::&::p2d_signal_name& * (METRIC::EMG::&::EMG_signal_name&_signal_MAX / METRIC::EMG::&::EMG_signal_name&_reference)
+			! /SIGNAL_TYPES=
+			! /SIGNAL_FOLDER=ORIGINAL
+			! /SIGNAL_NAMES=
+			/RESULT_TYPES=P2D
+			/RESULT_FOLDERS=EMG
+			/RESULT_NAME=&::EMG_signal_name& 
+			! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond2
+		;
+		
+		! make inverted copy of normatives to show them at RAW plots
+		Evaluate_Expression
+		/EXPRESSION=(P2D::EMG::&::EMG_signal_name&:&:&Y + P2D::EMG::&::EMG_signal_name&:&:&Z) * -1
+		/RESULT_NAME=&::EMG_signal_name&_inv_temp
+		/RESULT_TYPE=P2D
+		/RESULT_FOLDER=EMG
+		;
+
+		Evaluate_Expression
+		/EXPRESSION=vector(P2D::EMG::&::EMG_signal_name&:&:&X,P2D::EMG::&::EMG_signal_name&_inv_temp::X,P2D::EMG::&::EMG_signal_name&:&:&Z)
+		/RESULT_NAME=&::EMG_signal_name&_inv
+		/RESULT_TYPE=P2D
+		/RESULT_FOLDER=EMG
+		;
+
+		! plot green band 
+		Evaluate_Expression
+		/EXPRESSION=vector(P2D::EMG::&::EMG_signal_name&:&:&X,list(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0),P2D::EMG::&::EMG_signal_name&:&:&Y)
+		/RESULT_NAME=&::EMG_signal_name&_raw
+		/RESULT_TYPE=P2D
+		/RESULT_FOLDER=EMG
+		;
+
+		Evaluate_Expression
+		/EXPRESSION=vector(P2D::EMG::&::EMG_signal_name&:&:&X,list(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0),P2D::EMG::&::EMG_signal_name&_inv_temp:&:&X)
+		/RESULT_NAME=&::EMG_signal_name&_raw_inv
+		/RESULT_TYPE=P2D
+		/RESULT_FOLDER=EMG
+		;
+	 
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond3
+		/EXPRESSION=("&::EMG_units_pct&" = "TRUE")
+		! /AS_INTEGER=TRUE
+		;
+
+			Metric_Maximum
+			/RESULT_METRIC_NAME=&::EMG_signal_name&_reference_raw_MAX
+			!/APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+			/RESULT_METRIC_FOLDER=EMG
+			/SIGNAL_TYPES=P2D
+			/SIGNAL_NAMES=&::EMG_signal_name&_raw
+			/SIGNAL_FOLDER=EMG
+			/SIGNAL_COMPONENTS=Z
+			/EVENT_SEQUENCE=
+			/EXCLUDE_EVENTS=
+			/GENERATE_MEAN_AND_STDDEV=FALSE
+			! /APPEND_TO_EXISTING_VALUES=FALSE
+			! /CREATE_GLOBAL_MAXIMUM=FALSE
+			;
+
+			Metric_Minimum
+			/RESULT_METRIC_NAME=&::EMG_signal_name&_reference_raw_MIN
+			!/APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+			/RESULT_METRIC_FOLDER=EMG
+			/SIGNAL_TYPES=P2D
+			/SIGNAL_NAMES=&::EMG_signal_name&_raw_inv
+			/SIGNAL_FOLDER=EMG
+			/SIGNAL_COMPONENTS=Z
+			/EVENT_SEQUENCE=
+			/EXCLUDE_EVENTS=
+			/GENERATE_MEAN_AND_STDDEV=FALSE
+			! /APPEND_TO_EXISTING_VALUES=FALSE
+			! /CREATE_GLOBAL_MAXIMUM=FALSE
+			;
+
+			Evaluate_Expression
+			/EXPRESSION=P2D::EMG::&::EMG_signal_name&_raw * (100 / METRIC::EMG::&::EMG_signal_name&_reference_raw_MAX)
+			! /SIGNAL_TYPES=
+			! /SIGNAL_FOLDER=ORIGINAL
+			! /SIGNAL_NAMES=
+			/RESULT_TYPES=P2D
+			/RESULT_FOLDERS=EMG
+			/RESULT_NAME=&::EMG_signal_name&_raw
+			! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+			;
+
+			Evaluate_Expression
+			/EXPRESSION=P2D::EMG::&::EMG_signal_name&_raw_inv * (-100 / METRIC::EMG::&::EMG_signal_name&_signal_raw_MAX)
+			! /SIGNAL_TYPES=
+			! /SIGNAL_FOLDER=ORIGINAL
+			! /SIGNAL_NAMES=
+			/RESULT_TYPES=P2D
+			/RESULT_FOLDERS=EMG
+			/RESULT_NAME=&::EMG_signal_name&_raw_inv
+			! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+			;
+			
+			!overwrite the values with explicit ones set to 100
+			Metric_Explicit
+			/RESULT_METRIC_FOLDER=EMG
+			/RESULT_METRIC_NAME=&::EMG_signal_name&_signal_raw_MAX
+			/METRIC_VALUE=100
+			;
+
+			Metric_Explicit
+			/RESULT_METRIC_FOLDER=EMG
+			/RESULT_METRIC_NAME=&::EMG_signal_name&_signal_MAX
+			/METRIC_VALUE=100
+			;
+			
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond3
+		;
+		
+		! remove temporary files
+		Remove_Signals
+		/SIGNAL_TYPES=P2D
+		/SIGNAL_NAMES=&::EMG_signal_name&_inv_temp
+		/SIGNAL_FOLDER=EMG
+		;	
+
+	End_For_Each
+	/ITERATION_PARAMETER_NAME=EMG_signal_name
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;

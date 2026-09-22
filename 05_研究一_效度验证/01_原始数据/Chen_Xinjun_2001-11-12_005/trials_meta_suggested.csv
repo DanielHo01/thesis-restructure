@@ -1,0 +1,18 @@
+trial_id,load_kg,jump_type,arm,arm_amp_m,cm_jump_height_m,valid_mocap,oop_flag,oop_ratio,notes,suggested_arm
+4,0,CMJ,FREE_ARM?,0.2102,0.4308,True,OK,0.1448, arm_amp near threshold
+5,0,CMJ,FREE_ARM,0.2319,0.7287,True,Moderate,0.2412,
+6,0,CMJ,FREE_ARM,0.4431,1.8226,True,OK,0.1425, cm_jh suspiciously high vs FP JH=0.41m
+7,0,CMJ,FREE_ARM,0.7864,0.5803,True,Significant,0.5866, OOP large
+9,0,CMJ?,UNKNOWN,NA,NA,False,NA,NA, markers missing
+11,0,CMJ,NO_ARM?,0.0855,0.5138,True,Moderate,0.2217, arm_amp below 0.1m - possible NO_ARM
+12,0,CMJ,FREE_ARM,0.3878,1.0824,True,OK,0.1823, cm_jh high vs FP JH=0.48m
+13,0,CMJ,NO_ARM?,0.1116,0.5406,True,OK,0.1408, arm_amp below 0.15m threshold
+15,0,CMJ?,UNKNOWN,NA,NA,False,NA,NA, markers missing
+16,0,CMJ,FREE_ARM,0.9399,0.6429,True,Moderate,0.3481, largest arm_amp
+17,0,CMJ,FREE_ARM,0.9379,0.9662,True,Moderate,0.3143,
+18,20,CMJ?,UNKNOWN,NA,NA,False,NA,NA, markers missing
+19,20,CMJ,NO_ARM?,0.0599,0.3612,True,OK,0.1652, arm_amp very low
+20,20,CMJ?,UNKNOWN,NA,NA,False,NA,NA, markers missing
+22,40,CMJ,NO_ARM?,0.0456,0.3107,True,Significant,1.2985, OOP very large
+23,40,CMJ,NO_ARM?,0.0429,0.2987,True,OK,0.1694,
+24,40,CMJ?,UNKNOWN,NA,NA,False,NA,NA, markers missing

@@ -1,0 +1,372 @@
+! BEGIN_META
+! META_CMD_NAME	= MAP_Gait
+! META_PARAM	= model_used  :   string ::yes						
+! META_PARAM	= normative_data  :   string ::yes						
+! END_META
+
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!  Copyright notice
+!  This PAF and its content is copyright of Qualisys AB © 2012-2017. All rights reserved. 
+!  The PAF script is only to be used in conjunction with a Qualisys Motion Capture System. 
+!  Only legal PAF owners are entitled to use the script and only in relation with related PAF.
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+! Gait Profile Score (GPS)
+!====================
+! Based on: Baker, R. et al.: The Gait Profile Score and Movement Analysis Profile. Gait & Posture 30 (2009) 265-269
+
+! Following angles are used to cumpute GPS:
+! Pelvis Ant/Pst X
+! Pelvic Up/Dn Y
+! Pelvic Int/Ext Z
+
+! Hip Flx/Ext X
+! Hip Add/Abd Y
+! Hip Int/Ext Z
+
+! Knee Flx/Ext X
+
+! Ankle Dor/Pla X
+! Foot Int/Ext Z
+
+**__Add_a_Comment__**
+! /COMMENT=
+;
+
+!calculate Gait Variable Score (GVS) first
+For_Each
+/ITERATION_PARAMETER_NAME=ctrl_name
+/ITEMS=
+Left Pelvic Angles_X_LHS_LHS+
+Left Pelvic Angles_Y_LHS_LHS+
+Left Pelvic Angles_Z_LHS_LHS+
+Left Hip Angles_X_LHS_LHS+
+Left Hip Angles_Y_LHS_LHS+
+Left Hip Angles_Z_LHS_LHS+
+Left Knee Angles_X_LHS_LHS+
+Left Ankle Angles_X_LHS_LHS+
+Left Foot Progression_Z_LHS_LHS+
+Right Pelvic Angles_X_RHS_RHS+
+Right Pelvic Angles_Y_RHS_RHS+
+Right Pelvic Angles_Z_RHS_RHS+
+Right Hip Angles_X_RHS_RHS+
+Right Hip Angles_Y_RHS_RHS+
+Right Hip Angles_Z_RHS_RHS+
+Right Knee Angles_X_RHS_RHS+
+Right Ankle Angles_X_RHS_RHS+
+Right Foot Progression_Z_RHS_RHS
+;
+
+	!remove _LHS_LHS or _RHS_RHS from the end
+	Set_Pipeline_Parameter
+	/PARAMETER_NAME=tmp
+	/PARAMETER_VALUE=::ctrl_name
+	/PARAMETER_VALUE_SEARCH_FOR=_LHS_LHS
+	/PARAMETER_VALUE_REPLACE_WITH=
+	! /PARAMETER_VALUE_PREFIX=
+	! /PARAMETER_VALUE_APPEND=
+	;
+
+	Set_Pipeline_Parameter
+	/PARAMETER_NAME=tmp
+	/PARAMETER_VALUE=::tmp
+	/PARAMETER_VALUE_SEARCH_FOR=_RHS_RHS
+	/PARAMETER_VALUE_REPLACE_WITH=
+	! /PARAMETER_VALUE_PREFIX=
+	! /PARAMETER_VALUE_APPEND=
+	;
+
+	!remove component from the end
+	Set_Pipeline_Parameter
+	/PARAMETER_NAME=sig_name
+	/PARAMETER_VALUE=::tmp
+	/PARAMETER_VALUE_SEARCH_FOR=_X
+	/PARAMETER_VALUE_REPLACE_WITH=
+	! /PARAMETER_VALUE_PREFIX=
+	! /PARAMETER_VALUE_APPEND=
+	;
+
+	Set_Pipeline_Parameter
+	/PARAMETER_NAME=sig_name
+	/PARAMETER_VALUE=::sig_name
+	/PARAMETER_VALUE_SEARCH_FOR=_Y
+	/PARAMETER_VALUE_REPLACE_WITH=
+	! /PARAMETER_VALUE_PREFIX=
+	! /PARAMETER_VALUE_APPEND=
+	;
+
+	Set_Pipeline_Parameter
+	/PARAMETER_NAME=sig_name
+	/PARAMETER_VALUE=::sig_name
+	/PARAMETER_VALUE_SEARCH_FOR=_Z
+	/PARAMETER_VALUE_REPLACE_WITH=
+	! /PARAMETER_VALUE_PREFIX=
+	! /PARAMETER_VALUE_APPEND=
+	;
+
+	!remove everything but the signal component so that it can be stored
+	Set_Pipeline_Parameter
+	/PARAMETER_NAME=component
+	/PARAMETER_VALUE=::tmp
+	/PARAMETER_VALUE_SEARCH_FOR=::sig_name&_X
+	/PARAMETER_VALUE_REPLACE_WITH=X
+	! /PARAMETER_VALUE_PREFIX=
+	! /PARAMETER_VALUE_APPEND=
+	;
+
+	Set_Pipeline_Parameter
+	/PARAMETER_NAME=component
+	/PARAMETER_VALUE=::component
+	/PARAMETER_VALUE_SEARCH_FOR=::sig_name&_Y
+	/PARAMETER_VALUE_REPLACE_WITH=Y
+	! /PARAMETER_VALUE_PREFIX=
+	! /PARAMETER_VALUE_APPEND=
+	;
+
+	Set_Pipeline_Parameter
+	/PARAMETER_NAME=component
+	/PARAMETER_VALUE=::component
+	/PARAMETER_VALUE_SEARCH_FOR=::sig_name&_Z
+	/PARAMETER_VALUE_REPLACE_WITH=Z
+	! /PARAMETER_VALUE_PREFIX=
+	! /PARAMETER_VALUE_APPEND=
+	;
+	
+	!find LHS or RHS in signal name so that it can be used later
+	Set_Pipeline_Parameter
+	/PARAMETER_NAME=event
+	/PARAMETER_VALUE=::ctrl_name
+	/PARAMETER_VALUE_SEARCH_FOR=::sig_name&_&::component&_LHS_LHS
+	/PARAMETER_VALUE_REPLACE_WITH=LHS
+	! /PARAMETER_VALUE_PREFIX=
+	! /PARAMETER_VALUE_APPEND=
+	;
+
+	Set_Pipeline_Parameter
+	/PARAMETER_NAME=event
+	/PARAMETER_VALUE=::event
+	/PARAMETER_VALUE_SEARCH_FOR=::sig_name&_&::component&_RHS_RHS
+	/PARAMETER_VALUE_REPLACE_WITH=RHS
+	! /PARAMETER_VALUE_PREFIX=
+	! /PARAMETER_VALUE_APPEND=
+	;
+
+	! replace "Right" in Control as only left control is substracted
+	Set_Pipeline_Parameter
+	/PARAMETER_NAME=ctrl_name_left
+	/PARAMETER_VALUE=::ctrl_name
+	/PARAMETER_VALUE_SEARCH_FOR=Right
+	/PARAMETER_VALUE_REPLACE_WITH=Left
+	! /PARAMETER_VALUE_PREFIX=
+	! /PARAMETER_VALUE_APPEND=
+	;
+
+	! replace "RHS_RHS" in Control as only left control is substracted
+	Set_Pipeline_Parameter
+	/PARAMETER_NAME=ctrl_name_left
+	/PARAMETER_VALUE=::ctrl_name_left
+	/PARAMETER_VALUE_SEARCH_FOR=RHS_RHS
+	/PARAMETER_VALUE_REPLACE_WITH=LHS_LHS
+	! /PARAMETER_VALUE_PREFIX=
+	! /PARAMETER_VALUE_APPEND=
+	;
+
+	!start the actual calculation
+	Select_Active_File
+	/FILE_NAME=Dynamic
+	! /QUERY=
+	;
+
+	Set_Pipeline_Parameter
+	/PARAMETER_NAME=sig_folder
+	/PARAMETER_VALUE=ORIGINAL
+	;
+
+	Conditional_Statement
+	/ITERATION_PARAMETER_NAME=cond
+	/EXPRESSION=(("&::model_used&" = "CGM") &::AMP& (("&::sig_name&" = "Left Ankle Angles") | ("&::sig_name&" = "Right Ankle Angles")))
+	! /AS_INTEGER=TRUE
+	;
+
+		Set_Pipeline_Parameter
+		/PARAMETER_NAME=sig_folder
+		/PARAMETER_VALUE=PROCESSED
+		;
+		
+	Conditional_Statement_End
+	/ITERATION_PARAMETER_NAME=cond
+	;
+
+	Global_Normalized_Signal_Mean
+	/SIGNAL_TYPES=LINK_MODEL_BASED
+	/SIGNAL_NAMES=::sig_name
+	/SIGNAL_FOLDER=::sig_folder
+	/SIGNAL_COMPONENTS=::component
+	! /COMPONENT_SEQUENCE=
+	! /START_LABEL=
+	! /END_LABEL=
+	/EVENT_SEQUENCE=::event&+&::event
+	! /EXCLUDE_EVENTS=
+	/RESULT_NAME=::sig_name&_&::component
+	/RESULT_FOLDER=MEAN
+	! /NORMALIZE_POINTS=101
+	/CREATE_STANDARD_DEVIATION=TRUE
+	/CALCULATE_PER_FILE=TRUE
+	;
+
+	!calculate GVS
+	!patient (each trial - mean of controls)
+	Evaluate_Expression 
+	/EXPRESSION=P2D::MEAN::&::sig_name&_&::component&:&:Y - GLOBAL::P2D::PROCESSED::&::ctrl_name_left&:&:Y
+	/RESULT_NAME=&::sig_name&_&::component&_sub
+	/RESULT_TYPE=DERIVED 
+	/RESULT_FOLDER=MAP
+	;
+
+	Metric_Root_Mean_Squared
+	/RESULT_METRIC_NAME=&::sig_name&_&::component&_gvs
+	/APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+	/RESULT_METRIC_FOLDER=MAP
+	/SIGNAL_TYPES=DERIVED
+	/SIGNAL_NAMES=&::sig_name&_&::component&_sub
+	/SIGNAL_FOLDER=MAP
+	/SIGNAL_COMPONENTS=
+	/COMPONENT_SEQUENCE=ALL_COMPONENTS
+	/EVENT_SEQUENCE=BOF+EOF
+	/EXCLUDE_EVENTS=
+	/GENERATE_MEAN_AND_STDDEV=FALSE
+	! /APPEND_TO_EXISTING_VALUES=FALSE
+	;
+
+	! compute median for patient
+	Evaluate_Expression 
+	/EXPRESSION=log(METRIC::MAP&:&:&::sig_name&_&::component&_gvs)
+	/RESULT_NAME=&::sig_name&_&::component&_gvs_ln
+	/RESULT_TYPE=METRIC 
+	/RESULT_FOLDER=MAP
+	;
+
+	Metric_Mean
+	/RESULT_METRIC_NAME=_mean
+	/APPLY_AS_SUFFIX_TO_SIGNAL_NAME=TRUE
+	/RESULT_METRIC_FOLDER=MAP
+	/SIGNAL_TYPES=METRIC
+	/SIGNAL_NAMES=&::sig_name&_&::component&_gvs_ln
+	/SIGNAL_FOLDER=MAP
+	/SIGNAL_COMPONENTS=
+	/COMPONENT_SEQUENCE=ALL_COMPONENTS
+	/EVENT_SEQUENCE=BOF+EOF
+	/EXCLUDE_EVENTS=
+	/GENERATE_MEAN_AND_STDDEV=TRUE
+	! /APPEND_TO_EXISTING_VALUES=FALSE
+	;
+	
+	Evaluate_Expression 
+	/EXPRESSION=2.718281828459045^GLOBAL::METRIC::MAP&:&:&::sig_name&_&::component&_gvs_ln_mean_MEAN
+	/RESULT_NAME=GLOBAL::&::sig_name&_&::component&_gvs_MEDIAN
+	/RESULT_TYPE=METRIC 
+	/RESULT_FOLDER=MAP
+	;
+
+	!compute IRQ+
+	Evaluate_Expression 
+	/EXPRESSION=2.718281828459045^(GLOBAL::METRIC::MAP&:&:&::sig_name&_&::component&_gvs_ln_mean_MEAN+GLOBAL::METRIC::MAP&:&:&::sig_name&_&::component&_gvs_ln_mean_STDDEV)-GLOBAL::METRIC::MAP&:&:&::sig_name&_&::component&_gvs_MEDIAN
+	/RESULT_NAME=GLOBAL::&::sig_name&_&::component&_IQR
+	/RESULT_TYPE=METRIC 
+	/RESULT_FOLDER=MAP
+	;
+		
+End_For_Each
+/ITERATION_PARAMETER_NAME=ctrl_name
+;
+
+Select_Active_File
+/FILE_NAME=Dynamic
+! /QUERY=
+;
+
+! calculate GPS for left, right and overall for patient
+Evaluate_Expression 
+/EXPRESSION=sqrt((METRIC::MAP::Left Ankle Angles_X_gvs^2 + METRIC::MAP::Left Foot Progression_Z_gvs^2 + METRIC::MAP::Left Hip Angles_X_gvs^2 + METRIC::MAP::Left Hip Angles_Y_gvs^2 + METRIC::MAP::Left Hip Angles_Z_gvs^2 + METRIC::MAP::Left Knee Angles_X_gvs^2 + METRIC::MAP::Left Pelvic Angles_X_gvs^2 + METRIC::MAP::Left Pelvic Angles_Y_gvs^2 + METRIC::MAP::Left Pelvic Angles_Z_gvs^2) / 9)
+/RESULT_NAME=Left_GPS
+/RESULT_TYPE=METRIC 
+/RESULT_FOLDER=MAP
+;
+
+Evaluate_Expression 
+/EXPRESSION=sqrt((METRIC::MAP::Right Ankle Angles_X_gvs^2+METRIC::MAP::Right Foot Progression_Z_gvs^2+METRIC::MAP::Right Hip Angles_X_gvs^2+METRIC::MAP::Right Hip Angles_Y_gvs^2+METRIC::MAP::Right Hip Angles_Z_gvs^2+METRIC::MAP::Right Knee Angles_X_gvs^2+METRIC::MAP::Right Pelvic Angles_X_gvs^2+METRIC::MAP::Right Pelvic Angles_Y_gvs^2+METRIC::MAP::Right Pelvic Angles_Z_gvs^2)/9)
+/RESULT_NAME=Right_GPS
+/RESULT_TYPE=METRIC 
+/RESULT_FOLDER=MAP
+;
+
+Evaluate_Expression 
+/EXPRESSION=sqrt((METRIC::MAP::Left Ankle Angles_X_gvs^2+METRIC::MAP::Left Foot Progression_Z_gvs^2+METRIC::MAP::Left Hip Angles_X_gvs^2+METRIC::MAP::Left Hip Angles_Y_gvs^2+METRIC::MAP::Left Hip Angles_Z_gvs^2+METRIC::MAP::Left Knee Angles_X_gvs^2+ METRIC::MAP::Left Pelvic Angles_X_gvs^2 + METRIC::MAP::Left Pelvic Angles_Y_gvs^2 + METRIC::MAP::Left Pelvic Angles_Z_gvs^2+METRIC::MAP::Right Ankle Angles_X_gvs^2+METRIC::MAP::Right Foot Progression_Z_gvs^2+METRIC::MAP::Right Hip Angles_X_gvs^2+METRIC::MAP::Right Hip Angles_Y_gvs^2+METRIC::MAP::Right Hip Angles_Z_gvs^2+METRIC::MAP::Right Knee Angles_X_gvs^2)/15)
+/RESULT_NAME=Overall_GPS
+/RESULT_TYPE=METRIC 
+/RESULT_FOLDER=MAP
+;
+
+!compute GLOBAL GPS mean, std and median for patient
+For_Each
+/ITERATION_PARAMETER_NAME=gps
+/ITEMS=Left_GPS+Right_GPS+Overall_GPS
+;
+
+	! compute median for patient
+	Evaluate_Expression 
+	/EXPRESSION=log(METRIC::MAP&:&:&::gps&)
+	/RESULT_NAME=&::gps&_ln
+	/RESULT_TYPE=METRIC 
+	/RESULT_FOLDER=MAP
+	;
+
+	Metric_Mean
+	/RESULT_METRIC_NAME=_mean
+	/APPLY_AS_SUFFIX_TO_SIGNAL_NAME=TRUE
+	/RESULT_METRIC_FOLDER=MAP
+	/SIGNAL_TYPES=METRIC
+	/SIGNAL_NAMES=&::gps&_ln
+	/SIGNAL_FOLDER=MAP
+	/SIGNAL_COMPONENTS=
+	/COMPONENT_SEQUENCE=ALL_COMPONENTS
+	/EVENT_SEQUENCE=BOF+EOF
+	/EXCLUDE_EVENTS=
+	/GENERATE_MEAN_AND_STDDEV=TRUE
+	! /APPEND_TO_EXISTING_VALUES=FALSE
+	;
+	
+	Evaluate_Expression 
+	/EXPRESSION=2.718281828459045^GLOBAL::METRIC::MAP&:&:&::gps&_ln_mean_MEAN
+	/RESULT_NAME=GLOBAL::&::gps&_MEDIAN
+	/RESULT_TYPE=METRIC 
+	/RESULT_FOLDER=MAP
+	;
+	
+	!compute meas and sd
+	Metric_Mean
+	/RESULT_METRIC_NAME=_mean
+	/APPLY_AS_SUFFIX_TO_SIGNAL_NAME=TRUE
+	/RESULT_METRIC_FOLDER=MAP
+	/SIGNAL_TYPES=METRIC
+	/SIGNAL_NAMES=::gps
+	/SIGNAL_FOLDER=MAP
+	/SIGNAL_COMPONENTS=
+	/COMPONENT_SEQUENCE=ALL_COMPONENTS
+	/EVENT_SEQUENCE=BOF+EOF
+	/EXCLUDE_EVENTS=
+	/GENERATE_MEAN_AND_STDDEV=TRUE
+	! /APPEND_TO_EXISTING_VALUES=FALSE
+	;
+
+	!compute IRQ+
+	Evaluate_Expression 
+	/EXPRESSION=2.718281828459045^(GLOBAL::METRIC::MAP&:&:&::gps&_ln_mean_MEAN+GLOBAL::METRIC::MAP&:&:&::gps&_ln_mean_STDDEV)-GLOBAL::METRIC::MAP&:&:&::gps&_MEDIAN
+	/RESULT_NAME=GLOBAL::&::gps&_IQR
+	/RESULT_TYPE=METRIC 
+	/RESULT_FOLDER=MAP
+	;
+	
+End_For_Each
+/ITERATION_PARAMETER_NAME=gps
+;

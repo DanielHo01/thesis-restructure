@@ -1,0 +1,337 @@
+! BEGIN_META
+! META_CMD_NAME	= EMG_Filter_Gait
+! META_PARAM	= normativeDirectory  :   string ::yes						
+! META_PARAM	= noraxon_exists  :   string ::yes						
+! META_PARAM	= mega_me6000_exists  :   string ::yes						
+! META_PARAM	= delsys_trigno_exists  :   string ::yes						
+! META_PARAM	= myon_exists  :   string ::yes						
+! META_PARAM	= analog_EMG_exists  :   string ::yes						
+! META_PARAM	= normative_non_noraxon_file_exists  :   string ::yes						
+! META_PARAM	= EMG_signal_names  :   string ::yes						
+! META_PARAM	= EMG_high_pass_filter  :   string ::yes						
+! META_PARAM	= EMG_high_pass_bidir_pass  :   string ::yes						
+! META_PARAM	= EMG_low_pass_filter  :   string ::yes						
+! META_PARAM	= EMG_low_pass_bidir_pass  :   string ::yes						
+! META_PARAM	= EMG_rectify  :   string ::yes						
+! META_PARAM	= EMG_rms_window  :   string ::yes						
+! META_PARAM	= EMG_unit_multiply  :   string ::yes						
+! END_META
+
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!  Copyright notice
+!  This PAF and its content is copyright of Qualisys AB © 2012-2019. All rights reserved. 
+!  The PAF script is only to be used in conjunction with a Qualisys Motion Capture System. 
+!  Only legal PAF owners are entitled to use the script and only in relation with related PAF.
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+!=========================================
+! Load normative data for EMG
+!=========================================
+
+**__Add_a_Comment__**
+! /COMMENT=
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::noraxon_exists&" = "TRUE")
+! /AS_INTEGER=TRUE
+;
+
+	File_Open
+	/FILE_NAME=&::normativeDirectory&EMG_normatives_Noraxon.vnd
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=((("&::mega_me6000_exists&" = "TRUE") | ("&::delsys_trigno_exists&" = "TRUE") | ("&::myon_exists&" = "TRUE") | ("&::analog_EMG_exists&" = "TRUE")) &::AMP& ("&::normative_non_noraxon_file_exists&" = "TRUE"))
+! /AS_INTEGER=TRUE
+;
+
+	File_Open
+	/FILE_NAME=&::normativeDirectory&EMG_normatives.vnd
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+!=========================================
+! Filter signals
+!=========================================
+
+Select_Active_File
+/FILE_NAME=Dynamic
+! /QUERY=
+;
+
+Set_Pipeline_Parameter
+/PARAMETER_NAME=EMG_SIGNALS
+/PARAMETER_VALUE=&::EMG_signal_names
+! /PARAMETER_VALUE_SEARCH_FOR=
+! /PARAMETER_VALUE_REPLACE_WITH=
+! /PARAMETER_VALUE_PREFIX=
+! /PARAMETER_VALUE_APPEND=
+;
+
+For_Each
+/ITERATION_PARAMETER_NAME=EMG_ch
+/ITEMS=::EMG_SIGNALS
+;
+
+	Evaluate_Expression 
+	/EXPRESSION=ANALOG::ORIGINAL::&::EMG_ch 
+	/RESULT_NAME=&::EMG_ch 
+	/RESULT_TYPE=ANALOG 
+	/RESULT_FOLDER=EMG_RAW
+	; 
+	
+	!also put a copy of the raw signal into the processed folder so it is available for the next steps
+	Evaluate_Expression 
+	/EXPRESSION=ANALOG::ORIGINAL::&::EMG_ch 
+	/RESULT_NAME=&::EMG_ch 
+	/RESULT_TYPE=ANALOG 
+	/RESULT_FOLDER=EMG_PROCESSED
+	; 
+
+End_For_Each
+/ITERATION_PARAMETER_NAME=EMG_ch
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(&::EMG_high_pass_filter& > 0)
+! /AS_INTEGER=TRUE
+;
+
+	Highpass_Filter
+	/SIGNAL_TYPES=ANALOG
+	/SIGNAL_NAMES=
+	/SIGNAL_FOLDER=EMG_PROCESSED
+	! /RESULT_SUFFIX=
+	/RESULT_FOLDER=EMG_PROCESSED
+	! /FILTER_CLASS=BUTTERWORTH
+	/FREQUENCY_CUTOFF=::EMG_high_pass_filter
+	! /NUM_REFLECTED=6
+	! /TOTAL_BUFFER_SIZE=6
+	/NUM_BIDIRECTIONAL_PASSES=::EMG_high_pass_bidir_pass
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(&::EMG_low_pass_filter& > 0)
+! /AS_INTEGER=TRUE
+;
+
+	Lowpass_Filter
+	/SIGNAL_TYPES=ANALOG
+	/SIGNAL_NAMES=
+	/SIGNAL_FOLDER=EMG_PROCESSED
+	! /RESULT_SUFFIX=
+	/RESULT_FOLDER=EMG_PROCESSED
+	! /FILTER_CLASS=BUTTERWORTH
+	/FREQUENCY_CUTOFF=::EMG_low_pass_filter
+	! /NUM_REFLECTED=6
+	! /TOTAL_BUFFER_SIZE=6
+	/NUM_BIDIRECTIONAL_PASSES=::EMG_low_pass_bidir_pass
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(&::EMG_rectify& > 0)
+! /AS_INTEGER=TRUE
+;
+
+	Rectify
+	/SIGNAL_TYPES=ANALOG
+	/SIGNAL_NAMES=
+	/SIGNAL_FOLDER=EMG_PROCESSED
+	/RESULT_NAMES=
+	! /RESULT_TYPES=
+	/RESULT_FOLDER=EMG_PROCESSED
+	! /RESULT_SUFFIX=
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(&::EMG_rms_window& > 0)
+! /AS_INTEGER=TRUE
+;
+
+	! ------------------------------------------- 
+	! the following is from http://www.c-motion.com/v3dwiki/index.php?title=Moving_RMS
+	! copy the analog rate from the c3d parameter to a metric value 
+	! ------------------------------------------- 
+
+	Metric_From_Parameter 
+	/METRIC_NAME=ANALOG_RATE 
+	/PARAMETER_GROUP=ANALOG 
+	/PARAMETER_NAME=RATE 
+	; 
+
+	! ------------------------------------------- 
+	! compute the number of frames equivalent to a x ms window 
+	! ------------------------------------------- 
+
+	Evaluate_Expression 
+	/EXPRESSION=round(1+&::EMG_rms_window&/1000*METRIC::PROCESSED::ANALOG_RATE)
+	/RESULT_NAME=RMS_FRAMES 
+	/RESULT_TYPE=METRIC 
+	! /RESULT_FOLDER=PROCESSED 
+	; 
+
+	!make sure that RMS_FRAMES is odd number
+	Evaluate_Expression 
+	/EXPRESSION=fmod(METRIC::PROCESSED::RMS_FRAMES,round(METRIC::PROCESSED::RMS_FRAMES /2))
+	/RESULT_NAME=fmod_temp
+	/RESULT_TYPE=METRIC 
+	! /RESULT_FOLDER=PROCESSED 
+	; 
+
+	Expression_Loop
+	/ITERATION_PARAMETER_NAME=loop
+	/EXPRESSION=METRIC::PROCESSED::fmod_temp = 0
+	/AS_INTEGER=FALSE
+	;
+
+		Evaluate_Expression 
+		/EXPRESSION=1 + METRIC::PROCESSED::RMS_FRAMES
+		/RESULT_NAME=RMS_FRAMES 
+		/RESULT_TYPE=METRIC 
+		! /RESULT_FOLDER=PROCESSED 
+		;
+
+	Expression_Loop_End
+	/ITERATION_PARAMETER_NAME=loop
+	;
+
+	Expression_Loop
+	/ITERATION_PARAMETER_NAME=loop
+	/EXPRESSION=METRIC::PROCESSED::fmod_temp <> 0
+	/AS_INTEGER=FALSE
+	;
+
+		Evaluate_Expression 
+		/EXPRESSION=METRIC::PROCESSED::RMS_FRAMES
+		/RESULT_NAME=RMS_FRAMES 
+		/RESULT_TYPE=METRIC 
+		! /RESULT_FOLDER=PROCESSED 
+		;
+
+	Expression_Loop_End
+	/ITERATION_PARAMETER_NAME=loop
+	;
+
+	Remove_Signals
+	/SIGNAL_TYPES=METRIC
+	/SIGNAL_FOLDER=PROCESSED
+	/SIGNAL_NAMES=fmod_temp
+	! /INCLUDE_MODELS=FALSE
+	;
+
+	! -------------------------------------------- 
+	! compute a moving rms with a window of 100 ms 
+	! -------------------------------------------- 
+
+	Moving_RMS 
+	/SIGNAL_TYPES=ANALOG 
+	!/SIGNAL_NAMES=
+	/SIGNAL_FOLDER=EMG_PROCESSED 
+	! /RESULT_SUFFIX= 
+	/RESULT_FOLDER=EMG_PROCESSED 
+	/NUM_WINDOW_FRAMES=METRIC::PROCESSED::RMS_FRAMES 
+	; 
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+For_Each
+/ITERATION_PARAMETER_NAME=EMG_signal_name
+! /ITERATION_PARAMETER_COUNT_NAME=
+/ITEMS=::EMG_signal_names
+;
+
+	Metric_Mean
+	/RESULT_METRIC_NAME=&::EMG_signal_name&_shift
+	! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+	/RESULT_METRIC_FOLDER=EMG
+	/SIGNAL_TYPES=ANALOG
+	/SIGNAL_NAMES=::EMG_signal_name
+	/SIGNAL_FOLDER=EMG_RAW
+	! /SIGNAL_COMPONENTS=ALL_COMPONENTS
+	/EVENT_SEQUENCE=
+	/EXCLUDE_EVENTS=
+	/GENERATE_MEAN_AND_STDDEV=FALSE
+	! /APPEND_TO_EXISTING_VALUES=FALSE
+	;
+
+	Evaluate_Expression
+	/EXPRESSION=ANALOG::EMG_RAW::&::EMG_signal_name& - METRIC::EMG::&::EMG_signal_name&_shift
+	/RESULT_NAME=::EMG_signal_name
+	/RESULT_TYPE=ANALOG
+	/RESULT_FOLDER=EMG_RAW_web
+	;
+	
+End_For_Each
+/ITERATION_PARAMETER_NAME=EMG_signal_name
+;
+
+Delete_Folder
+/SIGNAL_TYPE=ANALOG
+/FOLDER=EMG_RAW
+;
+
+! Rename_Folder
+! /SIGNAL_TYPE=ANALOG
+! /EXISTING_FOLDER=EMG_RAW_web
+! /NEW_FOLDER_NAME=EMG_RAW
+! ;
+
+Copy_Folder
+/SIGNAL_TYPE=ANALOG
+/EXISTING_FOLDER=EMG_RAW_web
+/NEW_FOLDER_NAME=EMG_RAW
+/OVERWRITE_EXISTING_SIGNALS=TRUE
+;
+
+! Multiply EMG signals by 1 000 000. Units should be microV now
+Multiply_Signals_By_Constant
+/SIGNAL_TYPES=ANALOG
+! /SIGNAL_NAMES=
+/SIGNAL_FOLDER=EMG_PROCESSED
+! /RESULT_NAMES=
+/RESULT_TYPES=ANALOG
+/RESULT_FOLDER=EMG_PROCESSED
+!/RESULT_SUFFIX=
+! /SIGNAL_COMPONENTS=
+/CONSTANT=::EMG_unit_multiply
+;
+
+Multiply_Signals_By_Constant
+/SIGNAL_TYPES=ANALOG
+! /SIGNAL_NAMES=
+/SIGNAL_FOLDER=EMG_RAW
+! /RESULT_NAMES=
+/RESULT_TYPES=ANALOG
+/RESULT_FOLDER=EMG_RAW
+!/RESULT_SUFFIX=
+! /SIGNAL_COMPONENTS=
+/CONSTANT=::EMG_unit_multiply
+;

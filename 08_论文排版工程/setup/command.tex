@@ -1,0 +1,29 @@
+% setup/command.tex - 自定义命令
+
+% ========== 常用缩写 ==========
+\newcommand{\cn}{\text{C}}
+\newcommand{\en}{\text{E}}
+\newcommand{\ie}{i.e.}
+\newcommand{\eg}{e.g.}
+\newcommand{\etal}{\textit{et al.}}
+
+% ========== 图表引用命令 ==========
+\providecommand{\figref}[1]{图~\ref{fig:#1}}
+\providecommand{\tabref}[1]{表~\ref{tab:#1}}
+\providecommand{\eqnref}[1]{式~(\ref{eq:#1})}
+
+% ========== 实验相关 ==========
+\newcommand{\subject}{被试}
+\newcommand{\task}{任务}
+\newcommand{\measure}{测量指标}
+\newcommand{\protocol}{实验流程}
+
+% ========== 表格符号（amssymb math commands, safe） ==========
+\DeclareRobustCommand{\cmark}{$^\checkmark$}
+\DeclareRobustCommand{\xmark}{$^\times$}
+
+% ========== 数智化监控相关 ==========
+\newcommand{\imu}{惯性测量单元}
+\newcommand{\emg}{表面肌电}
+\newcommand{\forceplate}{测力台}
+\newcommand{\motioncapture}{动作捕捉}

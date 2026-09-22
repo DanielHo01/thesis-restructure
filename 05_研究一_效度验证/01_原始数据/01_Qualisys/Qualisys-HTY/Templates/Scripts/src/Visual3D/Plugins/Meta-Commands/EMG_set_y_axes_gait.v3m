@@ -1,0 +1,681 @@
+! BEGIN_META
+! META_CMD_NAME	= EMG_Set_Y_Axes_Gait
+! META_PARAM	= page_number  :   string ::yes						
+! META_PARAM	= first_EMG_page  :   string ::yes						
+! META_PARAM	= EMG_names_array_left_exists  :   string ::yes						
+! META_PARAM	= EMG_names_array_right_exists  :   string ::yes						
+! META_PARAM	= EMG_graph_signals_name_left  :   string ::yes						
+! META_PARAM	= EMG_graph_signals_name_right  :   string ::yes						
+! META_PARAM	= count_EMG_signals_left  :   string ::yes						
+! META_PARAM	= count_EMG_signals_right  :   string ::yes						
+! END_META
+
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!  Copyright notice
+!  This PAF and its content is copyright of Qualisys AB © 2012-2017. All rights reserved. 
+!  The PAF script is only to be used in conjunction with a Qualisys Motion Capture System. 
+!  Only legal PAF owners are entitled to use the script and only in relation with related PAF.
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Select_Active_File
+/FILE_NAME=GLOBAL
+! /QUERY=
+;
+
+! LEFT Filtered and raw ----------------
+Set_Pipeline_Parameter
+/PARAMETER_NAME=row
+/PARAMETER_VALUE=1
+;
+
+Set_Pipeline_Parameter
+/PARAMETER_NAME=col
+/PARAMETER_VALUE=1
+;
+
+Set_Pipeline_Parameter
+/PARAMETER_NAME=left
+/PARAMETER_VALUE=0
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::EMG_names_array_left_exists&" = "TRUE")
+! /AS_INTEGER=TRUE
+;
+
+	For_Each
+	/ITERATION_PARAMETER_NAME=EMG_graph_signal_name_left
+	! /ITERATION_PARAMETER_COUNT_NAME=
+	/ITEMS=::EMG_graph_signals_name_left
+	;
+
+		Set_Pipeline_Parameter
+		/PARAMETER_NAME=page_number
+		/PARAMETER_VALUE=::first_EMG_page
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=(&::left& = 4)
+		! /AS_INTEGER=TRUE
+		;
+
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=row
+			/PARAMETER_VALUE=1
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+	
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=(&::left& > 3)
+		! /AS_INTEGER=TRUE
+		;
+
+			Set_Pipeline_Parameter_From_Expression
+			/PARAMETER_NAME=page_number
+			/EXPRESSION=&::page_number& + 1
+			! /AS_INTEGER=TRUE
+			;
+		
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+	
+		! set y axis minimum to 0 and maximum to maximum of EMG signal value 
+		Evaluate_Expression
+		/EXPRESSION=GLOBAL::METRIC::EMG::&::EMG_graph_signal_name_left&_signal_MAX
+		/RESULT_NAME=GLOBAL::Y_AXIS_MAX
+		/RESULT_TYPE=METRIC
+		/RESULT_FOLDER=EMG
+		;
+
+		Set_Pipeline_Parameter_To_Data_Value
+		/PARAMETER_NAME=Y_AXIS_MAX
+		/SIGNAL_TYPES=METRIC
+		/SIGNAL_NAMES=Y_AXIS_MAX
+		/SIGNAL_FOLDER=EMG
+		! /SIGNAL_COMPONENTS=ALL_COMPONENTS
+		;
+		
+		Modify_Line_Graph
+		/PAGE_NUMBER=&::page_number
+		/COLUMN_NUMBER=&::col
+		/ROW_NUMBER=&::row
+		! /COLUMN_SPAN=1
+		! /ROW_SPAN=1
+		! /GRAPH_TITLE=
+		/GRAPH_TITLE_COLOR=Dark Red
+		! /X_AXIS_LABEL=
+		! /X_AXIS_SCALE=Normalize 0% to 100%
+		! /X_AXIS_MIN=
+		! /X_AXIS_MAX=
+		! /Y_AXIS_LABEL=
+		/Y_AXIS_SCALE=By Explicit Setting
+		/Y_AXIS_MIN=0
+		/Y_AXIS_MAX=::Y_AXIS_MAX
+		! /Y_USE_SCIENTIFIC_NOTATION=FALSE
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=(&::count_EMG_signals_left& <= 4)
+		! /AS_INTEGER=TRUE
+		;
+
+			Set_Pipeline_Parameter_From_Expression
+			/PARAMETER_NAME=page_number2
+			/EXPRESSION=&::page_number& + 1
+			! /AS_INTEGER=TRUE
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=(&::count_EMG_signals_left& > 4)
+		! /AS_INTEGER=TRUE
+		;
+
+			Set_Pipeline_Parameter_From_Expression
+			/PARAMETER_NAME=page_number2
+			/EXPRESSION=&::page_number& + 2
+			! /AS_INTEGER=TRUE
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+		
+		Evaluate_Expression
+		/EXPRESSION=GLOBAL::METRIC::EMG::&::EMG_graph_signal_name_left&_signal_raw_MAX
+		/RESULT_NAME=GLOBAL::Y_AXIS_MAX
+		/RESULT_TYPE=METRIC
+		/RESULT_FOLDER=EMG
+		;
+
+		Set_Pipeline_Parameter_To_Data_Value
+		/PARAMETER_NAME=Y_AXIS_MAX
+		/SIGNAL_TYPES=METRIC
+		/SIGNAL_NAMES=Y_AXIS_MAX
+		/SIGNAL_FOLDER=EMG
+		! /SIGNAL_COMPONENTS=ALL_COMPONENTS
+		;
+
+		Modify_Line_Graph
+		/PAGE_NUMBER=&::page_number2
+		/COLUMN_NUMBER=&::col
+		/ROW_NUMBER=&::row 
+		! /COLUMN_SPAN=1
+		! /ROW_SPAN=1
+		! /GRAPH_TITLE=
+		/GRAPH_TITLE_COLOR=Dark Red
+		! /X_AXIS_LABEL=
+		! /X_AXIS_SCALE=Normalize 0% to 100%
+		! /X_AXIS_MIN=
+		! /X_AXIS_MAX=
+		! /Y_AXIS_LABEL=
+		/Y_AXIS_SCALE=By Explicit Setting
+		/Y_AXIS_MIN=-&::Y_AXIS_MAX
+		/Y_AXIS_MAX=::Y_AXIS_MAX
+		! /Y_USE_SCIENTIFIC_NOTATION=FALSE
+		;
+		
+		Set_Pipeline_Parameter_From_Expression
+		/PARAMETER_NAME=row
+		/EXPRESSION=&::row& + 1
+		! /AS_INTEGER=TRUE
+		;
+		
+		Set_Pipeline_Parameter_From_Expression
+		/PARAMETER_NAME=left
+		/EXPRESSION=&::left& + 1
+		! /AS_INTEGER=TRUE
+		;
+
+	End_For_Each
+	/ITERATION_PARAMETER_NAME=EMG_graph_signal_name_left
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+! Right Filtered and Raw ----------------
+
+Set_Pipeline_Parameter
+/PARAMETER_NAME=row
+/PARAMETER_VALUE=1
+;
+
+Set_Pipeline_Parameter
+/PARAMETER_NAME=col
+/PARAMETER_VALUE=2
+;
+
+Set_Pipeline_Parameter
+/PARAMETER_NAME=right
+/PARAMETER_VALUE=0
+;
+		
+Set_Pipeline_Parameter
+/PARAMETER_NAME=page_number
+/PARAMETER_VALUE=::first_EMG_page
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::EMG_names_array_right_exists&" = "TRUE")
+! /AS_INTEGER=TRUE
+;
+
+	For_Each
+	/ITERATION_PARAMETER_NAME=EMG_graph_signal_name_right
+	! /ITERATION_PARAMETER_COUNT_NAME=
+	/ITEMS=::EMG_graph_signals_name_right
+	;
+
+		Set_Pipeline_Parameter
+		/PARAMETER_NAME=page_number
+		/PARAMETER_VALUE=::first_EMG_page
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=(&::right& = 4)
+		! /AS_INTEGER=TRUE
+		;
+
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=row
+			/PARAMETER_VALUE=1
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+	
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=(&::right& > 3)
+		! /AS_INTEGER=TRUE
+		;
+
+			Set_Pipeline_Parameter_From_Expression
+			/PARAMETER_NAME=page_number
+			/EXPRESSION=&::page_number& + 1
+			! /AS_INTEGER=TRUE
+			;
+		
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+	
+		! set y axis minimum to 0 and maximum to maximum of EMG signal value 
+		Evaluate_Expression
+		/EXPRESSION=GLOBAL::METRIC::EMG::&::EMG_graph_signal_name_right&_signal_MAX
+		/RESULT_NAME=GLOBAL::Y_AXIS_MAX
+		/RESULT_TYPE=METRIC
+		/RESULT_FOLDER=EMG
+		;
+
+		Set_Pipeline_Parameter_To_Data_Value
+		/PARAMETER_NAME=Y_AXIS_MAX
+		/SIGNAL_TYPES=METRIC
+		/SIGNAL_NAMES=Y_AXIS_MAX
+		/SIGNAL_FOLDER=EMG
+		! /SIGNAL_COMPONENTS=ALL_COMPONENTS
+		;
+		
+		Modify_Line_Graph
+		/PAGE_NUMBER=&::page_number
+		/COLUMN_NUMBER=&::col
+		/ROW_NUMBER=&::row
+		! /COLUMN_SPAN=1
+		! /ROW_SPAN=1
+		! /GRAPH_TITLE=
+		/GRAPH_TITLE_COLOR=Dark Red
+		! /X_AXIS_LABEL=
+		! /X_AXIS_SCALE=Normalize 0% to 100%
+		! /X_AXIS_MIN=
+		! /X_AXIS_MAX=
+		! /Y_AXIS_LABEL=
+		/Y_AXIS_SCALE=By Explicit Setting
+		/Y_AXIS_MIN=0
+		/Y_AXIS_MAX=::Y_AXIS_MAX
+		! /Y_USE_SCIENTIFIC_NOTATION=FALSE
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=(&::count_EMG_signals_right& <= 4)
+		! /AS_INTEGER=TRUE
+		;
+
+			Set_Pipeline_Parameter_From_Expression
+			/PARAMETER_NAME=page_number2
+			/EXPRESSION=&::page_number& + 1
+			! /AS_INTEGER=TRUE
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=(&::count_EMG_signals_right& > 4)
+		! /AS_INTEGER=TRUE
+		;
+
+			Set_Pipeline_Parameter_From_Expression
+			/PARAMETER_NAME=page_number2
+			/EXPRESSION=&::page_number& + 2
+			! /AS_INTEGER=TRUE
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+		
+		Evaluate_Expression
+		/EXPRESSION=GLOBAL::METRIC::EMG::&::EMG_graph_signal_name_right&_signal_raw_MAX
+		/RESULT_NAME=GLOBAL::Y_AXIS_MAX
+		/RESULT_TYPE=METRIC
+		/RESULT_FOLDER=EMG
+		;
+
+		Set_Pipeline_Parameter_To_Data_Value
+		/PARAMETER_NAME=Y_AXIS_MAX
+		/SIGNAL_TYPES=METRIC
+		/SIGNAL_NAMES=Y_AXIS_MAX
+		/SIGNAL_FOLDER=EMG
+		! /SIGNAL_COMPONENTS=ALL_COMPONENTS
+		;
+
+		Modify_Line_Graph
+		/PAGE_NUMBER=&::page_number2
+		/COLUMN_NUMBER=&::col
+		/ROW_NUMBER=&::row 
+		! /COLUMN_SPAN=1
+		! /ROW_SPAN=1
+		! /GRAPH_TITLE=
+		/GRAPH_TITLE_COLOR=Dark Red
+		! /X_AXIS_LABEL=
+		! /X_AXIS_SCALE=Normalize 0% to 100%
+		! /X_AXIS_MIN=
+		! /X_AXIS_MAX=
+		! /Y_AXIS_LABEL=
+		/Y_AXIS_SCALE=By Explicit Setting
+		/Y_AXIS_MIN=-&::Y_AXIS_MAX
+		/Y_AXIS_MAX=::Y_AXIS_MAX
+		! /Y_USE_SCIENTIFIC_NOTATION=FALSE
+		;
+		
+		Set_Pipeline_Parameter_From_Expression
+		/PARAMETER_NAME=row
+		/EXPRESSION=&::row& + 1
+		! /AS_INTEGER=TRUE
+		;
+		
+		Set_Pipeline_Parameter_From_Expression
+		/PARAMETER_NAME=right
+		/EXPRESSION=&::right& + 1
+		! /AS_INTEGER=TRUE
+		;
+
+	End_For_Each
+	/ITERATION_PARAMETER_NAME=EMG_graph_signal_name_right
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+! LEFT Filtered mean ----------------
+Set_Pipeline_Parameter
+/PARAMETER_NAME=row
+/PARAMETER_VALUE=1
+;
+
+Set_Pipeline_Parameter
+/PARAMETER_NAME=col
+/PARAMETER_VALUE=1
+;
+
+Set_Pipeline_Parameter
+/PARAMETER_NAME=left
+/PARAMETER_VALUE=0
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(&::count_EMG_signals_left& <= 4)
+! /AS_INTEGER=TRUE
+;
+
+	Set_Pipeline_Parameter_From_Expression
+	/PARAMETER_NAME=page_number1
+	/EXPRESSION=&::first_EMG_page& + 2
+	! /AS_INTEGER=TRUE
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(&::count_EMG_signals_left& > 4)
+! /AS_INTEGER=TRUE
+;
+
+	Set_Pipeline_Parameter_From_Expression
+	/PARAMETER_NAME=page_number1
+	/EXPRESSION=&::first_EMG_page& + 4
+	! /AS_INTEGER=TRUE
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::EMG_names_array_left_exists&" = "TRUE")
+! /AS_INTEGER=TRUE
+;
+
+	For_Each
+	/ITERATION_PARAMETER_NAME=EMG_graph_signal_name_left
+	/ITERATION_PARAMETER_COUNT_NAME=inc
+	/ITEMS=::EMG_graph_signals_name_left
+	;
+
+		Set_Pipeline_Parameter
+		/PARAMETER_NAME=page_number
+		/PARAMETER_VALUE=::first_EMG_page
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=(&::left& = 4) &::AMP& (&::count_EMG_signals_left& > 4)
+		! /AS_INTEGER=TRUE
+		;
+
+			Set_Pipeline_Parameter_From_Expression
+			/PARAMETER_NAME=page_number1
+			/EXPRESSION=&::page_number1& + 1
+			! /AS_INTEGER=TRUE
+			;
+		
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=row
+			/PARAMETER_VALUE=1
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+		! set y axis minimum to 0 and maximum to maximum of EMG signal value 
+		Evaluate_Expression
+		/EXPRESSION=GLOBAL::METRIC::EMG::&::EMG_graph_signal_name_left&_signal_MAX
+		/RESULT_NAME=GLOBAL::Y_AXIS_MAX
+		/RESULT_TYPE=METRIC
+		/RESULT_FOLDER=EMG
+		;
+
+		Set_Pipeline_Parameter_To_Data_Value
+		/PARAMETER_NAME=Y_AXIS_MAX
+		/SIGNAL_TYPES=METRIC
+		/SIGNAL_NAMES=Y_AXIS_MAX
+		/SIGNAL_FOLDER=EMG
+		! /SIGNAL_COMPONENTS=ALL_COMPONENTS
+		;
+		
+		Modify_Line_Graph
+		/PAGE_NUMBER=&::page_number1
+		/COLUMN_NUMBER=&::col
+		/ROW_NUMBER=&::row
+		! /COLUMN_SPAN=1
+		! /ROW_SPAN=1
+		! /GRAPH_TITLE=
+		/GRAPH_TITLE_COLOR=Dark Red
+		! /X_AXIS_LABEL=
+		! /X_AXIS_SCALE=Normalize 0% to 100%
+		! /X_AXIS_MIN=
+		! /X_AXIS_MAX=
+		! /Y_AXIS_LABEL=
+		/Y_AXIS_SCALE=By Explicit Setting
+		/Y_AXIS_MIN=0
+		/Y_AXIS_MAX=::Y_AXIS_MAX
+		! /Y_USE_SCIENTIFIC_NOTATION=FALSE
+		;
+
+		Set_Pipeline_Parameter_From_Expression
+		/PARAMETER_NAME=row
+		/EXPRESSION=&::row& + 1
+		! /AS_INTEGER=TRUE
+		;
+		
+		Set_Pipeline_Parameter_From_Expression
+		/PARAMETER_NAME=left
+		/EXPRESSION=&::left& + 1
+		! /AS_INTEGER=TRUE
+		;
+
+	End_For_Each
+	/ITERATION_PARAMETER_NAME=EMG_graph_signal_name_left
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+!Right Filtered mean ----------------
+Set_Pipeline_Parameter
+/PARAMETER_NAME=row
+/PARAMETER_VALUE=1
+;
+
+Set_Pipeline_Parameter
+/PARAMETER_NAME=col
+/PARAMETER_VALUE=2
+;
+
+Set_Pipeline_Parameter
+/PARAMETER_NAME=right
+/PARAMETER_VALUE=0
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(&::count_EMG_signals_right& <= 4)
+! /AS_INTEGER=TRUE
+;
+
+	Set_Pipeline_Parameter_From_Expression
+	/PARAMETER_NAME=page_number1
+	/EXPRESSION=&::first_EMG_page& + 2
+	! /AS_INTEGER=TRUE
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(&::count_EMG_signals_right& > 4)
+! /AS_INTEGER=TRUE
+;
+
+	Set_Pipeline_Parameter_From_Expression
+	/PARAMETER_NAME=page_number1
+	/EXPRESSION=&::first_EMG_page& + 4
+	! /AS_INTEGER=TRUE
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::EMG_names_array_right_exists&" = "TRUE")
+! /AS_INTEGER=TRUE
+;
+
+	For_Each
+	/ITERATION_PARAMETER_NAME=EMG_graph_signal_name_right
+	! /ITERATION_PARAMETER_COUNT_NAME=
+	/ITEMS=::EMG_graph_signals_name_right
+	;
+
+		Set_Pipeline_Parameter
+		/PARAMETER_NAME=page_number
+		/PARAMETER_VALUE=::first_EMG_page
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=(&::right& = 4) &::AMP& (&::count_EMG_signals_right& > 4)
+		! /AS_INTEGER=TRUE
+		;
+
+			Set_Pipeline_Parameter_From_Expression
+			/PARAMETER_NAME=page_number1
+			/EXPRESSION=&::page_number1& + 1
+			! /AS_INTEGER=TRUE
+			;
+		
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=row
+			/PARAMETER_VALUE=1
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+		! set y axis minimum to 0 and maximum to maximum of EMG signal value 
+		Evaluate_Expression
+		/EXPRESSION=GLOBAL::METRIC::EMG::&::EMG_graph_signal_name_right&_signal_MAX
+		/RESULT_NAME=GLOBAL::Y_AXIS_MAX
+		/RESULT_TYPE=METRIC
+		/RESULT_FOLDER=EMG
+		;
+
+		Set_Pipeline_Parameter_To_Data_Value
+		/PARAMETER_NAME=Y_AXIS_MAX
+		/SIGNAL_TYPES=METRIC
+		/SIGNAL_NAMES=Y_AXIS_MAX
+		/SIGNAL_FOLDER=EMG
+		! /SIGNAL_COMPONENTS=ALL_COMPONENTS
+		;
+		
+		Modify_Line_Graph
+		/PAGE_NUMBER=&::page_number1
+		/COLUMN_NUMBER=&::col
+		/ROW_NUMBER=&::row
+		! /COLUMN_SPAN=1
+		! /ROW_SPAN=1
+		! /GRAPH_TITLE=
+		/GRAPH_TITLE_COLOR=Dark Red
+		! /X_AXIS_LABEL=
+		! /X_AXIS_SCALE=Normalize 0% to 100%
+		! /X_AXIS_MIN=
+		! /X_AXIS_MAX=
+		! /Y_AXIS_LABEL=
+		/Y_AXIS_SCALE=By Explicit Setting
+		/Y_AXIS_MIN=0
+		/Y_AXIS_MAX=::Y_AXIS_MAX
+		! /Y_USE_SCIENTIFIC_NOTATION=FALSE
+		;
+
+		Set_Pipeline_Parameter_From_Expression
+		/PARAMETER_NAME=row
+		/EXPRESSION=&::row& + 1
+		! /AS_INTEGER=TRUE
+		;
+		
+		Set_Pipeline_Parameter_From_Expression
+		/PARAMETER_NAME=right
+		/EXPRESSION=&::right& + 1
+		! /AS_INTEGER=TRUE
+		;
+
+	End_For_Each
+	/ITERATION_PARAMETER_NAME=EMG_graph_signal_name_right
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;

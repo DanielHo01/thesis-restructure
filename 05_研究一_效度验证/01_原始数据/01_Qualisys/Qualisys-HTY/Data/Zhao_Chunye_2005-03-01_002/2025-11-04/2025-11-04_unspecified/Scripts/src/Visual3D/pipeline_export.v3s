@@ -1,0 +1,139 @@
+!No valid EMG signals found. Signals have to start with "EMG" for analog AD board or "Left "/"L " or "Right "/"R" for digital AD board\! 
+  
+
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!  Copyright notice
+!  This PAF and its content is copyright of Qualisys AB © 2012-2018. All rights reserved. 
+!  The PAF script is only to be used in conjunction with a Qualisys Motion Capture System. 
+!  Only legal PAF owners are entitled to use the script and only in relation with related PAF.
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Pipeline_Export_Gait
+/working_directory						= C:\Users\admin\Documents\Qualisys-HTY\Data\Zhao_Chunye_2005-03-01_002\2025-11-04\2025-11-04_unspecified\ 
+/openfile								= C:\Users\admin\Documents\Qualisys-HTY\Data\Zhao_Chunye_2005-03-01_002\2025-11-04\2025-11-04_unspecified\Report_002_Zhao_unspecified_2025-11-04.cmz 
+/analysis_name							= Internal Export Web 
+/event_mode								= Multiple forceplates 
+/auto_range_str							= FALSE 
+/normative_data 						= Default 
+/normative_file_exists 					= TRUE 
+/normative_directory					= C:\Users\admin\Documents\Qualisys-HTY\Templates\Assets/Visual3D Normatives/ 
+/normative_file							= C:\Users\admin\Documents\Qualisys-HTY\Templates\Assets/Visual3D Normatives/41kids_13ofm_modHFaxis.vnd 
+/select_tags_list						= Dynamic 
+/select_tags_arr_list					= Dynamic 
+/link_signal_names						= Left GRF+Right GRF+Left Ankle Angles+Left Ankle Moment+Left Ankle Power+Left Foot Pitch Angles+Left Foot Progression+Left Hip Angles+Left Hip Moment+Left Hip Power+Left Knee Angles+Left Knee Moment+Left Knee Power+Left Pelvic Angles+Right Ankle Angles+Right Ankle Moment+Right Ankle Power+Right Foot Pitch Angles+Right Foot Progression+Right Hip Angles+Right Hip Moment+Right Hip Power+Right Knee Angles+Right Knee Moment+Right Knee Power+Right Pelvic Angles+Left Elbow Angles+Left Shoulder Angles+Left Thorax Angles+Left Thorax_Lab Angles+Right Elbow Angles+Right Shoulder Angles+Right Thorax Angles+Right Thorax_Lab Angles 
+/event_seq								= LHS+LHS,RHS+RHS,LHS+LHS,LHS+LHS,LHS+LHS,LHS+LHS,LHS+LHS,LHS+LHS,LHS+LHS,LHS+LHS,LHS+LHS,LHS+LHS,LHS+LHS,LHS+LHS,RHS+RHS,RHS+RHS,RHS+RHS,RHS+RHS,RHS+RHS,RHS+RHS,RHS+RHS,RHS+RHS,RHS+RHS,RHS+RHS,RHS+RHS,RHS+RHS,LHS+LHS,LHS+LHS,LHS+LHS,LHS+LHS,RHS+RHS,RHS+RHS,RHS+RHS,RHS+RHS 
+/includes_OFM							= FALSE 
+/includes_RFM							= FALSE 
+/noraxon_exists 						= FALSE 
+/mega_me6000_exists						= FALSE 
+/delsys_trigno_exists					= FALSE 
+/myon_exists							= FALSE 
+/analog_EMG_exists						= FALSE 
+/EMG_signal_names						=  
+/EMG_type								=  
+/EMG_folder								=  
+/EMG_exclude_seq						=  
+/EMG_event_seq							=  
+/EMG_points								=  
+/EMG_names_norm							=  
+/EMG_type_norm							=  
+/EMG_folder_norm						=  
+/EMG_points_norm						=  
+/normative_non_noraxon_file_exists		= FALSE 
+/EMG_graph_signals_name_left			=  
+/EMG_graph_signals_name_right			=  
+/includes_thorax						= TRUE 
+/includes_arms							= TRUE 
+/event_sq								= LON+LHS, RON+RHS, LON+LHS, LON+LHS, LON+LHS, LON+LHS, LON+LHS, LON+LHS, LON+LHS, LON+LHS, LON+LHS, LON+LHS, LON+LHS, LON+LHS, RON+RHS, RON+RHS, RON+RHS, RON+RHS, RON+RHS, RON+RHS, RON+RHS, RON+RHS, RON+RHS, RON+RHS, RON+RHS, RON+RHS, LON+LHS, LON+LHS, LON+LHS, LON+LHS, RON+RHS, RON+RHS, RON+RHS, RON+RHS 
+/sig_types								= LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+DERIVED+DERIVED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED 
+/sig_names								= Right Thorax Angles+Left Thorax Angles+Right Thorax_Lab Angles+Left Thorax_Lab Angles+Left Shoulder Angles+Right Shoulder Angles+Left Elbow Angles+Right Elbow Angles+Left GRF+Right GRF+Left Foot Progression+Left Ankle Angles+Left Ankle Moment+Left Ankle Power+Left Foot Pitch Angles+Left Hip Angles+Left Hip Moment+Left Hip Power+Left Knee Angles+Left Knee Moment+Left Knee Power+Left Pelvic Angles+Right Ankle Angles+Right Foot Progression+Right Ankle Moment+Right Ankle Power+Right Foot Pitch Angles+Right Hip Angles+Right Hip Moment+Right Hip Power+Right Knee Angles+Right Knee Moment+Right Knee Power+Right Pelvic Angles 
+/sig_folder								= ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+FORCE_GRAPH+FORCE_GRAPH+ORIGINAL+PROCESSED+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+PROCESSED+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL 
+/sig_types_web							= EVENT_LABEL+EVENT_LABEL+EVENT_LABEL+EVENT_LABEL+EVENT_LABEL+EVENT_LABEL+EVENT_LABEL+EVENT_LABEL+EVENT_LABEL+EVENT_LABEL+
+					EVENT_LABEL+EVENT_LABEL+EVENT_LABEL+EVENT_LABEL+
+
+					DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+
+					DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+
+
+					LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+
+					LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+
+					LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+
+					LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+
+					LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+LINK_MODEL_BASED+
+					LINK_MODEL_BASED+
+
+					LINK_MODEL_BASED+LINK_MODEL_BASED+
+
+					DERIVED+DERIVED+
+
+					METRIC+METRIC+METRIC+METRIC+METRIC+METRIC+METRIC+METRIC+METRIC+METRIC+
+					METRIC+METRIC+METRIC+METRIC+METRIC+METRIC+METRIC+METRIC+METRIC+METRIC+
+					METRIC+METRIC+METRIC+METRIC+METRIC+METRIC+METRIC+
+					
+					METRIC+METRIC+METRIC+METRIC+METRIC+METRIC+METRIC+METRIC+METRIC+METRIC+
+					METRIC+METRIC+METRIC+METRIC+METRIC+METRIC+METRIC+METRIC+METRIC+METRIC+
+					METRIC+METRIC+METRIC 
+/sig_names_web							= end+LHS+LMS+LOFF+LON+LTO+RANGEEND+RANGESTART+RHS+RMS+
+				ROFF+RON+RTO+start+
+
+				Right F2G+Right F2Ps+Right F2Pt+Right MLA+Right S2F+Right S2V+Right V2G+Right S2G+Left F2G+Left F2Ps+
+				Left F2Pt+Left MLA+Left S2F+Left S2G+Left S2V+Left V2G+
+
+				Left Ankle Angles+Left Ankle Angles_CGM+Left Ankle Moment+Left Ankle Power+Left Elbow Angles+Left Foot Pitch Angles+Left Foot Progression+Left GRF+Left Hip Angles+Left Hip Moment+
+				Left Hip Power+Left Knee Angles+Left Knee Moment+Left Knee Power+Left Pelvic Angles+Left Shoulder Angles+Left Thorax Angles+Left Thorax_Lab Angles+PelvisPos+Right Ankle Angles+
+				Right Ankle Angles_CGM+Right Ankle Moment+Right Ankle Power+Right Elbow Angles+Right Foot Pitch Angles+Right Foot Progression+Right GRF+Right Hip Angles+Right Hip Moment+Right Hip Power+
+				Right Knee Angles+Right Knee Moment+Right Knee Power+Right Pelvic Angles+Right Shoulder Angles+Right Thorax Angles+Right Thorax_Lab Angles+Left Forefoot Hindfoot Angle+Left Forefoot Tibia Angle+Left Hallux Forefoot Angle+
+				Left Hindfoot Tibia Angle+Right Forefoot Hindfoot Angle+Right Forefoot Tibia Angle+Right Hallux Forefoot Angle+Right Hindfoot Tibia Angle+Left Forefoot Midfoot Angle+Left Hindfoot Midfoot Angle+Left Shank IORFoot Angle+Right Forefoot Midfoot Angle+Right Hindfoot Midfoot Angle+
+				Right Shank IORFoot Angle+
+
+				Left Ankle Angles+Right Ankle Angles+
+
+				Left Arch Height+Right Arch Height+
+
+				Left_GPS_ln_mean+Overall_GPS_ln_mean+Right_GPS_ln_mean+Left Ankle Angles_X_gvs_ln_mean+Left Foot Progression_Z_gvs_ln_mean+Left Hip Angles_X_gvs_ln_mean+Left Hip Angles_Y_gvs_ln_mean+Left Hip Angles_Z_gvs_ln_mean+Left Knee Angles_X_gvs_ln_mean+Left Pelvic Angles_X_gvs_ln_mean+
+				Left Pelvic Angles_Y_gvs_ln_mean+Left Pelvic Angles_Z_gvs_ln_mean+Right Ankle Angles_X_gvs_ln_mean+Right Foot Progression_Z_gvs_ln_mean+Right Hip Angles_X_gvs_ln_mean+Right Hip Angles_Y_gvs_ln_mean+Right Hip Angles_Z_gvs_ln_mean+Right Knee Angles_X_gvs_ln_mean+Right Pelvic Angles_X_gvs_ln_mean+Right Pelvic Angles_Y_gvs_ln_mean+
+				Right Pelvic Angles_Z_gvs_ln_mean+
+
+				Uncropped Measurement Length+Uncropped Measurement Frames+Cropped Measurement Start Frame+Cropped Measurement End Frame+Frame_rate+Analog_rate+
+				
+				Cadence+Cycle_Time+Left_Cycle_Time+Left_Initial_Double_Limb_Support_Time+Left_Stance_Time+Left_Stance_Time_Pct+Left_Step_Length+Left_Step_Time+Left_Stride_Length+Left_Swing_Time+
+				Right_Cycle_Time+Right_Initial_Double_Limb_Support_Time+Right_Stance_Time+Right_Stance_Time_Pct+Right_Step_Length+Right_Step_Time+Right_Stride_Length+Right_Swing_Time+Right_Terminal_Double_Limb_Support_Time+Speed+
+				Statures_Per_Second+Stride_Length+Stride_Width 
+/sig_folder_web							= ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+
+				ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+
+
+				RIZZOLI+RIZZOLI+RIZZOLI+RIZZOLI+RIZZOLI+RIZZOLI+RIZZOLI+RIZZOLI+RIZZOLI+RIZZOLI+
+				RIZZOLI+RIZZOLI+RIZZOLI+RIZZOLI+RIZZOLI+RIZZOLI+
+
+				ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+
+				ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+
+				ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+
+				ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+
+				ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+ORIGINAL+
+				ORIGINAL+
+
+				PROCESSED+PROCESSED+
+
+				ARCH_HEIGHT+ARCH_HEIGHT+
+
+				MAP+MAP+MAP+MAP+MAP+MAP+MAP+MAP+MAP+MAP+
+				MAP+MAP+MAP+MAP+MAP+MAP+MAP+MAP+MAP+MAP+
+				MAP+
+
+				PROCESSED+PROCESSED+PROCESSED+PROCESSED+PROCESSED+PROCESSED+
+				
+				TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+
+				TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+
+				TMPD+TMPD+TMPD 
+/ev_segence								= RHS+RHS, LHS+LHS, RHS+RHS, LHS+LHS, LHS+LHS, RHS+RHS, LHS+LHS, RHS+RHS, LON+LOFF, RON+ROFF, LHS+LHS, LHS+LHS, LON+LHS, LON+LHS, LHS+LHS, LHS+LHS, LON+LHS, LON+LHS, LHS+LHS, LON+LHS, LON+LHS, LHS+LHS, RHS+RHS, RHS+RHS, RON+RHS, RON+RHS, RHS+RHS, RHS+RHS, RON+RHS, RON+RHS, RHS+RHS, RON+RHS, RON+RHS, RHS+RHS 
+/ev_exclude								= , , , ,, , , ,, , , , , , , , , , , , , , , , , , , , , , , , , , 
+/norm_points							= 101+101+101+101+,101+101+101+101+,101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101 
+/EMG_units_pct_str						= FALSE 
+/sig_type_n								= DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+P2D+P2D+P2D+P2D+P2D 
+/sig_names_n							= Right Thorax_Lab Angles_X_RHS_RHS+Right Thorax_Lab Angles_Y_RHS_RHS+Right Thorax_Lab Angles_Z_RHS_RHS+Right Thorax Angles_X_RHS_RHS+Right Thorax Angles_Y_RHS_RHS+Right Thorax Angles_Z_RHS_RHS+Left Thorax Angles_X_LHS_LHS+Left Thorax Angles_Y_LHS_LHS+Left Thorax Angles_Z_LHS_LHS+Right Thorax_Lab Angles_X_RHS_RHS+Right Thorax_Lab Angles_Y_RHS_RHS+Right Thorax_Lab Angles_Z_RHS_RHS+Right Thorax Angles_X_RHS_RHS+Right Thorax Angles_Y_RHS_RHS+Right Thorax Angles_Z_RHS_RHS+Left Thorax Angles_X_LHS_LHS+Left Thorax Angles_Y_LHS_LHS+Left Thorax Angles_Z_LHS_LHS+Left Shoulder Angles_X_LHS_LHS+Left Shoulder Angles_Y_LHS_LHS+Right Shoulder Angles_X_RHS_RHS+Right Shoulder Angles_Y_RHS_RHS+Right Shoulder Angles_Z_RHS_RHS+Left Elbow Angles_X_LHS_LHS+Right Elbow Angles_X_RHS_RHS+Right Elbow Angles_Z_RHS_RHS+Left Shoulder Angles_X_LHS_LHS+Left Shoulder Angles_Y_LHS_LHS+Right Shoulder Angles_X_RHS_RHS+Right Shoulder Angles_Y_RHS_RHS+Right Shoulder Angles_Z_RHS_RHS+Left Elbow Angles_X_LHS_LHS+Right Elbow Angles_X_RHS_RHS+Right Elbow Angles_Z_RHS_RHS+Left Ankle Angles_X_LHS_LHS+Left Ankle Angles_Y_LHS_LHS+Left Ankle Moment_X_LON_LHS+Left Ankle Moment_Y_LON_LHS+Left Ankle Power_X_LON_LHS+Left Foot Pitch Angles_X_LHS_LHS+Left Foot Progression_Z_LHS_LHS+Left GRF_X_LON_LOFF+Left GRF_Y_LON_LOFF+Left GRF_Z_LON_LOFF+Left Hip Angles_X_LHS_LHS+Left Hip Angles_Y_LHS_LHS+Left Hip Angles_Z_LHS_LHS+Left Hip Moment_X_LON_LHS+Left Hip Moment_Y_LON_LHS+Left Hip Power_X_LON_LHS+Left Hip Power_Y_LON_LHS+Left Knee Angles_X_LHS_LHS+Left Knee Angles_Y_LHS_LHS+Left Knee Angles_Z_LHS_LHS+Left Knee Moment_X_LON_LHS+Left Knee Moment_Y_LON_LHS+Left Knee Power_X_LON_LHS+Left Pelvic Angles_X_LHS_LHS+Left Pelvic Angles_Y_LHS_LHS+Left Pelvic Angles_Z_LHS_LHS+Right Ankle Angles_X_RHS_RHS+Right Ankle Angles_Y_RHS_RHS+Right Ankle Moment_X_RON_RHS+Right Ankle Moment_Y_RON_RHS+Right Ankle Power_X_RON_RHS+Right Foot Pitch Angles_X_RHS_RHS+Right Foot Progression_Z_RHS_RHS+Right GRF_X_RON_ROFF+Right GRF_Y_RON_ROFF+Right GRF_Z_RON_ROFF+Right Hip Angles_X_RHS_RHS+Right Hip Angles_Y_RHS_RHS+Right Hip Angles_Z_RHS_RHS+Right Hip Moment_X_RON_RHS+Right Hip Moment_Y_RON_RHS+Right Hip Power_X_RON_RHS+Right Hip Power_Y_RON_RHS+Right Knee Angles_X_RHS_RHS+Right Knee Angles_Y_RHS_RHS+Right Knee Angles_Z_RHS_RHS+Right Knee Moment_X_RON_RHS+Right Knee Moment_Y_RON_RHS+Right Knee Power_X_RON_RHS+Right Pelvic Angles_X_RHS_RHS+Right Pelvic Angles_Y_RHS_RHS+Right Pelvic Angles_Z_RHS_RHS+Left Ankle Angles_X_LHS_LHS+Left Ankle Angles_Y_LHS_LHS+Left Ankle Moment_X_LON_LHS+Left Ankle Moment_Y_LON_LHS+Left Ankle Power_X_LON_LHS+Left Foot Pitch Angles_X_LHS_LHS+Left Foot Progression_Z_LHS_LHS+Left GRF_X_LON_LOFF+Left GRF_Y_LON_LOFF+Left GRF_Z_LON_LOFF+Left Hip Angles_X_LHS_LHS+Left Hip Angles_Y_LHS_LHS+Left Hip Angles_Z_LHS_LHS+Left Hip Moment_X_LON_LHS+Left Hip Moment_Y_LON_LHS+Left Hip Power_X_LON_LHS+Left Hip Power_Y_LON_LHS+Left Knee Angles_X_LHS_LHS+Left Knee Angles_Y_LHS_LHS+Left Knee Angles_Z_LHS_LHS+Left Knee Moment_X_LON_LHS+Left Knee Moment_Y_LON_LHS+Left Knee Power_X_LON_LHS+Left Pelvic Angles_X_LHS_LHS+Left Pelvic Angles_Y_LHS_LHS+Left Pelvic Angles_Z_LHS_LHS+Right Ankle Angles_X_RHS_RHS+Right Ankle Angles_Y_RHS_RHS+Right Ankle Moment_X_RON_RHS+Right Ankle Moment_Y_RON_RHS+Right Ankle Power_X_RON_RHS+Right Foot Pitch Angles_X_RHS_RHS+Right Foot Progression_Z_RHS_RHS+Right GRF_X_RON_ROFF+Right GRF_Y_RON_ROFF+Right GRF_Z_RON_ROFF+Right Hip Angles_X_RHS_RHS+Right Hip Angles_Y_RHS_RHS+Right Hip Angles_Z_RHS_RHS+Right Hip Moment_X_RON_RHS+Right Hip Moment_Y_RON_RHS+Right Hip Power_X_RON_RHS+Right Hip Power_Y_RON_RHS+Right Knee Angles_X_RHS_RHS+Right Knee Angles_Y_RHS_RHS+Right Knee Angles_Z_RHS_RHS+Right Knee Moment_X_RON_RHS+Right Knee Moment_Y_RON_RHS+Right Knee Power_X_RON_RHS+Right Pelvic Angles_X_RHS_RHS+Right Pelvic Angles_Y_RHS_RHS+Right Pelvic Angles_Z_RHS_RHS+CadenceNorm+Left_Step_LengthNorm+Right_Step_LengthNorm+SpeedNorm+Stride_LengthNorm 
+/sig_folder_n							= NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+TSP_normatives+TSP_normatives+TSP_normatives+TSP_normatives+TSP_normatives 
+/norm_points_n							= 101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101+101 
+/sig_type_3dv							= TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+TARGET+ 
+/sig_folder_3dv							= UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+UNITS_MM+ 
+/marker_list_3dv						= L_HEAD+R_HEAD+SGL+CV7+L_FAR+L_FCC+L_FM1+L_FM2+L_FM5+L_HLE+L_HUM+L_IAS+L_IPS+L_RSP+L_SAE+L_SIA+L_SK1+L_SK2+L_SK3+L_SK4+L_TH1+L_TH2+L_TH3+L_TH4+L_USP+L_HM2+R_FAR+R_FCC+R_FM1+R_FM2+R_FM5+R_HLE+R_HUM+R_IAS+R_IPS+R_RSP+R_SAE+R_SIA+R_SK1+R_SK2+R_SK3+R_SK4+R_TH1+R_TH2+R_TH3+R_TH4+R_USP+R_HM2+TV10 
+/cmo_file								= C:\Users\admin\Documents\Qualisys-HTY\Data\Zhao_Chunye_2005-03-01_002\2025-11-04\2025-11-04_unspecified\Report_002_Zhao_unspecified_2025-11-04_exp.cmz 
+;

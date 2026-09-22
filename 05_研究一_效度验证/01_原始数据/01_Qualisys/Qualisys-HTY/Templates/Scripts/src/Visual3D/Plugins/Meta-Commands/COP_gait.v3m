@@ -1,0 +1,2118 @@
+! BEGIN_META
+! META_CMD_NAME	= COP_Gait
+! META_PARAM	= event_mode  :   string ::yes						
+! META_PARAM	= normative_directory  :   string ::yes						
+! META_PARAM	= select_tags  :   string ::yes						
+! META_PARAM	= COP_start_shift  :   string ::yes						
+! END_META
+
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!  Copyright notice
+!  This PAF and its content is copyright of Qualisys AB © 2012-2019. All rights reserved. 
+!  The PAF script is only to be used in conjunction with a Qualisys Motion Capture System. 
+!  Only legal PAF owners are entitled to use the script and only in relation with related PAF.
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+**__Add_a_Comment__**
+! /COMMENT=
+;
+
+!Add L/R_FCC markers if Olga marker set is used
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(Data_Exists(TARGET::ORIGINAL::L_HEEL_CALC) = 1)
+! /AS_INTEGER=TRUE
+;
+
+	Create_Target
+	/SIGNAL_NAMES=L_FCC
+	! /SIGNAL_DESCRIPTION=
+	/EXPRESSION=TARGET::ORIGINAL::L_HEEL_CALC
+	! /INCLUDE_MOTIONFILE=TRUE
+	! /INCLUDE_CALFILE=FALSE
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(Data_Exists(TARGET::ORIGINAL::R_HEEL_CALC) = 1)
+! /AS_INTEGER=TRUE
+;
+
+	Create_Target
+	/SIGNAL_NAMES=R_FCC
+	! /SIGNAL_DESCRIPTION=
+	/EXPRESSION=TARGET::ORIGINAL::R_HEEL_CALC
+	! /INCLUDE_MOTIONFILE=TRUE
+	! /INCLUDE_CALFILE=FALSE
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::event_mode&" = "Single forceplate")
+! /AS_INTEGER=TRUE
+;
+
+	Assign_Tags_To_Files
+	/MOTION_FILE_NAMES=Dynamic
+	/QUERY=EVENT_LABEL::ORIGINAL::RON>0
+	/TAGS=r
+	;
+	
+	Assign_Tags_To_Files
+	/MOTION_FILE_NAMES=Dynamic
+	/QUERY=EVENT_LABEL::ORIGINAL::LON>0
+	/TAGS=l
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Select_Active_File
+/FILE_NAME=Dynamic
+! /QUERY=
+;
+
+! Add event at midstance (AP force is zero)
+Event_Threshold
+/RESULT_EVENT_NAME=LMS
+/SIGNAL_TYPES=LINK_MODEL_BASED
+! /SIGNAL_FOLDER=ORIGINAL
+/SIGNAL_NAMES=Left GRF
+/SIGNAL_COMPONENTS=Y
+! /FRAME_OFFSET=0
+! /TIME_OFFSET=
+/EVENT_SEQUENCE=RTO+RHS
+! /EXCLUDE_EVENTS=
+! /EVENT_SEQUENCE_INSTANCE=0
+! /EVENT_SUBSEQUENCE=
+! /SUBSEQUENCE_EXCLUDE_EVENTS=
+! /EVENT_SUBSEQUENCE_INSTANCE=0
+/EVENT_INSTANCE=1
+/THRESHOLD=0
+/ON_ASCENT=TRUE
+/ON_DESCENT=FALSE
+/FRAME_WINDOW=2
+! /ENSURE_FRAMES_BEFORE=FALSE
+! /ENSURE_FRAMES_AFTER=FALSE
+;
+
+! Add event at midstance (AP force is zero)
+Event_Threshold
+/RESULT_EVENT_NAME=RMS
+/SIGNAL_TYPES=LINK_MODEL_BASED
+! /SIGNAL_FOLDER=ORIGINAL
+/SIGNAL_NAMES=Right GRF
+/SIGNAL_COMPONENTS=Y
+! /FRAME_OFFSET=0
+! /TIME_OFFSET=
+/EVENT_SEQUENCE=LTO+LHS
+! /EXCLUDE_EVENTS=
+! /EVENT_SEQUENCE_INSTANCE=0
+! /EVENT_SUBSEQUENCE=
+! /SUBSEQUENCE_EXCLUDE_EVENTS=
+! /EVENT_SUBSEQUENCE_INSTANCE=0
+/EVENT_INSTANCE=1
+/THRESHOLD=0
+/ON_ASCENT=TRUE
+/ON_DESCENT=FALSE
+/FRAME_WINDOW=2
+! /ENSURE_FRAMES_BEFORE=FALSE
+! /ENSURE_FRAMES_AFTER=FALSE
+;
+
+!===========================================
+! Define metrics needed for transformations 
+!===========================================
+Set_Pipeline_Parameter_To_List_Of_Tagged_Files
+/PARAMETER_NAME=files
+/TAG_NAME=Dynamic
+! /GET_CURRENT_SELECTED_FILES=false
+! /USE_SHORT_FILENAMES=false
+;
+
+For_Each
+/ITERATION_PARAMETER_NAME=filename
+! /ITERATION_PARAMETER_COUNT_NAME=
+/ITEMS=::files
+;
+
+	Select_Active_File
+	/FILE_NAME=::filename
+	! /QUERY=
+	;
+	
+	Expression_Loop
+	/ITERATION_PARAMETER_NAME=check
+	/EXPRESSION=(METRIC::VIRTUAL_LAB::LAB_LATERAL::Y < 0) !walking in +X direction
+	/AS_INTEGER=FALSE
+	;
+
+		Set_Text_Item
+		/SIGNAL_NAME=Walking_dir
+		/SIGNAL_FOLDER=COP
+		/SIGNAL_DATA_VALUE=X_pos
+		;
+
+	Expression_Loop_End
+	/ITERATION_PARAMETER_NAME=check
+	;
+	
+	Expression_Loop
+	/ITERATION_PARAMETER_NAME=check
+	/EXPRESSION=(METRIC::VIRTUAL_LAB::LAB_LATERAL::Y > 0) !walking in -X direction
+	/AS_INTEGER=FALSE
+	;
+
+		Set_Text_Item
+		/SIGNAL_NAME=Walking_dir
+		/SIGNAL_FOLDER=COP
+		/SIGNAL_DATA_VALUE=X_neg
+		;
+			
+	Expression_Loop_End
+	/ITERATION_PARAMETER_NAME=check
+	;
+
+	Expression_Loop
+	/ITERATION_PARAMETER_NAME=check
+	/EXPRESSION=(METRIC::VIRTUAL_LAB::LAB_LATERAL::X > 0) !walking in +Y direction
+	/AS_INTEGER=FALSE
+	;
+
+		Set_Text_Item
+		/SIGNAL_NAME=Walking_dir
+		/SIGNAL_FOLDER=COP
+		/SIGNAL_DATA_VALUE=Y_pos
+		;
+
+	Expression_Loop_End
+	/ITERATION_PARAMETER_NAME=check
+	;
+	
+	Expression_Loop
+	/ITERATION_PARAMETER_NAME=check
+	/EXPRESSION=(METRIC::VIRTUAL_LAB::LAB_LATERAL::X < 0) !walking in -Y direction
+	/AS_INTEGER=FALSE
+	;
+
+		Set_Text_Item
+		/SIGNAL_NAME=Walking_dir
+		/SIGNAL_FOLDER=COP
+		/SIGNAL_DATA_VALUE=Y_neg
+		;
+			
+	Expression_Loop_End
+	/ITERATION_PARAMETER_NAME=check
+	;
+
+End_For_Each
+/ITERATION_PARAMETER_NAME=filename
+;
+
+Select_Active_File
+/FILE_NAME=Dynamic
+! /QUERY=
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::event_mode&" = "Single forceplate")
+! /AS_INTEGER=TRUE
+;
+
+	Select_Active_File
+	/FILE_NAME=l
+	! /QUERY=
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+!compute position of calcaneus at heel strike as it will be used to define position of foot outline
+Metric_Signal_Value_At_Event
+/RESULT_METRIC_NAME=L_FCC@LON
+! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+/RESULT_METRIC_FOLDER=COP
+/SIGNAL_TYPES=TARGET
+/SIGNAL_NAMES=L_FCC
+! /SIGNAL_FOLDER=ORIGINAL
+! /SIGNAL_COMPONENTS=
+/COMPONENT_SEQUENCE=ALL
+/EVENT_NAME=LON
+/GENERATE_MEAN_AND_STDDEV=TRUE
+! /APPEND_TO_EXISTING_VALUES=FALSE
+! /GENERATE_VECTOR_LENGTH_METRIC=FALSE
+! /RETAIN_NO_DATA_VALUES=FALSE
+;
+
+Metric_Signal_Value_At_Event
+/RESULT_METRIC_NAME=L_FCC@LOFF
+! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+/RESULT_METRIC_FOLDER=COP
+/SIGNAL_TYPES=TARGET
+/SIGNAL_NAMES=L_FCC
+! /SIGNAL_FOLDER=ORIGINAL
+! /SIGNAL_COMPONENTS=
+/COMPONENT_SEQUENCE=ALL
+/EVENT_NAME=LOFF
+/GENERATE_MEAN_AND_STDDEV=TRUE
+! /APPEND_TO_EXISTING_VALUES=FALSE
+! /GENERATE_VECTOR_LENGTH_METRIC=FALSE
+! /RETAIN_NO_DATA_VALUES=FALSE
+;
+
+!compute position of calcaneus at midstance as it will be used to define position of foot outline
+Metric_Signal_Value_At_Event
+/RESULT_METRIC_NAME=L_FCC@LMS
+! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+/RESULT_METRIC_FOLDER=COP
+/SIGNAL_TYPES=TARGET
+/SIGNAL_NAMES=L_FCC
+! /SIGNAL_FOLDER=ORIGINAL
+! /SIGNAL_COMPONENTS=
+/COMPONENT_SEQUENCE=ALL
+/EVENT_NAME=LMS
+/GENERATE_MEAN_AND_STDDEV=TRUE
+! /APPEND_TO_EXISTING_VALUES=FALSE
+! /GENERATE_VECTOR_LENGTH_METRIC=FALSE
+! /RETAIN_NO_DATA_VALUES=FALSE
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::event_mode&" = "Single forceplate")
+! /AS_INTEGER=TRUE
+;
+
+	Select_Active_File
+	/FILE_NAME=r
+	! /QUERY=
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+
+Metric_Signal_Value_At_Event
+/RESULT_METRIC_NAME=R_FCC@RON
+! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+/RESULT_METRIC_FOLDER=COP
+/SIGNAL_TYPES=TARGET
+/SIGNAL_NAMES=R_FCC
+! /SIGNAL_FOLDER=ORIGINAL
+! /SIGNAL_COMPONENTS=
+/COMPONENT_SEQUENCE=ALL
+/EVENT_NAME=RON
+/GENERATE_MEAN_AND_STDDEV=TRUE
+! /APPEND_TO_EXISTING_VALUES=FALSE
+! /GENERATE_VECTOR_LENGTH_METRIC=FALSE
+! /RETAIN_NO_DATA_VALUES=FALSE
+;
+
+Metric_Signal_Value_At_Event
+/RESULT_METRIC_NAME=R_FCC@ROFF
+! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+/RESULT_METRIC_FOLDER=COP
+/SIGNAL_TYPES=TARGET
+/SIGNAL_NAMES=R_FCC
+! /SIGNAL_FOLDER=ORIGINAL
+! /SIGNAL_COMPONENTS=
+/COMPONENT_SEQUENCE=ALL
+/EVENT_NAME=ROFF
+/GENERATE_MEAN_AND_STDDEV=TRUE
+! /APPEND_TO_EXISTING_VALUES=FALSE
+! /GENERATE_VECTOR_LENGTH_METRIC=FALSE
+! /RETAIN_NO_DATA_VALUES=FALSE
+;
+
+Metric_Signal_Value_At_Event
+/RESULT_METRIC_NAME=R_FCC@RMS
+! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+/RESULT_METRIC_FOLDER=COP
+/SIGNAL_TYPES=TARGET
+/SIGNAL_NAMES=R_FCC
+! /SIGNAL_FOLDER=ORIGINAL
+! /SIGNAL_COMPONENTS=
+/COMPONENT_SEQUENCE=ALL
+/EVENT_NAME=RMS
+/GENERATE_MEAN_AND_STDDEV=TRUE
+! /APPEND_TO_EXISTING_VALUES=FALSE
+! /GENERATE_VECTOR_LENGTH_METRIC=FALSE
+! /RETAIN_NO_DATA_VALUES=FALSE
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(("&::event_mode&" = "Instrumented treadmill (split belt)") | ("&::event_mode&" = "Instrumented treadmill (single belt)"))
+! /AS_INTEGER=TRUE
+;
+
+	!select only first occurence
+	Evaluate_Expression
+	 /EXPRESSION=METRIC::COP::L_FCC@LON_MEAN
+	 /RESULT_NAME=L_FCC@LON
+	 /RESULT_TYPE=METRIC
+	 /RESULT_FOLDER=COP
+	 ;
+
+	Evaluate_Expression
+	 /EXPRESSION=METRIC::COP::L_FCC@LMS_MEAN
+	 /RESULT_NAME=L_FCC@LMS
+	 /RESULT_TYPE=METRIC
+	 /RESULT_FOLDER=COP
+	 ;
+
+	Evaluate_Expression
+	 /EXPRESSION=METRIC::COP::R_FCC@RON_MEAN
+	 /RESULT_NAME=R_FCC@RON
+	 /RESULT_TYPE=METRIC
+	 /RESULT_FOLDER=COP
+	 ;
+	 
+ 	Evaluate_Expression
+	 /EXPRESSION=METRIC::COP::R_FCC@RMS_MEAN
+	 /RESULT_NAME=R_FCC@RMS
+	 /RESULT_TYPE=METRIC
+	 /RESULT_FOLDER=COP
+	 ;
+	 
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::event_mode&" = "Single forceplate")
+! /AS_INTEGER=TRUE
+;
+
+	Select_Active_File
+	/FILE_NAME=l
+	! /QUERY=
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+! calculate foot progression angle at oposite heel strike to rotate foot outline
+Metric_Signal_Values_In_Sequence
+/RESULT_METRIC_NAME=L_Foot_Prog@RHS
+/RESULT_METRIC_FOLDER=COP
+/EXPRESSION=LINK_MODEL_BASED::ORIGINAL::Left Foot Progression
+/PERCENT_LIST=0
+! /TIME_OFFSET_LIST=
+! /FRAME_OFFSET_LIST=
+! /USE_FRAMES_TYPE=1
+/SEQUENCE_INSTANCE=1
+/EVENT_SEQUENCE=RHS+LOFF
+! /EXCLUDE_EVENTS=
+/GENERATE_MEAN_AND_STDDEV=FALSE
+! /APPEND_TO_EXISTING_VALUES=FALSE
+! /RETAIN_NO_DATA_VALUES=TRUE
+;
+
+! convert prog angle from degs to rads 0.0174532925
+For_Each
+/ITERATION_PARAMETER_NAME=filename
+! /ITERATION_PARAMETER_COUNT_NAME=
+/ITEMS=::files
+;
+
+	Select_Active_File
+	/FILE_NAME=::filename
+	! /QUERY=
+	;
+
+	Set_Pipeline_Parameter_From_Expression
+	/PARAMETER_NAME=wd
+	/EXPRESSION=TEXT_DATA::COP::Walking_dir
+	/AS_INTEGER=FALSE
+	;
+
+	Expression_Loop
+	/ITERATION_PARAMETER_NAME=check
+	/EXPRESSION=("&::wd&" = "X_pos") + ("&::wd&" = "X_neg")
+	/AS_INTEGER=FALSE
+	;
+
+		Evaluate_Expression
+		/EXPRESSION=METRIC::COP::L_Foot_Prog@RHS * 0.0174532925
+		/RESULT_NAME=L_Foot_Prog@opositeHS_rad
+		/RESULT_TYPE=METRIC
+		/RESULT_FOLDER=COP
+		;
+
+	Expression_Loop_End
+	/ITERATION_PARAMETER_NAME=check
+	;
+	
+	Expression_Loop
+	/ITERATION_PARAMETER_NAME=check
+	/EXPRESSION=("&::wd&" = "Y_pos") + ("&::wd&" = "Y_neg")
+	/AS_INTEGER=FALSE
+	;
+
+		Evaluate_Expression
+		/EXPRESSION=(METRIC::COP::L_Foot_Prog@RHS - 90) * 0.0174532925
+		/RESULT_NAME=L_Foot_Prog@opositeHS_rad
+		/RESULT_TYPE=METRIC
+		/RESULT_FOLDER=COP
+		;
+
+	Expression_Loop_End
+	/ITERATION_PARAMETER_NAME=check
+	;
+	
+End_For_Each
+/ITERATION_PARAMETER_NAME=filename
+;
+
+Select_Active_File
+/FILE_NAME=Dynamic
+! /QUERY=
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::event_mode&" = "Single forceplate")
+! /AS_INTEGER=TRUE
+;
+
+	Select_Active_File
+	/FILE_NAME=r
+	! /QUERY=
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Metric_Signal_Values_In_Sequence
+/RESULT_METRIC_NAME=R_Foot_Prog@LHS
+/RESULT_METRIC_FOLDER=COP
+/EXPRESSION=LINK_MODEL_BASED::ORIGINAL::Right Foot Progression
+/PERCENT_LIST=0
+! /TIME_OFFSET_LIST=
+! /FRAME_OFFSET_LIST=
+! /USE_FRAMES_TYPE=1
+/SEQUENCE_INSTANCE=1
+/EVENT_SEQUENCE=LHS+ROFF
+! /EXCLUDE_EVENTS=
+/GENERATE_MEAN_AND_STDDEV=FALSE
+! /APPEND_TO_EXISTING_VALUES=FALSE
+! /RETAIN_NO_DATA_VALUES=TRUE
+;
+
+! negate r foot prog angle since link_model_based was negated for report
+For_Each
+/ITERATION_PARAMETER_NAME=filename
+! /ITERATION_PARAMETER_COUNT_NAME=
+/ITEMS=::files
+;
+
+	Select_Active_File
+	/FILE_NAME=::filename
+	! /QUERY=
+	;
+
+	Set_Pipeline_Parameter_From_Expression
+	/PARAMETER_NAME=wd
+	/EXPRESSION=TEXT_DATA::COP::Walking_dir
+	/AS_INTEGER=FALSE
+	;
+
+	Expression_Loop
+	/ITERATION_PARAMETER_NAME=check
+	/EXPRESSION=("&::wd&" = "X_pos") + ("&::wd&" = "X_neg")
+	/AS_INTEGER=FALSE
+	;
+
+		Evaluate_Expression
+		/EXPRESSION=-1 * METRIC::COP::R_Foot_Prog@LHS * 0.0174532925
+		/RESULT_NAME=R_Foot_Prog@opositeHS_rad
+		/RESULT_TYPE=METRIC
+		/RESULT_FOLDER=COP
+		;
+
+	Expression_Loop_End
+	/ITERATION_PARAMETER_NAME=check
+	;
+	
+	Expression_Loop
+	/ITERATION_PARAMETER_NAME=check
+	/EXPRESSION=("&::wd&" = "Y_pos") + ("&::wd&" = "Y_neg")
+	/AS_INTEGER=FALSE
+	;
+
+		Evaluate_Expression
+		/EXPRESSION=-1 * (METRIC::COP::R_Foot_Prog@LHS - 90) * 0.0174532925
+		/RESULT_NAME=R_Foot_Prog@opositeHS_rad
+		/RESULT_TYPE=METRIC
+		/RESULT_FOLDER=COP
+		;
+
+	Expression_Loop_End
+	/ITERATION_PARAMETER_NAME=check
+	;
+	
+End_For_Each
+/ITERATION_PARAMETER_NAME=filename
+;
+
+Select_Active_File
+/FILE_NAME=Dynamic
+! /QUERY=
+;
+
+!define LON/RON as metrics and check which one is first and use different algorith based od walking direction
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(("&::event_mode&" = "Instrumented treadmill (split belt)") | ("&::event_mode&" = "Instrumented treadmill (single belt)"))
+! /AS_INTEGER=TRUE
+;
+
+	Evaluate_Expression
+	 /EXPRESSION=EVENT_LABEL::ORIGINAL::LON[1]
+	 /RESULT_NAME=LON
+	 /RESULT_TYPE=METRIC
+	 /RESULT_FOLDER=COP
+	 ;
+
+	Evaluate_Expression
+	 /EXPRESSION=EVENT_LABEL::ORIGINAL::RON[1]
+	 /RESULT_NAME=RON
+	 /RESULT_TYPE=METRIC
+	 /RESULT_FOLDER=COP
+	 ;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(("&::event_mode&" <> "Instrumented treadmill (split belt)") &::AMP& ("&::event_mode&" <> "Instrumented treadmill (single belt)"))
+! /AS_INTEGER=TRUE
+;
+
+	Conditional_Statement
+	/ITERATION_PARAMETER_NAME=cond1
+	/EXPRESSION=("&::event_mode&" = "Single forceplate")
+	! /AS_INTEGER=TRUE
+	;
+
+		Select_Active_File
+		/FILE_NAME=l
+		! /QUERY=
+		;
+		
+	Conditional_Statement_End
+	/ITERATION_PARAMETER_NAME=cond1
+	;
+	
+	Evaluate_Expression
+	 /EXPRESSION=EVENT_LABEL::ORIGINAL::LON
+	 /RESULT_NAME=LON
+	 /RESULT_TYPE=METRIC
+	 /RESULT_FOLDER=COP
+	 ;
+		 
+	Conditional_Statement
+	/ITERATION_PARAMETER_NAME=cond1
+	/EXPRESSION=("&::event_mode&" = "Single forceplate")
+	! /AS_INTEGER=TRUE
+	;
+
+		Select_Active_File
+		/FILE_NAME=r
+		! /QUERY=
+		;
+		
+	Conditional_Statement_End
+	/ITERATION_PARAMETER_NAME=cond1
+	;
+		 
+	Evaluate_Expression
+	 /EXPRESSION=EVENT_LABEL::ORIGINAL::RON
+	 /RESULT_NAME=RON
+	 /RESULT_TYPE=METRIC
+	 /RESULT_FOLDER=COP
+	 ;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+! create FPs outlines
+! =====================
+Select_Active_File
+/FILE_NAME=Dynamic
+! /QUERY=
+;
+
+! Extract FP coordinates
+Metric_From_C3D_Parameter
+/METRIC_NAME=C3D_CORNERS
+/PARAMETER_GROUP=FORCE_PLATFORM
+/PARAMETER_NAME=CORNERS
+;
+
+!add FP1
+Evaluate_Expression
+/EXPRESSION=vector(METRIC::PROCESSED::C3D_CORNERS[1],METRIC::PROCESSED::C3D_CORNERS[2],METRIC::PROCESSED::C3D_CORNERS[3])
+/RESULT_NAME=FP1_CORNER1
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=COP
+;
+
+Evaluate_Expression
+/EXPRESSION=vector(METRIC::PROCESSED::C3D_CORNERS[4],METRIC::PROCESSED::C3D_CORNERS[5],METRIC::PROCESSED::C3D_CORNERS[6])
+/RESULT_NAME=FP1_CORNER2
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=COP
+;
+
+Evaluate_Expression
+/EXPRESSION=vector(METRIC::PROCESSED::C3D_CORNERS[7],METRIC::PROCESSED::C3D_CORNERS[8],METRIC::PROCESSED::C3D_CORNERS[9])
+/RESULT_NAME=FP1_CORNER3
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=COP
+;
+
+Evaluate_Expression
+/EXPRESSION=vector(METRIC::PROCESSED::C3D_CORNERS[10],METRIC::PROCESSED::C3D_CORNERS[11],METRIC::PROCESSED::C3D_CORNERS[12])
+/RESULT_NAME=FP1_CORNER4
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=COP
+;
+
+Merge_Data
+/SIGNAL_NAMES=FP1_CORNER1+FP1_CORNER2+FP1_CORNER3+FP1_CORNER4+FP1_CORNER1
+/SIGNAL_TYPES=METRIC+METRIC+METRIC+METRIC+METRIC
+/SIGNAL_FOLDER=COP+COP+COP+COP+COP
+/SIGNAL_COMPONENTS=
+/RESULT_NAME=FP1_outlines
+/RESULT_TYPE=DERIVED
+/RESULT_FOLDER=COP
+! /MERGE_TYPE=APPEND_TO_END
+;
+
+! convert units from [mm] to [m] for FP1
+Multiply_Signals_By_Constant
+/SIGNAL_TYPES=DERIVED
+/SIGNAL_FOLDER=COP
+/SIGNAL_NAMES=FP1_outlines
+/RESULT_TYPES=DERIVED
+/RESULT_FOLDER=COP
+/RESULT_NAMES=FP1_outlines
+! /RESULT_SUFFIX=
+! /SIGNAL_COMPONENTS=
+/CONSTANT=0.001
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::event_mode&" <> "Single forceplate")
+! /AS_INTEGER=TRUE
+;
+
+	!add second FP2
+	Evaluate_Expression
+	/EXPRESSION=vector(METRIC::PROCESSED::C3D_CORNERS[13],METRIC::PROCESSED::C3D_CORNERS[14],METRIC::PROCESSED::C3D_CORNERS[15])
+	/RESULT_NAME=FP2_CORNER1
+	/RESULT_TYPE=METRIC
+	/RESULT_FOLDER=COP
+	;
+
+	Evaluate_Expression
+	/EXPRESSION=vector(METRIC::PROCESSED::C3D_CORNERS[16],METRIC::PROCESSED::C3D_CORNERS[17],METRIC::PROCESSED::C3D_CORNERS[18])
+	/RESULT_NAME=FP2_CORNER2
+	/RESULT_TYPE=METRIC
+	/RESULT_FOLDER=COP
+	;
+
+	Evaluate_Expression
+	/EXPRESSION=vector(METRIC::PROCESSED::C3D_CORNERS[19],METRIC::PROCESSED::C3D_CORNERS[20],METRIC::PROCESSED::C3D_CORNERS[21])
+	/RESULT_NAME=FP2_CORNER3
+	/RESULT_TYPE=METRIC
+	/RESULT_FOLDER=COP
+	;
+
+	Evaluate_Expression
+	/EXPRESSION=vector(METRIC::PROCESSED::C3D_CORNERS[22],METRIC::PROCESSED::C3D_CORNERS[23],METRIC::PROCESSED::C3D_CORNERS[24])
+	/RESULT_NAME=FP2_CORNER4
+	/RESULT_TYPE=METRIC
+	/RESULT_FOLDER=COP
+	;
+
+	Merge_Data
+	/SIGNAL_NAMES=FP2_CORNER1+FP2_CORNER2+FP2_CORNER3+FP2_CORNER4+FP2_CORNER1
+	/SIGNAL_TYPES=METRIC+METRIC+METRIC+METRIC+METRIC
+	/SIGNAL_FOLDER=COP+COP+COP+COP+COP
+	/SIGNAL_COMPONENTS=
+	/RESULT_NAME=FP2_outlines
+	/RESULT_TYPE=DERIVED
+	/RESULT_FOLDER=COP
+	! /MERGE_TYPE=APPEND_TO_END
+	;
+
+	! convert units from [mm] to [m] for FP1
+	Multiply_Signals_By_Constant
+	/SIGNAL_TYPES=DERIVED
+	/SIGNAL_FOLDER=COP
+	/SIGNAL_NAMES=FP2_outlines
+	/RESULT_TYPES=DERIVED
+	/RESULT_FOLDER=COP
+	/RESULT_NAMES=FP2_outlines
+	! /RESULT_SUFFIX=
+	! /SIGNAL_COMPONENTS=
+	/CONSTANT=0.001
+	;
+	
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+!create foot outlines
+!====================
+!load left foot vnd
+File_Open
+/FILE_NAME=&::normative_directory&l_foot_outline.vnd
+! /SUFFIX=
+! /SET_PROMPT=File_Open
+;
+
+!rescale left foot outline based on LTF segment length
+Evaluate_Expression
+/EXPRESSION=MODEL::SEGMENT::LFT::LENGTH
+/RESULT_NAME=GLOBAL::l_foot_size
+/RESULT_TYPE=DERIVED
+/RESULT_FOLDER=COP
+;
+
+!define scaling factor (needs to be verified)
+Evaluate_Expression
+/EXPRESSION=1
+/RESULT_NAME=GLOBAL::scaling_factor
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=COP
+;
+
+Select_Active_File
+/FILE_NAME=GLOBAL
+! /QUERY=
+;
+
+!rescale left outline
+Multiply_Signals_By_Constant
+/SIGNAL_TYPES=P2D
+/SIGNAL_FOLDER=Feet_outlines
+/SIGNAL_NAMES=l_foot_outline
+/RESULT_TYPES=P2D
+/RESULT_FOLDER=Feet_outlines
+/RESULT_NAMES=l_foot_outline
+! /RESULT_SUFFIX=
+! /SIGNAL_COMPONENTS=
+/CONSTANT=GLOBAL::METRIC::COP::scaling_factor
+;
+
+!create right foot outline
+Evaluate_Expression
+/EXPRESSION=vector(GLOBAL::P2D::Feet_outlines::l_foot_outline::x,(-1*GLOBAL::P2D::Feet_outlines::l_foot_outline::y))
+/RESULT_NAME=GLOBAL::r_foot_outline
+/RESULT_TYPE=P2D
+/RESULT_FOLDER=Feet_outlines
+;
+
+For_Each
+/ITERATION_PARAMETER_NAME=select_files
+/ITEMS=::select_tags
+;
+
+	Select_Active_File
+	/FILE_NAME=::select_files
+	! /QUERY=
+	;
+
+	Set_Pipeline_Parameter_To_List_Of_Tagged_Files
+	/PARAMETER_NAME=files
+	/TAG_NAME=::select_files
+	! /GET_CURRENT_SELECTED_FILES=false
+	! /USE_SHORT_FILENAMES=false
+	;
+
+	For_Each
+	/ITERATION_PARAMETER_NAME=filename
+	/ITEMS=::files
+	;
+
+		Select_Active_File
+		 /FILE_NAME=::filename
+		 ! /QUERY=
+		 ;
+
+		!invert left foot outline (for walking in -X/-Y direction)
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond
+		/EXPRESSION=("&::event_mode&" = "Single forceplate")
+		! /AS_INTEGER=TRUE
+		;
+
+			Evaluate_Expression
+			/EXPRESSION=((METRIC::VIRTUAL_LAB::LAB_LATERAL::X = 0)*(GLOBAL::P2D::Feet_outlines::l_foot_outline::x)) 
+					  + ((METRIC::VIRTUAL_LAB::LAB_LATERAL::Y = 0)*(-GLOBAL::P2D::Feet_outlines::l_foot_outline::x))
+
+			/RESULT_NAME=l_foot_outline_X
+			/RESULT_TYPE=P2D
+			/RESULT_FOLDER=Feet_outlines
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond
+		;
+		
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond
+		/EXPRESSION=(("&::event_mode&" = "Instrumented treadmill (split belt)") | ("&::event_mode&" = "Instrumented treadmill (single belt)"))
+		! /AS_INTEGER=TRUE
+		;
+
+			Evaluate_Expression
+			/EXPRESSION=(("&::wd&" = "X_pos") + ("&::wd&" = "X_neg")) *(GLOBAL::P2D::Feet_outlines::l_foot_outline::x)
+					  + (("&::wd&" = "Y_pos") + ("&::wd&" = "Y_neg")) *(-GLOBAL::P2D::Feet_outlines::l_foot_outline::x)
+			/RESULT_NAME=l_foot_outline_X
+			/RESULT_TYPE=P2D
+			/RESULT_FOLDER=Feet_outlines
+			;
+			
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond
+		;
+		
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond
+		/EXPRESSION=(("&::event_mode&" <> "Single forceplate") &::AMP& ("&::event_mode&" <> "Instrumented treadmill (split belt)") &::AMP& ("&::event_mode&" <> "Instrumented treadmill (single belt)"))
+		! /AS_INTEGER=TRUE
+		;
+
+			Evaluate_Expression
+			/EXPRESSION=(("&::wd&" = "X_pos") + ("&::wd&" = "X_neg"))
+					  * (((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(GLOBAL::P2D::Feet_outlines::l_foot_outline::x))
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(-GLOBAL::P2D::Feet_outlines::l_foot_outline::x))
+
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(GLOBAL::P2D::Feet_outlines::l_foot_outline::x))
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(-GLOBAL::P2D::Feet_outlines::l_foot_outline::x))
+
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(GLOBAL::P2D::Feet_outlines::l_foot_outline::x))
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(-GLOBAL::P2D::Feet_outlines::l_foot_outline::x))
+
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(GLOBAL::P2D::Feet_outlines::l_foot_outline::x))
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(-GLOBAL::P2D::Feet_outlines::l_foot_outline::x))
+
+					  
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(-GLOBAL::P2D::Feet_outlines::l_foot_outline::x))
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(GLOBAL::P2D::Feet_outlines::l_foot_outline::x))
+
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(-GLOBAL::P2D::Feet_outlines::l_foot_outline::x))
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(GLOBAL::P2D::Feet_outlines::l_foot_outline::x)) 
+
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(-GLOBAL::P2D::Feet_outlines::l_foot_outline::x)) 
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(GLOBAL::P2D::Feet_outlines::l_foot_outline::x))
+
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(-GLOBAL::P2D::Feet_outlines::l_foot_outline::x)) 
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(GLOBAL::P2D::Feet_outlines::l_foot_outline::x)))
+					  
+					  
+					  + (("&::wd&" = "Y_pos") + ("&::wd&" = "Y_neg"))
+						* (((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(GLOBAL::P2D::Feet_outlines::l_foot_outline::x))
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(-GLOBAL::P2D::Feet_outlines::l_foot_outline::x))
+																																																		   
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(GLOBAL::P2D::Feet_outlines::l_foot_outline::x))
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(-GLOBAL::P2D::Feet_outlines::l_foot_outline::x))
+																																																		   
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(GLOBAL::P2D::Feet_outlines::l_foot_outline::x))
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(-GLOBAL::P2D::Feet_outlines::l_foot_outline::x))
+																																																		   
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(GLOBAL::P2D::Feet_outlines::l_foot_outline::x))
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(-GLOBAL::P2D::Feet_outlines::l_foot_outline::x))
+																																																		   
+																																																		   
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(-GLOBAL::P2D::Feet_outlines::l_foot_outline::x))
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(GLOBAL::P2D::Feet_outlines::l_foot_outline::x))
+																																																		   
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(-GLOBAL::P2D::Feet_outlines::l_foot_outline::x))
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(GLOBAL::P2D::Feet_outlines::l_foot_outline::x))  
+																																																		   
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(-GLOBAL::P2D::Feet_outlines::l_foot_outline::x))
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(GLOBAL::P2D::Feet_outlines::l_foot_outline::x))
+																																																		   
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(-GLOBAL::P2D::Feet_outlines::l_foot_outline::x))
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(GLOBAL::P2D::Feet_outlines::l_foot_outline::x)))
+			/RESULT_NAME=l_foot_outline_X
+			/RESULT_TYPE=P2D
+			/RESULT_FOLDER=Feet_outlines
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond
+		;
+		
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond
+		/EXPRESSION=("&::event_mode&" = "Single forceplate")
+		! /AS_INTEGER=TRUE
+		;
+
+			Evaluate_Expression
+			/EXPRESSION=((METRIC::VIRTUAL_LAB::LAB_LATERAL::X = 0) *(GLOBAL::P2D::Feet_outlines::l_foot_outline::y)) 
+					  + ((METRIC::VIRTUAL_LAB::LAB_LATERAL::Y = 0) *(-GLOBAL::P2D::Feet_outlines::l_foot_outline::y))
+			/RESULT_NAME=l_foot_outline_Y
+			/RESULT_TYPE=P2D
+			/RESULT_FOLDER=Feet_outlines
+			;
+			
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond
+		;
+		
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond
+		/EXPRESSION=(("&::event_mode&" = "Instrumented treadmill (split belt)") | ("&::event_mode&" = "Instrumented treadmill (single belt)"))
+		! /AS_INTEGER=TRUE
+		;
+
+			Evaluate_Expression
+			/EXPRESSION=(("&::wd&" = "X_pos") + ("&::wd&" = "X_neg")) *(GLOBAL::P2D::Feet_outlines::l_foot_outline::y)
+					  + (("&::wd&" = "Y_pos") + ("&::wd&" = "Y_neg")) *(-GLOBAL::P2D::Feet_outlines::l_foot_outline::y)
+			/RESULT_NAME=l_foot_outline_Y
+			/RESULT_TYPE=P2D
+			/RESULT_FOLDER=Feet_outlines
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond
+		;
+		
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond
+		/EXPRESSION=(("&::event_mode&" <> "Single forceplate") &::AMP& ("&::event_mode&" <> "Instrumented treadmill (split belt)") &::AMP& ("&::event_mode&" <> "Instrumented treadmill (single belt)"))
+		! /AS_INTEGER=TRUE
+		;
+
+			Evaluate_Expression
+			/EXPRESSION=(("&::wd&" = "X_pos") + ("&::wd&" = "X_neg"))
+						*(((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(GLOBAL::P2D::Feet_outlines::l_foot_outline::y))
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(-GLOBAL::P2D::Feet_outlines::l_foot_outline::y))
+
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(GLOBAL::P2D::Feet_outlines::l_foot_outline::y))
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(-GLOBAL::P2D::Feet_outlines::l_foot_outline::y))
+
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(GLOBAL::P2D::Feet_outlines::l_foot_outline::y))
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(-GLOBAL::P2D::Feet_outlines::l_foot_outline::y))
+
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(GLOBAL::P2D::Feet_outlines::l_foot_outline::y))
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(-GLOBAL::P2D::Feet_outlines::l_foot_outline::y))
+
+					  
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(-GLOBAL::P2D::Feet_outlines::l_foot_outline::y))
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(GLOBAL::P2D::Feet_outlines::l_foot_outline::y))
+
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(-GLOBAL::P2D::Feet_outlines::l_foot_outline::y))
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(GLOBAL::P2D::Feet_outlines::l_foot_outline::y))
+
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(-GLOBAL::P2D::Feet_outlines::l_foot_outline::y)) 
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(GLOBAL::P2D::Feet_outlines::l_foot_outline::y))
+
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(-GLOBAL::P2D::Feet_outlines::l_foot_outline::y)) 
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(GLOBAL::P2D::Feet_outlines::l_foot_outline::y)))
+
+					  + (("&::wd&" = "Y_pos") + ("&::wd&" = "Y_neg"))
+					  * (((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(GLOBAL::P2D::Feet_outlines::l_foot_outline::y))
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(-GLOBAL::P2D::Feet_outlines::l_foot_outline::y))
+
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(GLOBAL::P2D::Feet_outlines::l_foot_outline::y))
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(-GLOBAL::P2D::Feet_outlines::l_foot_outline::y))
+
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(GLOBAL::P2D::Feet_outlines::l_foot_outline::y))
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(-GLOBAL::P2D::Feet_outlines::l_foot_outline::y))
+
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(GLOBAL::P2D::Feet_outlines::l_foot_outline::y))
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(-GLOBAL::P2D::Feet_outlines::l_foot_outline::y))
+
+					  
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(-GLOBAL::P2D::Feet_outlines::l_foot_outline::y))
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(GLOBAL::P2D::Feet_outlines::l_foot_outline::y))
+
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(-GLOBAL::P2D::Feet_outlines::l_foot_outline::y))
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(GLOBAL::P2D::Feet_outlines::l_foot_outline::y))
+
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(-GLOBAL::P2D::Feet_outlines::l_foot_outline::y)) 
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(GLOBAL::P2D::Feet_outlines::l_foot_outline::y))
+
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(-GLOBAL::P2D::Feet_outlines::l_foot_outline::y)) 
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(GLOBAL::P2D::Feet_outlines::l_foot_outline::y)))
+			/RESULT_NAME=l_foot_outline_Y
+			/RESULT_TYPE=P2D
+			/RESULT_FOLDER=Feet_outlines
+			;
+			
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond
+		;
+		
+		Evaluate_Expression
+		/EXPRESSION=vector(P2D::Feet_outlines::l_foot_outline_X, P2D::Feet_outlines::l_foot_outline_Y)
+		/RESULT_NAME=l_foot_outline
+		/RESULT_TYPE=P2D
+		/RESULT_FOLDER=Feet_outlines
+		;
+
+		!invert right foot outline
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond
+		/EXPRESSION=("&::event_mode&" = "Single forceplate")
+		! /AS_INTEGER=TRUE
+		;
+
+			Evaluate_Expression
+			/EXPRESSION=((METRIC::VIRTUAL_LAB::LAB_LATERAL::X = 0) *(GLOBAL::P2D::Feet_outlines::r_foot_outline::x)) 
+					  + ((METRIC::VIRTUAL_LAB::LAB_LATERAL::Y = 0) *(-GLOBAL::P2D::Feet_outlines::r_foot_outline::x))
+			/RESULT_NAME=r_foot_outline_X
+			/RESULT_TYPE=P2D
+			/RESULT_FOLDER=Feet_outlines
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond
+		;
+		
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond
+		/EXPRESSION=(("&::event_mode&" = "Instrumented treadmill (split belt)") | ("&::event_mode&" = "Instrumented treadmill (single belt)"))
+		! /AS_INTEGER=TRUE
+		;
+
+			Evaluate_Expression
+			/EXPRESSION=(("&::wd&" = "X_pos") + ("&::wd&" = "X_neg")) *(GLOBAL::P2D::Feet_outlines::r_foot_outline::x)
+					  + (("&::wd&" = "Y_pos") + ("&::wd&" = "Y_neg")) *(-GLOBAL::P2D::Feet_outlines::r_foot_outline::x)
+			/RESULT_NAME=r_foot_outline_X
+			/RESULT_TYPE=P2D
+			/RESULT_FOLDER=Feet_outlines
+			;
+		
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond
+		;
+		
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond
+		/EXPRESSION=(("&::event_mode&" <> "Single forceplate") &::AMP& ("&::event_mode&" <> "Instrumented treadmill (split belt)") &::AMP& ("&::event_mode&" <> "Instrumented treadmill (single belt)"))
+		! /AS_INTEGER=TRUE
+		;
+
+			Evaluate_Expression
+			/EXPRESSION=(("&::wd&" = "X_pos") + ("&::wd&" = "X_neg"))
+						*(((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(GLOBAL::P2D::Feet_outlines::r_foot_outline::x))
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(-GLOBAL::P2D::Feet_outlines::r_foot_outline::x))
+
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(GLOBAL::P2D::Feet_outlines::r_foot_outline::x))
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(-GLOBAL::P2D::Feet_outlines::r_foot_outline::x))
+
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(GLOBAL::P2D::Feet_outlines::r_foot_outline::x))
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(-GLOBAL::P2D::Feet_outlines::r_foot_outline::x))
+
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(GLOBAL::P2D::Feet_outlines::r_foot_outline::x))
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(-GLOBAL::P2D::Feet_outlines::r_foot_outline::x)) 
+
+					  
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(-GLOBAL::P2D::Feet_outlines::r_foot_outline::x))
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(GLOBAL::P2D::Feet_outlines::r_foot_outline::x))
+
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(-GLOBAL::P2D::Feet_outlines::r_foot_outline::x))
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(GLOBAL::P2D::Feet_outlines::r_foot_outline::x)) 
+
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(-GLOBAL::P2D::Feet_outlines::r_foot_outline::x)) 
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(GLOBAL::P2D::Feet_outlines::r_foot_outline::x))
+
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(-GLOBAL::P2D::Feet_outlines::r_foot_outline::x)) 
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(GLOBAL::P2D::Feet_outlines::r_foot_outline::x)))
+
+					  +(("&::wd&" = "Y_pos") + ("&::wd&" = "Y_neg"))
+						*(((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(-GLOBAL::P2D::Feet_outlines::r_foot_outline::x))
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(GLOBAL::P2D::Feet_outlines::r_foot_outline::x))
+
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(-GLOBAL::P2D::Feet_outlines::r_foot_outline::x))
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(GLOBAL::P2D::Feet_outlines::r_foot_outline::x))
+
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(-GLOBAL::P2D::Feet_outlines::r_foot_outline::x))
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(GLOBAL::P2D::Feet_outlines::r_foot_outline::x))
+
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(-GLOBAL::P2D::Feet_outlines::r_foot_outline::x))
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(GLOBAL::P2D::Feet_outlines::r_foot_outline::x)) 
+
+					  
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(GLOBAL::P2D::Feet_outlines::r_foot_outline::x))
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(-GLOBAL::P2D::Feet_outlines::r_foot_outline::x))
+
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(GLOBAL::P2D::Feet_outlines::r_foot_outline::x))
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(-GLOBAL::P2D::Feet_outlines::r_foot_outline::x)) 
+
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(GLOBAL::P2D::Feet_outlines::r_foot_outline::x)) 
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(-GLOBAL::P2D::Feet_outlines::r_foot_outline::x))
+
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(GLOBAL::P2D::Feet_outlines::r_foot_outline::x)) 
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(-GLOBAL::P2D::Feet_outlines::r_foot_outline::x)))				  
+			/RESULT_NAME=r_foot_outline_X
+			/RESULT_TYPE=P2D
+			/RESULT_FOLDER=Feet_outlines
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond
+		;
+		
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond
+		/EXPRESSION=("&::event_mode&" = "Single forceplate")
+		! /AS_INTEGER=TRUE
+		;
+
+			Evaluate_Expression
+			/EXPRESSION=((METRIC::VIRTUAL_LAB::LAB_LATERAL::X = 0) *(GLOBAL::P2D::Feet_outlines::r_foot_outline::y)) 
+					  + ((METRIC::VIRTUAL_LAB::LAB_LATERAL::Y = 0) *(-GLOBAL::P2D::Feet_outlines::r_foot_outline::y))
+			/RESULT_NAME=r_foot_outline_Y
+			/RESULT_TYPE=P2D
+			/RESULT_FOLDER=Feet_outlines
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond
+		;
+		
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond
+		/EXPRESSION=(("&::event_mode&" = "Instrumented treadmill (split belt)") | ("&::event_mode&" = "Instrumented treadmill (single belt)"))
+		! /AS_INTEGER=TRUE
+		;
+
+			Evaluate_Expression
+			/EXPRESSION=(("&::wd&" = "X_pos") + ("&::wd&" = "X_neg")) *(GLOBAL::P2D::Feet_outlines::r_foot_outline::y)
+					  + (("&::wd&" = "Y_pos") + ("&::wd&" = "Y_neg")) *(-GLOBAL::P2D::Feet_outlines::r_foot_outline::y)
+			/RESULT_NAME=r_foot_outline_Y
+			/RESULT_TYPE=P2D
+			/RESULT_FOLDER=Feet_outlines
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond
+		;
+		
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond
+		/EXPRESSION=(("&::event_mode&" <> "Single forceplate") &::AMP& ("&::event_mode&" <> "Instrumented treadmill (split belt)") &::AMP& ("&::event_mode&" <> "Instrumented treadmill (single belt)"))
+		! /AS_INTEGER=TRUE
+		;
+
+			Evaluate_Expression
+			/EXPRESSION=(("&::wd&" = "X_pos") + ("&::wd&" = "X_neg"))
+						*(((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(GLOBAL::P2D::Feet_outlines::r_foot_outline::y))
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(-GLOBAL::P2D::Feet_outlines::r_foot_outline::y))
+
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(GLOBAL::P2D::Feet_outlines::r_foot_outline::y))
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(-GLOBAL::P2D::Feet_outlines::r_foot_outline::y))
+
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(GLOBAL::P2D::Feet_outlines::r_foot_outline::y))
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(-GLOBAL::P2D::Feet_outlines::r_foot_outline::y))
+
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(GLOBAL::P2D::Feet_outlines::r_foot_outline::y)) 
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(-GLOBAL::P2D::Feet_outlines::r_foot_outline::y)) 
+
+					  
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(-GLOBAL::P2D::Feet_outlines::r_foot_outline::y))
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(GLOBAL::P2D::Feet_outlines::r_foot_outline::y))
+
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(-GLOBAL::P2D::Feet_outlines::r_foot_outline::y))
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(GLOBAL::P2D::Feet_outlines::r_foot_outline::y)) 
+
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(-GLOBAL::P2D::Feet_outlines::r_foot_outline::y)) 
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(GLOBAL::P2D::Feet_outlines::r_foot_outline::y))
+
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(-GLOBAL::P2D::Feet_outlines::r_foot_outline::y)) 
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(GLOBAL::P2D::Feet_outlines::r_foot_outline::y)))
+					
+					
+					  +(("&::wd&" = "Y_pos") + ("&::wd&" = "Y_neg"))
+						*(((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(-GLOBAL::P2D::Feet_outlines::r_foot_outline::y))
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(GLOBAL::P2D::Feet_outlines::r_foot_outline::y))
+
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(-GLOBAL::P2D::Feet_outlines::r_foot_outline::y))
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(GLOBAL::P2D::Feet_outlines::r_foot_outline::y))
+
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(-GLOBAL::P2D::Feet_outlines::r_foot_outline::y))
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(GLOBAL::P2D::Feet_outlines::r_foot_outline::y))
+
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(-GLOBAL::P2D::Feet_outlines::r_foot_outline::y)) 
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(GLOBAL::P2D::Feet_outlines::r_foot_outline::y)) 
+
+					  
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(GLOBAL::P2D::Feet_outlines::r_foot_outline::y))
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(-GLOBAL::P2D::Feet_outlines::r_foot_outline::y))
+
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(GLOBAL::P2D::Feet_outlines::r_foot_outline::y))
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(-GLOBAL::P2D::Feet_outlines::r_foot_outline::y)) 
+
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(GLOBAL::P2D::Feet_outlines::r_foot_outline::y)) 
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(-GLOBAL::P2D::Feet_outlines::r_foot_outline::y))
+
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(GLOBAL::P2D::Feet_outlines::r_foot_outline::y)) 
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(-GLOBAL::P2D::Feet_outlines::r_foot_outline::y)))
+			/RESULT_NAME=r_foot_outline_Y
+			/RESULT_TYPE=P2D
+			/RESULT_FOLDER=Feet_outlines
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond
+		;
+		
+		Evaluate_Expression
+		/EXPRESSION=vector(P2D::Feet_outlines::r_foot_outline_X, P2D::Feet_outlines::r_foot_outline_Y)
+		/RESULT_NAME=r_foot_outline
+		/RESULT_TYPE=P2D
+		/RESULT_FOLDER=Feet_outlines
+		;
+
+		! shift COP start since calcaneus marker is 2 cm behind the actual bone
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond
+		/EXPRESSION=(("&::event_mode&" = "Single forceplate") | ("&::event_mode&" = "Instrumented treadmill (split belt)") | ("&::event_mode&" = "Instrumented treadmill (single belt)"))
+		! /AS_INTEGER=TRUE
+		;
+
+			 Evaluate_Expression
+			 /EXPRESSION=&::COP_start_shift&
+			 /RESULT_NAME=HS_pos_shift
+			 /RESULT_TYPE=METRIC
+			 /RESULT_FOLDER=COP
+			 ;
+			 
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond
+		;
+		
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond
+		/EXPRESSION=(("&::event_mode&" <> "Single forceplate") &::AMP& ("&::event_mode&" <> "Instrumented treadmill (split belt)") &::AMP& ("&::event_mode&" <> "Instrumented treadmill (single belt)"))
+		! /AS_INTEGER=TRUE
+		;
+
+			 Evaluate_Expression
+			/EXPRESSION=((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)* &::COP_start_shift&)
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)* -&::COP_start_shift&)
+
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)* &::COP_start_shift&)
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)* -&::COP_start_shift&)
+
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)* &::COP_start_shift&)
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)* -&::COP_start_shift&)
+
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)* &::COP_start_shift&)
+					  + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)* -&::COP_start_shift&)
+
+					  
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)* -&::COP_start_shift&)
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)* &::COP_start_shift&)
+
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)* -&::COP_start_shift&)
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)* &::COP_start_shift&)
+
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)* -&::COP_start_shift&)
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)* &::COP_start_shift&)
+
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)* -&::COP_start_shift&)
+					  + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)* &::COP_start_shift&)
+			/RESULT_NAME=HS_pos_shift
+			/RESULT_TYPE=METRIC
+			/RESULT_FOLDER=COP
+			;
+		 
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond
+		;
+		
+		Add_Constant_To_Signals
+		 /SIGNAL_TYPES=METRIC
+		 /SIGNAL_FOLDER=COP
+		 /SIGNAL_NAMES=L_FCC@LON
+		 /RESULT_TYPES=METRIC
+		 /RESULT_FOLDER=COP
+		 /RESULT_NAMES=L_FCC@LON
+		 ! /RESULT_SUFFIX=
+		 /SIGNAL_COMPONENTS=X
+		 /CONSTANT=METRIC::COP::HS_pos_shift
+		 ;
+
+		Add_Constant_To_Signals
+		 /SIGNAL_TYPES=METRIC
+		 /SIGNAL_FOLDER=COP
+		 /SIGNAL_NAMES=R_FCC@RON
+		 /RESULT_TYPES=METRIC
+		 /RESULT_FOLDER=COP
+		 /RESULT_NAMES=R_FCC@RON
+		 ! /RESULT_SUFFIX=
+		 /SIGNAL_COMPONENTS=X
+		 /CONSTANT=METRIC::COP::HS_pos_shift
+		 ;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond
+		/EXPRESSION=("&::event_mode&" <> "Single forceplate")
+		! /AS_INTEGER=TRUE
+		;
+
+			! move outline to calcaneus position and rotate it to foot progression angle
+			 Evaluate_Expression
+			 !rotation and transposition
+			 /EXPRESSION=((P2D::Feet_outlines::l_foot_outline::X * cos (METRIC::COP::L_Foot_Prog@opositeHS_rad::Z)) + (P2D::Feet_outlines::l_foot_outline::Y * sin (METRIC::COP::L_Foot_Prog@opositeHS_rad::Z)) + (METRIC::COP::L_FCC@LON::X))
+			 /RESULT_NAME=L_foot_outline_X_rot
+			 ! /RESULT_TYPE=DERIVED
+			 /RESULT_FOLDER=COP
+			 ;
+
+			Evaluate_Expression
+			 !rotation and transposition
+			 /EXPRESSION=((- P2D::Feet_outlines::l_foot_outline::X * sin (METRIC::COP::L_Foot_Prog@opositeHS_rad::Z)) + (P2D::Feet_outlines::l_foot_outline::Y * cos (METRIC::COP::L_Foot_Prog@opositeHS_rad::Z)) + (METRIC::COP::L_FCC@LON::Y))
+			 /RESULT_NAME=L_foot_outline_Y_rot
+			 ! /RESULT_TYPE=DERIVED
+			 /RESULT_FOLDER=COP
+			 ;
+
+			Evaluate_Expression
+			 /EXPRESSION=vector(DERIVED::COP::L_foot_outline_X_rot,DERIVED::COP::L_foot_outline_Y_rot)
+			 /RESULT_NAME=L_foot_outline_rot
+			 ! /RESULT_TYPE=DERIVED
+			 /RESULT_FOLDER=COP
+			 ;
+
+			Evaluate_Expression
+			 !rotation and transposition
+			 /EXPRESSION=((P2D::Feet_outlines::r_foot_outline::X * cos (METRIC::COP::R_Foot_Prog@opositeHS_rad::Z)) + (P2D::Feet_outlines::r_foot_outline::Y * sin (METRIC::COP::R_Foot_Prog@opositeHS_rad::Z)) + (METRIC::COP::R_FCC@RON::X))
+			 /RESULT_NAME=R_foot_outline_X_rot
+			 ! /RESULT_TYPE=DERIVED
+			 /RESULT_FOLDER=COP
+			 ;
+
+			Evaluate_Expression
+			 !rotation and transposition
+			 /EXPRESSION=((- P2D::Feet_outlines::r_foot_outline::X * sin (METRIC::COP::R_Foot_Prog@opositeHS_rad::Z)) + (P2D::Feet_outlines::r_foot_outline::Y * cos (METRIC::COP::R_Foot_Prog@opositeHS_rad::Z)) + (METRIC::COP::R_FCC@RON::Y))
+			 /RESULT_NAME=R_foot_outline_Y_rot
+			 ! /RESULT_TYPE=DERIVED
+			 /RESULT_FOLDER=COP
+			 ;
+
+			Evaluate_Expression
+			 /EXPRESSION=vector(DERIVED::COP::R_foot_outline_X_rot,DERIVED::COP::R_foot_outline_Y_rot)
+			 /RESULT_NAME=R_foot_outline_rot
+			 ! /RESULT_TYPE=DERIVED
+			 /RESULT_FOLDER=COP
+			 ;
+			 
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond
+		;
+		
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond
+		/EXPRESSION=("&::event_mode&" = "Single forceplate")
+		! /AS_INTEGER=TRUE
+		;
+
+			Evaluate_Expression
+			 !rotation and transposition
+			 /EXPRESSION=((P2D::Feet_outlines::&::select_files&_foot_outline::X * cos (METRIC::COP::&::select_files&_Foot_Prog@opositeHS_rad::Z)) + (P2D::Feet_outlines::&::select_files&_foot_outline::Y * sin (METRIC::COP::&::select_files&_Foot_Prog@opositeHS_rad::Z)) + (METRIC::COP::&::select_files&_FCC@&::select_files&ON::X))
+			 /RESULT_NAME=&::select_files&_foot_outline_X_rot
+			 ! /RESULT_TYPE=DERIVED
+			 /RESULT_FOLDER=COP
+			 ;
+
+			Evaluate_Expression
+			 !rotation and transposition
+			 /EXPRESSION=((- P2D::Feet_outlines::&::select_files&_foot_outline::X * sin (METRIC::COP::&::select_files&_Foot_Prog@opositeHS_rad::Z)) + (P2D::Feet_outlines::&::select_files&_foot_outline::Y * cos (METRIC::COP::&::select_files&_Foot_Prog@opositeHS_rad::Z)) + (METRIC::COP::&::select_files&_FCC@&::select_files&ON::Y))
+			 /RESULT_NAME=&::select_files&_foot_outline_Y_rot
+			 ! /RESULT_TYPE=DERIVED
+			 /RESULT_FOLDER=COP
+			 ;
+
+			Evaluate_Expression
+			 /EXPRESSION=vector(DERIVED::COP::&::select_files&_foot_outline_X_rot,DERIVED::COP::&::select_files&_foot_outline_Y_rot)
+			 /RESULT_NAME=&::select_files&_foot_outline_rot
+			 ! /RESULT_TYPE=DERIVED
+			 /RESULT_FOLDER=COP
+			 ;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond
+		;
+		
+		!Place all COPs at one graph
+		!==============================
+		
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond
+		/EXPRESSION=("&::event_mode&" <> "Single forceplate")
+		! /AS_INTEGER=TRUE
+		;
+
+			For_Each
+			/ITERATION_PARAMETER_NAME=side
+			/ITEMS=L+R
+			;
+
+				! zeroing COP to place them at same origin relative to foot outline
+				! calculate distance of foot COG to proximal end of foot segment at L/RMS
+				Metric_Signal_Value_At_Event
+				/SIGNAL_TYPES=LINK_MODEL_BASED
+				! /SIGNAL_FOLDER=ORIGINAL
+				/SIGNAL_NAMES=&::side&_COP
+				/RESULT_METRIC_FOLDER=COP
+				/RESULT_METRIC_NAME=@&::side&MS
+				/APPLY_AS_SUFFIX_TO_SIGNAL_NAME=TRUE
+				! /SIGNAL_COMPONENTS=
+				/COMPONENT_SEQUENCE=ALL
+				/EVENT_NAME=&::side&MS
+				! /GENERATE_MEAN_AND_STDDEV=TRUE
+				! /APPEND_TO_EXISTING_VALUES=FALSE
+				! /GENERATE_VECTOR_LENGTH_METRIC=FALSE
+				! /RETAIN_NO_DATA_VALUES=FALSE
+				;
+
+				Metric_Signal_Value_At_Event
+				/RESULT_METRIC_NAME=&::side&_foot_CG_rt_LAB@&::side&MS
+				! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+				/RESULT_METRIC_FOLDER=COP
+				/SIGNAL_TYPES=LINK_MODEL_BASED
+				/SIGNAL_NAMES=&::side&_foot_CG_rt_LAB
+				! /SIGNAL_FOLDER=ORIGINAL
+				! /SIGNAL_COMPONENTS=
+				! /COMPONENT_SEQUENCE=
+				/EVENT_NAME=&::side&MS
+				! /GENERATE_MEAN_AND_STDDEV=TRUE
+				! /APPEND_TO_EXISTING_VALUES=FALSE
+				! /GENERATE_VECTOR_LENGTH_METRIC=FALSE
+				! /RETAIN_NO_DATA_VALUES=FALSE
+				;
+				
+				Conditional_Statement
+				/ITERATION_PARAMETER_NAME=cond1
+				/EXPRESSION=(("&::event_mode&" = "Instrumented treadmill (split belt)") | ("&::event_mode&" = "Instrumented treadmill (single belt)"))
+				! /AS_INTEGER=TRUE
+				;
+
+					!compute COP within trial mean
+					Global_Normalized_Signal_Mean
+					/SIGNAL_TYPES=LINK_MODEL_BASED
+					/SIGNAL_NAMES=&::side&_COP
+					/SIGNAL_FOLDER=ORIGINAL
+					! /SIGNAL_COMPONENTS=
+					/COMPONENT_SEQUENCE=X
+					! /START_LABEL=
+					! /END_LABEL=
+					/EVENT_SEQUENCE=&::side&ON+&::side&OFF
+					! /EXCLUDE_EVENTS=
+					/RESULT_NAME=&::side&_COP_mean_X
+					/RESULT_FOLDER=COP
+					! /NORMALIZE_POINTS=101
+					/CREATE_STANDARD_DEVIATION=TRUE
+					/CALCULATE_PER_FILE=TRUE
+					;
+
+					Global_Normalized_Signal_Mean
+					/SIGNAL_TYPES=LINK_MODEL_BASED
+					/SIGNAL_NAMES=&::side&_COP
+					/SIGNAL_FOLDER=ORIGINAL
+					! /SIGNAL_COMPONENTS=
+					/COMPONENT_SEQUENCE=Y
+					! /START_LABEL=
+					! /END_LABEL=
+					/EVENT_SEQUENCE=&::side&ON+&::side&OFF
+					! /EXCLUDE_EVENTS=
+					/RESULT_NAME=&::side&_COP_mean_Y
+					/RESULT_FOLDER=COP
+					! /NORMALIZE_POINTS=101
+					/CREATE_STANDARD_DEVIATION=TRUE
+					/CALCULATE_PER_FILE=TRUE
+					;
+
+					Global_Normalized_Signal_Mean
+					/SIGNAL_TYPES=LINK_MODEL_BASED
+					/SIGNAL_NAMES=&::side&_COP
+					/SIGNAL_FOLDER=ORIGINAL
+					! /SIGNAL_COMPONENTS=
+					/COMPONENT_SEQUENCE=Z
+					! /START_LABEL=
+					! /END_LABEL=
+					/EVENT_SEQUENCE=&::side&ON+&::side&OFF
+					! /EXCLUDE_EVENTS=
+					/RESULT_NAME=&::side&_COP_mean_Z
+					/RESULT_FOLDER=COP
+					! /NORMALIZE_POINTS=101
+					/CREATE_STANDARD_DEVIATION=TRUE
+					/CALCULATE_PER_FILE=TRUE
+					;
+
+					!correct COP by adding distance covered by treadmill
+					! distance covered by treadmill in one frame
+					Evaluate_Expression
+					/EXPRESSION=METRIC::TREADMILL::SPEED / PARAMETERS::POINT::RATE
+					/RESULT_NAME=DISPLACEMENT_PER_FRAME
+					/RESULT_TYPE=METRIC
+					/RESULT_FOLDER=COP
+					;
+
+					!number of frames from L/RON to L/ROFF
+					Metric_Frames_Between_Events
+					/RESULT_METRIC_NAME=Frames_&::side&ON_to_&::side&OFF
+					/RESULT_METRIC_FOLDER=COP
+					/EVENT_SEQUENCE=&::side&ON& + &::side&OFF
+					/EXCLUDE_EVENTS=
+					/GENERATE_MEAN_AND_STDDEV=FALSE
+					! /APPEND_TO_E XISTING_VALUES=FALSE
+					;
+					
+					Metric_Mean
+					/RESULT_METRIC_NAME=_mean
+					/APPLY_AS_SUFFIX_TO_SIGNAL_NAME=TRUE
+					/RESULT_METRIC_FOLDER=COP
+					/SIGNAL_TYPES=METRIC
+					/SIGNAL_NAMES=Frames_&::side&ON_to_&::side&OFF
+					/SIGNAL_FOLDER=COP
+					/SIGNAL_COMPONENTS=
+					/COMPONENT_SEQUENCE=ALL
+					/EVENT_SEQUENCE=
+					/EXCLUDE_EVENTS=
+					/GENERATE_MEAN_AND_STDDEV=FALSE
+					! /APPEND_TO_EXISTING_VALUES=FALSE
+					;
+					
+					!recalculate distance per frame to 101 frames since P2D::COP::L/RCOP_mean has 101 frames
+					Evaluate_Expression
+					/EXPRESSION=METRIC::COP::Frames_&::side&ON_to_&::side&OFF_mean / 101 * METRIC::COP::DISPLACEMENT_PER_FRAME
+					/RESULT_NAME=DISPLACEMENT_PER_FRAME_rel
+					/RESULT_TYPE=METRIC
+					/RESULT_FOLDER=COP
+					;
+					
+					! add distance traveled by treadmill to COP coordinates (only x component so far)
+					Evaluate_Expression
+					/EXPRESSION=GLOBAL::P2D::COP::&::side&_COP_mean_X::Y + (METRIC::COP::DISPLACEMENT_PER_FRAME_rel * GLOBAL::P2D::COP::&::side&_COP_mean_X::X)
+					/RESULT_NAME=&::side&_COP_mean_work
+					/RESULT_TYPE=P2D
+					/RESULT_FOLDER=COP
+					;
+
+					! recreate X component of P2D::COP::cop_mean_X
+					Evaluate_Expression
+					/EXPRESSION=vector(P2D::COP::&::side&_COP_mean_Y::X, P2D::COP::&::side&_COP_mean_work::X,GLOBAL::P2D::COP::&::side&_COP_mean_X::Z)
+					/RESULT_NAME=&::side&_COP_mean_X
+					/RESULT_TYPE=P2D
+					/RESULT_FOLDER=COP
+					;
+
+					!delete temporary signal
+					Remove_Signals
+					/SIGNAL_TYPES=P2D
+					/SIGNAL_NAMES=&::side&_COP_mean_work
+					/SIGNAL_FOLDER=COP
+					! /INCLUDE_MODELS=FALSE
+					;
+
+					! merge components to one signal
+					Evaluate_Expression
+					/EXPRESSION=vector(P2D::COP::&::side&_COP_mean_X::Y,P2D::COP::&::side&_COP_mean_Y::Y,P2D::COP::&::side&_COP_mean_Z::Y)
+					/RESULT_NAME=&::side&_COP_mean
+					! /RESULT_TYPE=DERIVED
+					/RESULT_FOLDER=COP
+					;
+					
+					! calculate mean midstance as pct of stance
+					!first ensure same number of events
+					Event_Copy
+					/EVENT_NAME=&::side&HS
+					/NEW_EVENT_NAME=&::side&HS_temp
+					! /EVENT_INSTANCE=0
+					! /RANGE_INSTANCE=0
+					/EVENT_SEQUENCE=&::side&HS+&::side&TO
+					! /EXCLUDE_EVENTS=
+					! /START_AT_EVENT=
+					! /END_AT_EVENT=
+					/FRAME_OFFSET=0
+					! /TIME_OFFSET=
+					! /PERCENT_OFFSET=
+					;
+					
+					Event_Copy
+					/EVENT_NAME=&::side&MS
+					/NEW_EVENT_NAME=&::side&MS_temp
+					! /EVENT_INSTANCE=0
+					! /RANGE_INSTANCE=0
+					/EVENT_SEQUENCE=&::side&HS+&::side&TO
+					! /EXCLUDE_EVENTS=
+					! /START_AT_EVENT=
+					! /END_AT_EVENT=
+					/FRAME_OFFSET=0
+					! /TIME_OFFSET=
+					! /PERCENT_OFFSET=
+					;
+					
+					Event_Copy
+					/EVENT_NAME=&::side&TO
+					/NEW_EVENT_NAME=&::side&TO_temp_1f
+					! /EVENT_INSTANCE=0
+					! /RANGE_INSTANCE=0
+					!/EVENT_SEQUENCE=
+					! /EXCLUDE_EVENTS=
+					! /START_AT_EVENT=
+					! /END_AT_EVENT=
+					/FRAME_OFFSET=1
+					! /TIME_OFFSET=
+					! /PERCENT_OFFSET=
+					;
+					
+					Event_Copy
+					/EVENT_NAME=&::side&TO
+					/NEW_EVENT_NAME=&::side&TO_temp
+					! /EVENT_INSTANCE=0
+					! /RANGE_INSTANCE=0
+					/EVENT_SEQUENCE=&::side&HS+&::side&TO_temp_1f
+					! /EXCLUDE_EVENTS=
+					! /START_AT_EVENT=
+					! /END_AT_EVENT=
+					/FRAME_OFFSET=0
+					! /TIME_OFFSET=
+					! /PERCENT_OFFSET=
+					;
+					
+					Metric_Time_Between_Events
+					/RESULT_METRIC_NAME=&::side&_cycle_time
+					/RESULT_METRIC_FOLDER=COP
+					/EVENT_SEQUENCE=&::side&HS_temp+&::side&MS_temp+&::side&TO_temp
+					/EXCLUDE_EVENTS=
+					! /GENERATE_MEAN_AND_STDDEV=TRUE
+					! /APPEND_TO_EXISTING_VALUES=FALSE
+					;
+					
+					Metric_Time_Between_Events
+					/RESULT_METRIC_NAME=&::side&HS_to_&::side&MS_time
+					/RESULT_METRIC_FOLDER=COP
+					/EVENT_SEQUENCE=&::side&HS_temp+&::side&MS_temp
+					/EXCLUDE_EVENTS=
+					! /GENERATE_MEAN_AND_STDDEV=TRUE
+					! /APPEND_TO_EXISTING_VALUES=FALSE
+					;
+					
+					Set_Pipeline_Parameter_From_Expression
+					/PARAMETER_NAME=MS_frame
+					/EXPRESSION=round(mean((METRIC::COP::&::side&HS_to_&::side&MS_time / METRIC::COP::&::side&_cycle_time) * 100))
+					! /AS_INTEGER=TRUE
+					;
+
+					!position of COP_mean first frame @ L/RMS
+					Evaluate_Expression
+					/EXPRESSION=DERIVED::COP::&::side&_COP_mean[&::MS_frame&]
+					/RESULT_NAME=&::side&_COP@&::side&MS
+					/RESULT_TYPE=METRIC
+					/RESULT_FOLDER=COP
+					;
+					
+					!calculate distance of foot COG to COP @ L/RMS
+					Evaluate_Expression
+					/EXPRESSION=METRIC::COP::&::side&_foot_CG_rt_LAB@&::side&MS_MEAN - METRIC::COP::&::side&_COP@&::side&MS_MEAN
+					/RESULT_NAME=&::side&_foot_CG_to_&::side&_COP_dist
+					/RESULT_TYPE=METRIC
+					/RESULT_FOLDER=COP
+					;
+
+					!calculate distance of calcaneus to foot COG at L/RMS
+					Evaluate_Expression
+					/EXPRESSION=METRIC::COP::&::side&_foot_CG_rt_LAB@&::side&MS_MEAN - METRIC::COP::&::side&_FCC@&::side&MS_MEAN
+					/RESULT_NAME=&::side&_foot_CG_to_&::side&_FCC_dist
+					/RESULT_TYPE=METRIC
+					/RESULT_FOLDER=COP
+					;
+
+					! zeroing COP
+					Evaluate_Expression
+					/EXPRESSION=DERIVED::COP::&::side&_COP_mean - METRIC::COP::&::side&_COP@&::side&MS
+					/RESULT_NAME=&::side&_COP_zeroed
+					! /RESULT_TYPE=DERIVED
+					/RESULT_FOLDER=COP
+					;
+
+					!shift COP origin by difference of CG to COP_origin minus COP_origin to FCC
+					Evaluate_Expression
+					/EXPRESSION=DERIVED::COP::&::side&_COP_zeroed + (METRIC::COP::&::side&_foot_CG_to_&::side&_FCC_dist - METRIC::COP::&::side&_foot_CG_to_&::side&_COP_dist)
+					/RESULT_NAME=&::side&_COP_shifted
+					! /RESULT_TYPE=DERIVED
+					/RESULT_FOLDER=COP
+					;
+					
+				Conditional_Statement_End
+				/ITERATION_PARAMETER_NAME=cond1
+				;
+		
+				Conditional_Statement
+				/ITERATION_PARAMETER_NAME=cond1
+				/EXPRESSION=(("&::event_mode&" <> "Instrumented treadmill (split belt)") &::AMP& ("&::event_mode&" <> "Instrumented treadmill (single belt)"))
+				! /AS_INTEGER=TRUE
+				;
+
+					Evaluate_Expression
+					/EXPRESSION=METRIC::COP::&::side&_foot_CG_rt_LAB@&::side&MS - METRIC::COP::&::side&_COP@&::side&MS
+					/RESULT_NAME=&::side&_foot_CG_to_&::side&_COP_dist
+					/RESULT_TYPE=METRIC
+					/RESULT_FOLDER=COP
+					;
+
+					!calculate distance of calcaneus to foot COG at L/RMS
+					Evaluate_Expression
+					/EXPRESSION=METRIC::COP::&::side&_foot_CG_rt_LAB@&::side&MS - METRIC::COP::&::side&_FCC@&::side&MS
+					/RESULT_NAME=&::side&_foot_CG_to_&::side&_FCC_dist
+					/RESULT_TYPE=METRIC
+					/RESULT_FOLDER=COP
+					;
+
+					!calculate difference between calcaneus position and COP origin
+					Evaluate_Expression
+					/EXPRESSION=LINK_MODEL_BASED::ORIGINAL::&::side&_COP - METRIC::COP::&::side&_COP@&::side&MS
+					/RESULT_NAME=&::side&_COP_zeroed
+					! /RESULT_TYPE=DERIVED
+					/RESULT_FOLDER=COP
+					;
+
+					!shift COP origin by difference of two above
+					Evaluate_Expression
+					/EXPRESSION=DERIVED::COP::&::side&_COP_zeroed + (METRIC::COP::&::side&_foot_CG_to_&::side&_FCC_dist - METRIC::COP::&::side&_foot_CG_to_&::side&_COP_dist)
+					/RESULT_NAME=&::side&_COP_shifted
+					! /RESULT_TYPE=DERIVED
+					/RESULT_FOLDER=COP
+					;
+					
+				Conditional_Statement_End
+				/ITERATION_PARAMETER_NAME=cond1
+				;
+		
+			End_For_Each
+			/ITERATION_PARAMETER_NAME=side
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond
+		;
+		
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond
+		/EXPRESSION=("&::event_mode&" = "Single forceplate")
+		! /AS_INTEGER=TRUE
+		;
+
+			Metric_Signal_Value_At_Event
+			/RESULT_METRIC_NAME=&::select_files&_foot_CG_rt_LAB@&::select_files&MS
+			! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+			/RESULT_METRIC_FOLDER=COP
+			/SIGNAL_TYPES=LINK_MODEL_BASED
+			/SIGNAL_NAMES=&::select_files&_foot_CG_rt_LAB
+			! /SIGNAL_FOLDER=ORIGINAL
+			! /SIGNAL_COMPONENTS=
+			! /COMPONENT_SEQUENCE=
+			/EVENT_NAME=&::select_files&MS
+			! /GENERATE_MEAN_AND_STDDEV=TRUE
+			! /APPEND_TO_EXISTING_VALUES=FALSE
+			! /GENERATE_VECTOR_LENGTH_METRIC=FALSE
+			! /RETAIN_NO_DATA_VALUES=FALSE
+			;
+
+			Metric_Signal_Value_At_Event
+			/RESULT_METRIC_NAME=&::select_files&_COP@&::select_files&MS
+			! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+			/RESULT_METRIC_FOLDER=COP
+			/SIGNAL_TYPES=LINK_MODEL_BASED
+			/SIGNAL_NAMES=&::select_files&_COP
+			! /SIGNAL_FOLDER=ORIGINAL
+			! /SIGNAL_COMPONENTS=
+			! /COMPONENT_SEQUENCE=
+			/EVENT_NAME=&::select_files&MS
+			! /GENERATE_MEAN_AND_STDDEV=TRUE
+			! /APPEND_TO_EXISTING_VALUES=FALSE
+			! /GENERATE_VECTOR_LENGTH_METRIC=FALSE
+			! /RETAIN_NO_DATA_VALUES=FALSE
+			;
+
+			Evaluate_Expression
+			/EXPRESSION=METRIC::COP::&::select_files&_foot_CG_rt_LAB@&::select_files&MS - METRIC::COP::&::select_files&_COP@&::select_files&MS
+			/RESULT_NAME=&::select_files&_foot_CG_to_&::select_files&_COP_dist
+			/RESULT_TYPE=METRIC
+			/RESULT_FOLDER=COP
+			;
+
+			!calculate distance of calcaneus to foot COG at L/RON
+			Evaluate_Expression
+			/EXPRESSION=METRIC::COP::&::select_files&_foot_CG_rt_LAB@&::select_files&MS - METRIC::COP::&::select_files&_FCC@&::select_files&MS
+			/RESULT_NAME=&::select_files&_foot_CG_to_&::select_files&_FCC_dist
+			/RESULT_TYPE=METRIC
+			/RESULT_FOLDER=COP
+			;
+
+			!calculate difference between calcaneus position and COP origin
+			Evaluate_Expression
+			/EXPRESSION=LINK_MODEL_BASED::ORIGINAL::&::select_files&_COP - METRIC::COP::&::select_files&_COP@&::select_files&MS
+			/RESULT_NAME=&::select_files&_COP_zeroed
+			! /RESULT_TYPE=DERIVED
+			/RESULT_FOLDER=COP
+			;
+			 
+			!shift COP origin by difference of two above
+			Evaluate_Expression
+			/EXPRESSION=DERIVED::COP::&::select_files&_COP_zeroed + (METRIC::COP::&::select_files&_foot_CG_to_&::select_files&_FCC_dist - METRIC::COP::&::select_files&_foot_CG_to_&::select_files&_COP_dist)
+			/RESULT_NAME=&::select_files&_COP_shifted
+			! /RESULT_TYPE=DERIVED
+			/RESULT_FOLDER=COP
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond
+		;
+		
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond
+		/EXPRESSION=("&::event_mode&" <> "Single forceplate")
+		! /AS_INTEGER=TRUE
+		;
+
+			! rotate COP (without transpositioning)
+			 Evaluate_Expression
+			 /EXPRESSION=((DERIVED::COP::L_COP_shifted::X * cos (METRIC::COP::L_Foot_Prog@opositeHS_rad::Z)) - (DERIVED::COP::L_COP_shifted::Y * sin (METRIC::COP::L_Foot_Prog@opositeHS_rad::Z)))
+			 /RESULT_NAME=L_COP_X_rot
+			 ! /RESULT_TYPE=DERIVED
+			 /RESULT_FOLDER=COP
+			 ;
+
+			Evaluate_Expression
+			/EXPRESSION=((DERIVED::COP::L_COP_shifted::X * sin (METRIC::COP::L_Foot_Prog@opositeHS_rad::Z)) + (DERIVED::COP::L_COP_shifted::Y * cos (METRIC::COP::L_Foot_Prog@opositeHS_rad::Z)))
+			/RESULT_NAME=L_COP_Y_rot
+			! /RESULT_TYPE=DERIVED
+			/RESULT_FOLDER=COP
+			;
+
+			! invert if walking direction = -X/-Y
+			Conditional_Statement
+			/ITERATION_PARAMETER_NAME=cond1
+			/EXPRESSION=(("&::event_mode&" = "Instrumented treadmill (split belt)") | ("&::event_mode&" = "Instrumented treadmill (single belt)"))
+			! /AS_INTEGER=TRUE
+			;
+
+				Evaluate_Expression
+				/EXPRESSION=vector(DERIVED::COP::L_COP_X_rot,DERIVED::COP::L_COP_Y_rot)
+				 /RESULT_NAME=L_COP_rot
+				 ! /RESULT_TYPE=DERIVED
+				 /RESULT_FOLDER=COP
+				 ;
+
+			Conditional_Statement_End
+			/ITERATION_PARAMETER_NAME=cond1
+			;
+		
+			Conditional_Statement
+			/ITERATION_PARAMETER_NAME=cond1
+			/EXPRESSION=(("&::event_mode&" <> "Instrumented treadmill (split belt)") &::AMP& ("&::event_mode&" <> "Instrumented treadmill (single belt)"))
+			! /AS_INTEGER=TRUE
+			;
+
+				Evaluate_Expression
+				/EXPRESSION=(("&::wd&" = "X_pos") + ("&::wd&" = "X_neg"))
+						* (((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(vector(DERIVED::COP::L_COP_X_rot,DERIVED::COP::L_COP_Y_rot)))
+						   + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(vector(DERIVED::COP::L_COP_X_rot,DERIVED::COP::L_COP_Y_rot)))
+						   + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(-1 * vector(DERIVED::COP::L_COP_X_rot,DERIVED::COP::L_COP_Y_rot)))
+						   + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(vector(DERIVED::COP::L_COP_X_rot,DERIVED::COP::L_COP_Y_rot)))
+						   + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(vector(DERIVED::COP::L_COP_X_rot,DERIVED::COP::L_COP_Y_rot)))
+						   + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(-1 * vector(DERIVED::COP::L_COP_X_rot,DERIVED::COP::L_COP_Y_rot)))
+						   + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(-1 * vector(DERIVED::COP::L_COP_X_rot,DERIVED::COP::L_COP_Y_rot)))
+						   + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(-1 * vector(DERIVED::COP::L_COP_X_rot,DERIVED::COP::L_COP_Y_rot)))
+						   
+						   + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(-1 * vector(DERIVED::COP::L_COP_X_rot,DERIVED::COP::L_COP_Y_rot)))
+						   + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(vector(DERIVED::COP::L_COP_X_rot,DERIVED::COP::L_COP_Y_rot)))
+						   + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(-1 * vector(DERIVED::COP::L_COP_X_rot,DERIVED::COP::L_COP_Y_rot)))
+						   + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(vector(DERIVED::COP::L_COP_X_rot,DERIVED::COP::L_COP_Y_rot)))
+						   + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(-1 * vector(DERIVED::COP::L_COP_X_rot,DERIVED::COP::L_COP_Y_rot)))
+						   + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(vector(DERIVED::COP::L_COP_X_rot,DERIVED::COP::L_COP_Y_rot)))
+						   + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(-1 * vector(DERIVED::COP::L_COP_X_rot,DERIVED::COP::L_COP_Y_rot)))
+						   + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(vector(DERIVED::COP::L_COP_X_rot,DERIVED::COP::L_COP_Y_rot))))
+						   
+						+ (("&::wd&" = "Y_pos") + ("&::wd&" = "Y_neg"))
+							* (((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(vector(DERIVED::COP::L_COP_X_rot,DERIVED::COP::L_COP_Y_rot)))
+						   + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(vector(DERIVED::COP::L_COP_X_rot,DERIVED::COP::L_COP_Y_rot)))
+						   + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(-1 * vector(DERIVED::COP::L_COP_X_rot,DERIVED::COP::L_COP_Y_rot)))
+						   + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(vector(DERIVED::COP::L_COP_X_rot,DERIVED::COP::L_COP_Y_rot)))
+						   + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(vector(DERIVED::COP::L_COP_X_rot,DERIVED::COP::L_COP_Y_rot)))
+						   + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(-1 * vector(DERIVED::COP::L_COP_X_rot,DERIVED::COP::L_COP_Y_rot)))
+						   + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(-1 * vector(DERIVED::COP::L_COP_X_rot,DERIVED::COP::L_COP_Y_rot)))
+						   + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(-1 * vector(DERIVED::COP::L_COP_X_rot,DERIVED::COP::L_COP_Y_rot)))
+						   
+						   + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(-1 * vector(DERIVED::COP::L_COP_X_rot,DERIVED::COP::L_COP_Y_rot)))
+						   + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(vector(DERIVED::COP::L_COP_X_rot,DERIVED::COP::L_COP_Y_rot)))
+						   + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(-1 * vector(DERIVED::COP::L_COP_X_rot,DERIVED::COP::L_COP_Y_rot)))
+						   + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(vector(DERIVED::COP::L_COP_X_rot,DERIVED::COP::L_COP_Y_rot)))
+						   + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(-1 * vector(DERIVED::COP::L_COP_X_rot,DERIVED::COP::L_COP_Y_rot)))
+						   + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(vector(DERIVED::COP::L_COP_X_rot,DERIVED::COP::L_COP_Y_rot)))
+						   + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(-1 * vector(DERIVED::COP::L_COP_X_rot,DERIVED::COP::L_COP_Y_rot)))
+						   + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(vector(DERIVED::COP::L_COP_X_rot,DERIVED::COP::L_COP_Y_rot))))
+				 /RESULT_NAME=L_COP_rot
+				 ! /RESULT_TYPE=DERIVED
+				 /RESULT_FOLDER=COP
+				 ;
+
+			Conditional_Statement_End
+			/ITERATION_PARAMETER_NAME=cond1
+			;
+		
+			Evaluate_Expression
+			 /EXPRESSION=((DERIVED::COP::R_COP_shifted::X * cos (METRIC::COP::R_Foot_Prog@opositeHS_rad::Z)) - (DERIVED::COP::R_COP_shifted::Y * sin (METRIC::COP::R_Foot_Prog@opositeHS_rad::Z)))
+			 /RESULT_NAME=R_COP_X_rot
+			 ! /RESULT_TYPE=DERIVED
+			 /RESULT_FOLDER=COP
+			 ;
+
+			Evaluate_Expression
+			 /EXPRESSION=((DERIVED::COP::R_COP_shifted::X * sin (METRIC::COP::R_Foot_Prog@opositeHS_rad::Z)) + (DERIVED::COP::R_COP_shifted::Y * cos (METRIC::COP::R_Foot_Prog@opositeHS_rad::Z)))
+			 /RESULT_NAME=R_COP_Y_rot
+			 ! /RESULT_TYPE=DERIVED
+			 /RESULT_FOLDER=COP
+			 ;
+
+			Conditional_Statement
+			/ITERATION_PARAMETER_NAME=cond1
+			/EXPRESSION=(("&::event_mode&" = "Instrumented treadmill (split belt)") | ("&::event_mode&" = "Instrumented treadmill (single belt)"))
+			! /AS_INTEGER=TRUE
+			;
+
+				Evaluate_Expression
+				/EXPRESSION=vector(DERIVED::COP::R_COP_X_rot,DERIVED::COP::R_COP_Y_rot)
+				/RESULT_NAME=R_COP_rot
+				! /RESULT_TYPE=DERIVED
+				/RESULT_FOLDER=COP
+				;
+
+			Conditional_Statement_End
+			/ITERATION_PARAMETER_NAME=cond1
+			;
+		
+			Conditional_Statement
+			/ITERATION_PARAMETER_NAME=cond1
+			/EXPRESSION=(("&::event_mode&" <> "Instrumented treadmill (split belt)") &::AMP& ("&::event_mode&" <> "Instrumented treadmill (single belt)"))
+			! /AS_INTEGER=TRUE
+			;
+
+				Evaluate_Expression
+			   /EXPRESSION=(("&::wd&" = "X_pos") + ("&::wd&" = "X_neg"))
+						* (((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(vector(DERIVED::COP::R_COP_X_rot,DERIVED::COP::R_COP_Y_rot)))
+						 + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(vector(DERIVED::COP::R_COP_X_rot,DERIVED::COP::R_COP_Y_rot)))
+						 + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(-1 * vector(DERIVED::COP::R_COP_X_rot,DERIVED::COP::R_COP_Y_rot)))
+						 + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(vector(DERIVED::COP::R_COP_X_rot,DERIVED::COP::R_COP_Y_rot)))
+						 + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(vector(DERIVED::COP::R_COP_X_rot,DERIVED::COP::R_COP_Y_rot)))
+						 + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(-1 * vector(DERIVED::COP::R_COP_X_rot,DERIVED::COP::R_COP_Y_rot)))
+						 + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(-1 * vector(DERIVED::COP::R_COP_X_rot,DERIVED::COP::R_COP_Y_rot)))
+						 + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(-1 * vector(DERIVED::COP::R_COP_X_rot,DERIVED::COP::R_COP_Y_rot)))
+						 
+						 + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(-1 * vector(DERIVED::COP::R_COP_X_rot,DERIVED::COP::R_COP_Y_rot)))
+						 + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(vector(DERIVED::COP::R_COP_X_rot,DERIVED::COP::R_COP_Y_rot)))
+						 + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(-1 * vector(DERIVED::COP::R_COP_X_rot,DERIVED::COP::R_COP_Y_rot)))
+						 + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X < 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(vector(DERIVED::COP::R_COP_X_rot,DERIVED::COP::R_COP_Y_rot)))
+						 + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(-1 * vector(DERIVED::COP::R_COP_X_rot,DERIVED::COP::R_COP_Y_rot)))
+						 + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X > 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(vector(DERIVED::COP::R_COP_X_rot,DERIVED::COP::R_COP_Y_rot)))
+						 + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X < METRIC::COP::R_FCC@RON::X)*(-1 * vector(DERIVED::COP::R_COP_X_rot,DERIVED::COP::R_COP_Y_rot)))
+						 + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::X > 0)*(METRIC::COP::R_FCC@RON::X < 0)*(METRIC::COP::L_FCC@LON::X > METRIC::COP::R_FCC@RON::X)*(vector(DERIVED::COP::R_COP_X_rot,DERIVED::COP::R_COP_Y_rot))))
+
+						 + (("&::wd&" = "Y_pos") + ("&::wd&" = "Y_neg"))
+						* (((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(-1 * vector(DERIVED::COP::R_COP_X_rot,DERIVED::COP::R_COP_Y_rot)))
+						 + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(-1 * vector(DERIVED::COP::R_COP_X_rot,DERIVED::COP::R_COP_Y_rot)))
+						 + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(vector(DERIVED::COP::R_COP_X_rot,DERIVED::COP::R_COP_Y_rot)))
+						 + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(-1 * vector(DERIVED::COP::R_COP_X_rot,DERIVED::COP::R_COP_Y_rot)))
+						 + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(-1 * vector(DERIVED::COP::R_COP_X_rot,DERIVED::COP::R_COP_Y_rot)))
+						 + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(vector(DERIVED::COP::R_COP_X_rot,DERIVED::COP::R_COP_Y_rot)))
+						 + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(vector(DERIVED::COP::R_COP_X_rot,DERIVED::COP::R_COP_Y_rot)))
+						 + ((METRIC::COP::LON < METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(vector(DERIVED::COP::R_COP_X_rot,DERIVED::COP::R_COP_Y_rot)))
+						 
+						 + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(vector(DERIVED::COP::R_COP_X_rot,DERIVED::COP::R_COP_Y_rot)))
+						 + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(-1 * vector(DERIVED::COP::R_COP_X_rot,DERIVED::COP::R_COP_Y_rot)))
+						 + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(vector(DERIVED::COP::R_COP_X_rot,DERIVED::COP::R_COP_Y_rot)))
+						 + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y < 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(-1 * vector(DERIVED::COP::R_COP_X_rot,DERIVED::COP::R_COP_Y_rot)))
+						 + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(vector(DERIVED::COP::R_COP_X_rot,DERIVED::COP::R_COP_Y_rot)))
+						 + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y > 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(-1 * vector(DERIVED::COP::R_COP_X_rot,DERIVED::COP::R_COP_Y_rot)))
+						 + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y < METRIC::COP::R_FCC@RON::Y)*(vector(DERIVED::COP::R_COP_X_rot,DERIVED::COP::R_COP_Y_rot)))
+						 + ((METRIC::COP::LON > METRIC::COP::RON)*(METRIC::COP::L_FCC@LON::Y > 0)*(METRIC::COP::R_FCC@RON::Y < 0)*(METRIC::COP::L_FCC@LON::Y > METRIC::COP::R_FCC@RON::Y)*(-1 * vector(DERIVED::COP::R_COP_X_rot,DERIVED::COP::R_COP_Y_rot))))
+				 /RESULT_NAME=R_COP_rot
+				 ! /RESULT_TYPE=DERIVED
+				 /RESULT_FOLDER=COP
+				 ;
+				 
+			Conditional_Statement_End
+			/ITERATION_PARAMETER_NAME=cond1
+			;
+		
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond
+		;
+		
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond
+		/EXPRESSION=("&::event_mode&" = "Single forceplate")
+		! /AS_INTEGER=TRUE
+		;
+
+			! rotate COP (without transpositioning)
+			 Evaluate_Expression
+			 /EXPRESSION=((DERIVED::COP::&::select_files&_COP_shifted::X * cos (METRIC::COP::&::select_files&_Foot_Prog@opositeHS_rad::Z)) - (DERIVED::COP::&::select_files&_COP_shifted::Y * sin (METRIC::COP::&::select_files&_Foot_Prog@opositeHS_rad::Z)))
+			 /RESULT_NAME=&::select_files&_COP_X_rot
+			 ! /RESULT_TYPE=DERIVED
+			 /RESULT_FOLDER=COP
+			 ;
+
+			Evaluate_Expression
+			/EXPRESSION=((DERIVED::COP::&::select_files&_COP_shifted::X * sin (METRIC::COP::&::select_files&_Foot_Prog@opositeHS_rad::Z)) + (DERIVED::COP::&::select_files&_COP_shifted::Y * cos (METRIC::COP::&::select_files&_Foot_Prog@opositeHS_rad::Z)))
+			/RESULT_NAME=&::select_files&_COP_Y_rot
+			! /RESULT_TYPE=DERIVED
+			/RESULT_FOLDER=COP
+			;
+
+			! invert if walking direction = -X
+			Evaluate_Expression
+			/EXPRESSION=((METRIC::VIRTUAL_LAB::LAB_LATERAL::X = 0) * (vector(DERIVED::COP::&::select_files&_COP_X_rot,DERIVED::COP::&::select_files&_COP_Y_rot)))
+					  + ((METRIC::VIRTUAL_LAB::LAB_LATERAL::Y = 0) * (-1 * vector(DERIVED::COP::&::select_files&_COP_X_rot,DERIVED::COP::&::select_files&_COP_Y_rot)))
+			/RESULT_NAME=&::select_files&_COP_rot
+			! /RESULT_TYPE=DERIVED
+			/RESULT_FOLDER=COP
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond
+		;
+		
+	End_For_Each
+	/ITERATION_PARAMETER_NAME=filename
+	;
+
+End_For_Each
+/ITERATION_PARAMETER_NAME=select_files
+;

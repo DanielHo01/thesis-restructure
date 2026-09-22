@@ -1,0 +1,110 @@
+Set_Pipeline_Parameter_To_List_Of_Signal_Names
+/PARAMETER_NAME=signals
+/SIGNAL_TYPES=P2D
+/SIGNAL_FOLDER=PROCESSED
+;
+
+For_Each
+/ITERATION_PARAMETER_NAME=signal
+! /ITERATION_PARAMETER_COUNT_NAME=
+/ITEMS=::signals
+;
+
+Evaluate_Expression
+  /EXPRESSION=(P2D::PROCESSED::&::signal&::COLON&::COLON&2 - P2D::PROCESSED::&::signal&::COLON&::COLON&3) / 1000000
+  /RESULT_NAME=&::signal
+  /RESULT_TYPE=DERIVED
+  /RESULT_FOLDER=NORM_LOWER
+;
+
+Evaluate_Expression
+  /EXPRESSION=(2 * P2D::PROCESSED::&::signal&::COLON&::COLON&3) / 1000000
+  /RESULT_NAME=&::signal
+  /RESULT_TYPE=DERIVED
+  /RESULT_FOLDER=NORM_RANGE
+;
+
+End_For_Each
+/ITERATION_PARAMETER_NAME=signal
+;
+
+Export_Data_To_Ascii_File
+/SIGNAL_TYPES=DERIVED
+/SIGNAL_FOLDER=NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE
+/SIGNAL_NAMES=Biceps Femoris+Erector Spinae lumbar+Erector Spinae thoracic+External Oblique+Gastrocnemius lateral+Gastrocnemius medial+Gluteus Maximus+Gluteus Medius+Hip Adductors+Internal Oblique+Multifidus+Peroneus+Rectus Abdominis+Rectus Femoris+Semitendinosus+Soleus+Tensor Fasciae Latae+Tibialis Anterior+Trapezius upper+Vastus Lateralis+Vastus Medialis+Biceps Femoris+Erector Spinae lumbar+Erector Spinae thoracic+External Oblique+Gastrocnemius lateral+Gastrocnemius medial+Gluteus Maximus+Gluteus Medius+Hip Adductors+Internal Oblique+Multifidus+Peroneus+Rectus Abdominis+Rectus Femoris+Semitendinosus+Soleus+Tensor Fasciae Latae+Tibialis Anterior+Trapezius upper+Vastus Lateralis+Vastus Medialis
+/FILE_NAME=E:\Qualisys_repository\PAF-Qualisys-Clinical-System\Templates\Assets\Web Normatives\normatives_EMG_Noraxon.xml
+! /SIGNAL_COMPONENTS=
+/COMPONENT_SEQUENCE=ALL
+! /SIGNAL_PRECISION=
+! /EVENT_SEQUENCE=
+! /EXCLUDE_EVENTS=
+! /USE_POINT_RATE=FALSE
+! /NORMALIZE_DATA=FALSE
+! /NORMALIZE_POINTS=101
+! /EXPORT_MEAN_AND_STD_DEV=FALSE
+! /USE_P2D_FORMAT=FALSE
+/USE_XML_FORMAT=TRUE
+/USE_SHORT_FILENAME=TRUE
+! /EXPORT_EMPTY_SIGNALS=FALSE
+! /EXPORT_WITHOUT_HEADER=FALSE
+! /EXPORT_NAN=FALSE
+/USE_SCIENTIFIC_NOTATION=TRUE
+;
+
+Set_Pipeline_Parameter_To_List_Of_Signal_Names
+/PARAMETER_NAME=signals
+/SIGNAL_TYPES=P2D
+/SIGNAL_FOLDER=TSP_normatives
+;
+
+For_Each
+/ITERATION_PARAMETER_NAME=signal
+! /ITERATION_PARAMETER_COUNT_NAME=
+/ITEMS=::signals
+;
+
+Evaluate_Expression
+  /EXPRESSION=P2D::TSP_normatives::&::signal&::COLON&::COLON&2 - P2D::TSP_normatives::&::signal&::COLON&::COLON&3
+  /RESULT_NAME=&::signal
+  /RESULT_TYPE=DERIVED
+  /RESULT_FOLDER=NORM_LOWER
+;
+
+Evaluate_Expression
+  /EXPRESSION=2 * P2D::TSP_normatives::&::signal&::COLON&::COLON&3
+  /RESULT_NAME=&::signal
+  /RESULT_TYPE=DERIVED
+  /RESULT_FOLDER=NORM_RANGE
+;
+
+End_For_Each
+/ITERATION_PARAMETER_NAME=signal
+;
+
+Export_Data_To_Ascii_File
+/SIGNAL_TYPES=DERIVED
+/SIGNAL_FOLDER=NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_LOWER+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE+NORM_RANGE
+/SIGNAL_NAMES=CadenceNorm+Left_Step_LengthNorm+Right_Step_LengthNorm+SpeedNorm+Stride_LengthNorm+CadenceNorm+Left_Step_LengthNorm+Right_Step_LengthNorm+SpeedNorm+Stride_LengthNorm
+/FILE_NAME=E:\Qualisys_repository\PAF-Qualisys-Clinical-System\Templates\Assets\Web Normatives\normatives_TSP.xml
+! /SIGNAL_COMPONENTS=
+/COMPONENT_SEQUENCE=ALL
+! /SIGNAL_PRECISION=
+! /EVENT_SEQUENCE=
+! /EXCLUDE_EVENTS=
+! /USE_POINT_RATE=FALSE
+! /NORMALIZE_DATA=FALSE
+! /NORMALIZE_POINTS=101
+! /EXPORT_MEAN_AND_STD_DEV=FALSE
+! /USE_P2D_FORMAT=FALSE
+/USE_XML_FORMAT=TRUE
+/USE_SHORT_FILENAME=TRUE
+! /EXPORT_EMPTY_SIGNALS=FALSE
+! /EXPORT_WITHOUT_HEADER=FALSE
+! /EXPORT_NAN=FALSE
+/USE_SCIENTIFIC_NOTATION=TRUE
+;
+
+**__Add_a_Comment__**
+! /COMMENT=normatives_MAP crated manually
+;
+

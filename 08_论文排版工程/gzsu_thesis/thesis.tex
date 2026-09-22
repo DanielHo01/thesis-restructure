@@ -1,0 +1,212 @@
+%%
+%% 广州体育学院硕士学位论文
+%% thesis.tex
+%% 编译命令：
+%%   xelatex thesis.tex
+%%   biber thesis
+%%   xelatex thesis.tex
+%%   xelatex thesis.tex
+%%
+
+\documentclass[
+  degree=master,
+  degreetype=profession,
+  bibtype=numeric
+]{gzsu_thesis}
+
+% ========================================================================
+% 封面信息设置
+% ========================================================================
+\gzsusetup{
+  classification={},
+  schoolcode={10585},
+  secretlevel={},
+  ctitle={数智化监控下青年男性下肢抗阻训练的执行与适应},
+  etitle={Execution and Adaptation of Lower-Body Resistance Training Under Digital Monitoring in Young Men: A Mixed-Methods Pilot Study},
+  cauthor={何天元},
+  eauthor={He Tianyuan},
+  studentid={105852024400158},
+  csupervisor={孙健 教授},
+  esupervisor={Prof. Sun Jian},
+  cmajor={体育教学},
+  emajor={Physical Education},
+  cdirection={体育学},
+  cthesis={体育硕士专业学位论文},
+  cdate={2026年6月},
+  edate={June, 2026},
+}
+
+% ========================================================================
+% 参考文献
+% ========================================================================
+\addbibresource{refs.bib}
+
+% ========================================================================
+% 图片路径
+% ========================================================================
+\graphicspath{{figures/}}
+
+\begin{document}
+
+% ========================================================================
+% 前言部分
+% ========================================================================
+\frontmatter
+
+% 封面
+\makecover
+
+% 独创性声明
+\makestatement
+
+% 中文摘要
+\newpage
+\thispagestyle{empty}
+\begin{center}
+  \sanhao\heiti\bfseries 摘~~要
+\end{center}
+\par\vskip 0.5em
+
+本研究采用混合方法设计，探索数智化监控环境下青年男性下肢抗阻训练的执行效果与生理适应机制...
+
+\keywords{数智化监控；抗阻训练；青年男性；执行与适应}
+
+% 英文摘要
+\newpage
+\thispagestyle{empty}
+\begin{center}
+  \sanhao\bfseries Abstract
+\end{center}
+\par\vskip 0.5em
+
+This study employed a mixed-methods design to investigate the execution and adaptation of lower-body resistance training under digital monitoring in young men...
+
+\engkeywords{Digital Monitoring; Resistance Training; Young Men; Execution and Adaptation}
+
+% 目录
+\newpage
+\pagestyle{gzsu@toc}
+\pagenumbering{Roman}
+\tableofcontents
+
+% 图目录
+\newpage
+\listoffigures
+
+% 表目录
+\newpage
+\listoftables
+
+% ========================================================================
+% 正文部分
+% ========================================================================
+\clearpage
+\pagenumbering{arabic}
+\pagestyle{gzsu@headingmain}
+
+% 第一章
+\chapter{绪论}
+
+\section{研究背景}
+
+\subsection{理论背景}
+
+一级标题三号黑体，居中，1.5倍行距，段前、段后各设为0.5行。所有二级标题为四号黑体，左对齐，1.5倍行距，段前、段后各设为0.5行，不接排。所有三级标题为小四号黑体，左对齐，1.5倍行距，段前、段后各设为0.5行，不接排。
+
+全文一律采用无网格、小四号宋体字，行距为1.5倍，段前段后不空行。全文所有英文和数字用小四Times New Roman字体，段落首行缩进"两个字符"。
+
+为了方便排版，如果英文或者数字与中文挨着，比如出现"正如Brian (2025)所说"或者"今年是2025年"的情况，最好将英文 or 数字与中文隔一个空格，这样做不仅排版好看，而且还可以不影响\LaTeX\的自动换行。
+
+\subsection{现实背景}
+
+随着信息技术的快速发展，数字化监控设备在体育训练中的应用越来越广泛。智能手环、可穿戴传感器等设备能够实时采集运动员的训练数据，为教练员提供科学的训练反馈。
+
+\section{研究意义}
+
+\subsection{理论意义}
+
+本研究从理论与实践两个层面探讨数智化监控在抗阻训练中的应用价值。理论层面拓展了运动训练学的研究视野，实践层面为教练员提供了科学的训练指导依据。
+
+\subsection{现实意义}
+
+通过量化分析训练过程中的各项指标，为青年男性的科学健身提供实证依据。
+
+% 第二章
+\chapter{理论机制}
+
+\section{影响机制M1}
+
+本研究提出了数智化监控对训练效果的影响机制模型。
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.8\textwidth]{example-image}
+  \caption{研究框架图}
+  \label{fig:framework}
+\end{figure}
+
+如图\cref{fig:framework}所示，系统包含数据采集、实时反馈、训练调整三个核心环节。
+
+\section{影响机制M2}
+
+通过对比实验验证假设。
+
+\begin{equation}\label{eq:model1}
+  Y = \beta_0 + \beta_1 \cdot D + \gamma \cdot X + \varepsilon
+\end{equation}
+
+如\cref{eq:model1}所示，$D$表示干预变量。
+
+% 第三章
+\chapter{计量模型与数据说明}
+
+\section{模型设定}
+
+本研究采用双重差分模型（DID）进行因果推断。
+
+\begin{table}[htbp]
+  \centering
+  \caption{基准回归结果}
+  \label{tab:baseline}
+  \begin{threeparttable}
+    \begin{tabular}{l*{4}{c}}
+      \toprule
+      & (1) & (2) & (3) & (4) \\
+      & Y & Y & Y & Y \\ \midrule
+      D & -0.024*** & -0.050*** & -0.014*** & -0.044*** \\
+         & (-4.96) & (-3.88) & (-3.09) & (-3.26) \\
+      X1 &  &  & 0.593*** & 2.267*** \\
+         &  &  & (9.70) & (6.54) \\
+      Constant & -2.058*** & -0.696*** & -9.196*** & -15.569*** \\
+         & (-41.31) & (-6.20) & (-27.00) & (-12.40) \\
+      Observations & 34,409 & 18,039 & 34,409 & 18,039 \\ \bottomrule
+    \end{tabular}
+    \begin{tablenotes}
+      \footnotesize
+      \item[a] Robust standard error clustered at firm level.
+      \item[b] *** p$<$0.01, ** p$<$0.05, * p$<$0.1
+    \end{tablenotes}
+  \end{threeparttable}
+\end{table}
+
+如\cref{tab:baseline}所示，主要结果稳健。
+
+% ========================================================================
+% 后记部分
+% ========================================================================
+\backmatter
+
+% 参考文献
+\printbibliography[heading=bibintoc, title={参考文献}]
+
+% 致谢
+\chapter*{致谢}\markboth{致谢}{}
+
+感谢导师的悉心指导，感谢家人的支持与鼓励。
+
+% 个人简历
+\chapter*{个人简历}\markboth{个人简历}{}
+
+何天元，男，1998年生，2024年毕业于广州体育学院...
+
+\end{document}

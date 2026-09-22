@@ -1,0 +1,687 @@
+\documentclass[UTF8,zihao=-4,twoside,openany]{ctexbook}
+
+% ---------------- 页面宏包与几何尺寸（严格对应 Word 页面设置） ----------------
+\usepackage[
+  a4paper,
+  top=2.75cm,
+  bottom=1.92cm,
+  left=3.2cm,
+  right=2.2cm,
+  headheight=15pt,
+  headsep=0.75cm,
+  footskip=0.55cm,
+  asymmetric % 锁定左侧 3.2cm 装订边距，不随奇偶页翻转
+]{geometry}
+
+% 消除 book 类自动插入的空白过渡页
+\let\cleardoublepage\clearpage
+
+% ---------------- 字体与字符支持 ----------------
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+
+% 英文无衬线字体绑定 Arial
+\IfFontExistsTF{Arial}{%
+  \setsansfont{Arial}
+  \newfontfamily\arialfont{Arial}
+}{%
+  \setsansfont{TeX Gyre Heros}
+  \newfontfamily\arialfont{TeX Gyre Heros}
+}
+
+% 开启伪粗体算法，消除仿宋等无天然粗体字重的报警
+\usepackage{xeCJK}
+\xeCJKsetup{AutoFakeBold=true}
+
+\usepackage{amssymb} % 复选框符号 \square
+\usepackage{xurl}    % 允许超长网址任意断行，消除 Overfull \hbox
+
+% ---------------- 正文基础排版（宋体 12 磅，行距 20 磅） ----------------
+\renewcommand{\normalsize}{\fontsize{12pt}{20pt}\selectfont}
+\normalsize
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0pt}
+
+% ---------------- 标题样式设定（严格依照图示批注） ----------------
+\ctexset{
+  chapter = {
+    name = {,},
+    number = {\arabic{chapter}},
+    format = {\raggedright\bfseries\heiti\fontsize{16pt}{16pt}\selectfont},
+    aftername = {\hspace{1em}},
+    beforeskip = {24pt},
+    afterskip = {18pt},
+    fixskip = true
+  },
+  section = {
+    format = {\raggedright\heiti\fontsize{14pt}{14pt}\selectfont},
+    aftername = {\hspace{1em}},
+    beforeskip = {24pt},
+    afterskip = {6pt},
+    fixskip = true
+  },
+  subsection = {
+    format = {\raggedright\heiti\fontsize{13pt}{13pt}\selectfont},
+    aftername = {\hspace{1em}},
+    beforeskip = {12pt},
+    afterskip = {6pt},
+    fixskip = true
+  }
+}
+
+% ---------------- 页眉页脚配置 ----------------
+\usepackage{fancyhdr}
+
+% 前置页样式（摘要、目录：无页眉横线，仅底部居中罗马数字）
+\fancypagestyle{frontmatterstyle}{
+  \fancyhf{}
+  \fancyfoot[C]{\fontsize{10.5pt}{12pt}\selectfont\thepage}
+  \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\footrulewidth}{0pt}
+}
+
+% 正文页样式（奇数页：论文题目；偶数页：学校届别）
+\fancypagestyle{mainmatterstyle}{
+  \fancyhf{}
+  \fancyhead[CO]{\fontsize{9pt}{12pt}\selectfont 奇数页：论文题目}
+  \fancyhead[CE]{\fontsize{9pt}{12pt}\selectfont 偶数页："广州体育学院 20**届硕士研究生学位论文"}
+  \fancyfoot[C]{\fontsize{10.5pt}{12pt}\selectfont\thepage}
+  \renewcommand{\headrulewidth}{0.75pt}
+  \renewcommand{\footrulewidth}{0pt}
+}
+
+% ---------------- 目录精确样式（黑体 11 磅，单倍行距，段前 6 磅） ----------------
+\usepackage{titletoc}
+\titlecontents{chapter}[0em]
+  {\vspace{6pt}\heiti\fontsize{11pt}{11pt}\selectfont}
+  {\thecontentslabel\hspace{1em}}
+  {}
+  {\titlerule*[0.5pc]{.}\contentspage}
+
+\titlecontents{section}[1.5em]
+  {\vspace{6pt}\heiti\fontsize{11pt}{11pt}\selectfont}
+  {\thecontentslabel\hspace{1em}}
+  {}
+  {\titlerule*[0.5pc]{.}\contentspage}
+
+\titlecontents{subsection}[3.0em]
+  {\vspace{6pt}\heiti\fontsize{11pt}{11pt}\selectfont}
+  {\thecontentslabel\hspace{1em}}
+  {}
+  {\titlerule*[0.5pc]{.}\contentspage}
+
+% 安全重写目录生成机制，彻底杜绝 \spacefactor 语法错误
+\makeatletter
+\renewcommand{\tableofcontents}{%
+  \clearpage
+  \addcontentsline{toc}{chapter}{目录}%
+  \begin{center}
+    {\heiti\bfseries\fontsize{16pt}{16pt}\selectfont 目录}\par
+    \vspace{18pt}%
+  \end{center}
+  \@starttoc{toc}%
+}
+\makeatother
+
+% ---------------- 图表与公式环境配置 ----------------
+\usepackage{caption}
+% 图注：置于图下方，宋体 10.5 磅居中，单倍行距，段前 6 磅，段后 12 磅
+\DeclareCaptionFont{songti5}{\songti\fontsize{10.5pt}{10.5pt}\selectfont}
+\captionsetup[figure]{
+  font=songti5,
+  name={图},
+  labelsep=quad,
+  justification=centering,
+  skip=6pt
+}
+% 表注：置于表上方，宋体 10.5 磅居中
+\captionsetup[table]{
+  font=songti5,
+  name={表},
+  labelsep=quad,
+  justification=centering,
+  skip=6pt
+}
+
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{setspace}
+\usepackage{xcolor}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage[hidelinks]{hyperref}
+
+% ---------------- 规范填空与下划线宏 ----------------
+\newcommand{\fixedunderline}[3][c]{\CJKunderline{\CJKbox[#2][#1]{#3}}}
+\newcommand{\dateunderline}{\CJKunderline{\CJKbox[1.2cm]{}}年\CJKunderline{\CJKbox[0.8cm]{}}月\CJKunderline{\CJKbox[0.8cm]{}}日}
+
+% 0.8pt 粗下划线宏（封面专用，带 3pt 基线沉降防粘连）
+\newcommand{\coverline}[3][l]{%
+  \CJKbox[#2][#1]{%
+    \rule[-3pt]{0pt}{3pt}%
+    \hspace{0.5em}#3%
+  }%
+  \hspace{-#2}%
+  \CJKunderline{\CJKbox[#2]{}}%
+}
+
+% 校徽自动载入兼容宏
+\newcommand{\insertschoollogo}[1]{%
+  \IfFileExists{gzsu_logo.png}{\includegraphics[width=#1]{gzsu_logo.png}}{%
+  \IfFileExists{gzsu_logo.jpg}{\includegraphics[width=#1]{gzsu_logo.jpg}}{%
+  \IfFileExists{logo.png}{\includegraphics[width=#1]{logo.png}}{%
+  \IfFileExists{logo.jpg}{\includegraphics[width=#1]{logo.jpg}}{%
+  \IfFileExists{logo.pdf}{\includegraphics[width=#1]{logo.pdf}}{%
+    \framebox[#1]{\rule{0pt}{1.5cm}\fontsize{10pt}{12pt}\selectfont [请放置校徽图片 gzsu_logo.png 至工程根目录]}%
+  }}}}}%
+}
+
+\begin{document}
+
+% ==================== 1. 中文封面 ====================
+\begin{titlepage}
+  \thispagestyle{empty}
+  % 顶部信息：通过字符定宽盒子强制冒号与右端绝对对齐
+  \begin{flushleft}
+    \fontsize{10.5pt}{18pt}\selectfont
+    \CJKbox[4\ccwd][s]{分类号}：\coverline{3.2cm}{} \hfill 
+    \CJKbox[4\ccwd][s]{学校代码}：\coverline[c]{2.8cm}{10585} \\[0.1cm]
+    \CJKbox[4\ccwd][s]{密级}：\coverline{3.2cm}{} \hfill 
+    \CJKbox[4\ccwd][s]{学号}：\coverline[c]{2.8cm}{******}
+  \end{flushleft}
+
+  \vspace{1.0cm}
+  \begin{center}
+    \insertschoollogo{8.8cm} \\[1.2cm]
+    {\heiti\fontsize{26pt}{26pt}\selectfont\ziju{0.35} 硕士学位论文} \\[0.6cm]
+    {\heiti\fontsize{14pt}{14pt}\selectfont\ziju{0.15} （专业学位）} \\[1.8cm]
+    {\heiti\fontsize{22pt}{28pt}\selectfont 中文题目} \\[2.4cm]
+
+    \fontsize{12pt}{24pt}\selectfont
+    \begin{tabular}{r@{\ }l}
+      \textbf{培养单位：} & \coverline{6.8cm}{体育教育学院} \\
+      \textbf{学位类别：} & \coverline{6.8cm}{体育} \\
+      \textbf{专业领域：} & \coverline{6.8cm}{运动训练} \\
+      \textbf{研究方向：} & \coverline{6.8cm}{篮球训练} \\
+      \textbf{学生姓名：} & \coverline{6.8cm}{XXX} \\
+      \textbf{指导教师：} & \coverline{6.8cm}{XXX 教授} \\
+      \textbf{第二导师：} & \coverline{6.8cm}{XXX 副教授} \\
+    \end{tabular}
+
+    \vfill
+    {\songti\fontsize{12pt}{12pt}\selectfont\ziju{0.25} 二〇二*年六月}
+  \end{center}
+\end{titlepage}
+
+% ==================== 2. 英文封面 ====================
+\begin{titlepage}
+  \thispagestyle{empty}
+  \begin{center}
+    \vspace*{0.6cm}
+    {\fontsize{14pt}{20pt}\selectfont \textbf{Dissertation Submitted to Guangzhou Sport\\[3pt] University for Master Degree}} \\[1.8cm]
+
+    \IfFileExists{logo_shield.png}{%
+      \includegraphics[height=2.3cm]{logo_shield.png}%
+    }{%
+      \insertschoollogo{2.8cm}%
+    } \\[2.0cm]
+
+    {\fontsize{16pt}{22pt}\selectfont \textbf{Thesis/Dissertation Title × × × × ×\\[6pt] × × × × × ×}} \\[3.5cm]
+    
+    \fontsize{12pt}{22pt}\selectfont
+    \begin{tabular}{l@{\hspace{1em}}l}
+      Author:     & × × × \\[0.3cm]
+      Supervisor: & × × × \\
+    \end{tabular}
+
+    \vfill
+    {\fontsize{12pt}{12pt}\selectfont \textbf{June, 2026}}
+    \vspace*{0.3cm}
+  \end{center}
+\end{titlepage}
+
+% ==================== 3. 声明与非公开标注页 ====================
+\clearpage
+\thispagestyle{empty}
+\begin{center}
+  {\heiti\bfseries\fontsize{16pt}{16pt}\selectfont 广州体育学院学位论文原创性声明}
+\end{center}
+\vspace{0.4cm}
+
+\noindent 本人郑重声明：本人所呈交的学位论文，是在导师的指导下独立进行研究工作所取得的成果。除文中已经注明引用的内容外，本论文不包含任何其他个人或集体已经发表或撰写过的作品成果，不存在抄袭、篡改、伪造等学术不端行为及买卖论文等造假行为。对本文的研究做出重要贡献的个人和集体，均已在文中以明确方式标明并致谢。本人完全意识到本声明的法律结果由本人承担。
+
+\vspace{0.8cm}
+\begin{flushright}
+  学生签名：\fixedunderline{3.2cm}{} \qquad \dateunderline \\[0.4cm]
+  导师签名：\fixedunderline{3.2cm}{} \qquad \dateunderline
+\end{flushright}
+
+\vspace{0.3cm}
+\CJKbox[\textwidth][c]{\leaders\hbox to 6pt{\hss-\hss}\hfill}
+\vspace{0.3cm}
+
+\begin{center}
+  {\heiti\bfseries\fontsize{14pt}{14pt}\selectfont 非公开学位论文标注说明}
+\end{center}
+\vspace{0.2cm}
+
+\noindent 根据广州体育学院有关规定，非公开学位论文须经指导教师同意、作者本人申请和相关部门批准方能标注。未经批准的均为公开学位论文（公开的学位论文本项为空白）。
+
+\vspace{0.3cm}
+\noindent
+\begin{tabular}{|m{2.3cm}|m{11.8cm}|}
+  \hline
+  \centering 论文题目 & \\ \hline
+  \centering 申请密级 & \quad $\square$限制($\le$2年) \qquad $\square$秘密($\le$10年) \qquad $\square$机密($\le$20年) \\ \hline
+  \centering 保密期限 & \qquad\qquad 年\qquad 月\qquad 日 \quad 至 \quad\qquad 年\qquad 月\qquad 日 \\ \hline
+  \centering 批准日期 & \qquad\qquad\qquad\qquad 年\qquad 月\qquad 日 \\ \hline
+\end{tabular}
+
+\vspace{0.25cm}
+\begin{flushright}
+  {\fontsize{10.5pt}{12pt}\selectfont 广州体育学院研究生院盖章(有效)\qquad\ }
+\end{flushright}
+\vspace{-0.1cm}
+{\fontsize{9pt}{11pt}\selectfont
+\noindent 注：限制$\bigstar$2年(可少于2年); 秘密$\bigstar$10年(可少于10年); 机密$\bigstar$20年(可少于20年)
+}
+
+% ==================== 4. 授权书页 ====================
+\clearpage
+\thispagestyle{empty}
+\begin{center}
+  {\heiti\bfseries\fontsize{16pt}{16pt}\selectfont 广州体育学院学位论文使用授权书}
+\end{center}
+\vspace{0.5cm}
+
+\noindent 本人依据广州体育学院关于研究生学位论文收藏和使用的相关规定，同意向学校提交本人的学位论文（纸质版和电子版）。
+
+\vspace{0.3cm}
+\noindent 根据《中华人民共和国著作权法》及相关规定，学校有权对本人的学位论文进行使用。具体授权内容包括：
+
+\vspace{0.2cm}
+\begin{list}{}{%
+  \setlength{\leftmargin}{1.8em}
+  \setlength{\itemindent}{-1.2em}
+  \setlength{\labelwidth}{1.2em}
+  \setlength{\labelsep}{0em}
+  \setlength{\parsep}{0pt}
+  \setlength{\itemsep}{4pt}
+}
+  \item[1.\ ] 学校将本人的学位论文编入《广州体育学院硕士学位论文全文数据库》，并提供在图书馆等场所的查阅服务；
+  \item[2.\ ] 学校有权将学位论文的全部或部分内容编入相关数据库进行检索，并通过影印、缩印或其他复制方式保存和汇编学位论文，同时根据国家有关规定向指定机构提交；
+  \item[3.\ ] 对于非公开的学位论文，待解密后适用本授权书规定。
+\end{list}
+
+\vspace{3.5cm}
+\begin{flushright}
+  学位论文作者签字：\fixedunderline{4.5cm}{} \\[0.8cm]
+  \CJKunderline{\CJKbox[1.8cm]{}}年\CJKunderline{\CJKbox[0.9cm]{}}月\CJKunderline{\CJKbox[0.9cm]{}}日\qquad\quad
+\end{flushright}
+
+% ==================== 5. 前置内容（摘要、目录） ====================
+\frontmatter
+\pagestyle{frontmatterstyle}
+\pagenumbering{Roman}
+
+% ---------------- 中文摘要 ----------------
+\clearpage
+\addcontentsline{toc}{chapter}{摘要}
+\begin{center}
+  {\heiti\bfseries\fontsize{16pt}{16pt}\selectfont 摘要}
+  \vspace{18pt}
+\end{center}
+
+这部分是论文的摘要
+
+中文摘要是论文内容的简要陈述，一般以第三人称语气撰写，300～1000 字（如遇特殊需要字数可以略多），不加评论和解释，是一篇具有独立性和完整性的短文，能准确反映论文的中心思想，规范的学术用语，逻辑性强、结构严谨，体现出论文的新理论、新方法、新技术等。其内容包括：目的意义、研究方法、研究成果和结论，应与论文等同的主要信息，要突出本论文的创造性成果，不可出现图、表、化学方程式、非公知公用的符号和术语。
+
+关键词是为了便于做文献索引和检索工作而从论文中选取出来用以表示全文主题内容信息的单词或术语，在论文中有明确出处，关键词在摘要内容后另起一行，一般 3～8 个，之间用分号分开。
+
+……
+
+\vspace{0.8cm}
+\noindent \textbf{关键词：}术语；最多 7 个汉字；最少 3 组，最多 8 组。
+
+% ---------------- 英文摘要 ----------------
+\clearpage
+\addcontentsline{toc}{chapter}{ABSTRACT}
+\begin{center}
+  {\arialfont\bfseries\fontsize{16pt}{16pt}\selectfont ABSTRACT}
+  \vspace{18pt}
+\end{center}
+
+The following English is not correct.
+
+This part is a summary of my paper.
+
+The Chinese abstract is a brief statement of the content of the paper, which is usually written in third person tone, 300 to 1,000 words (the word count may be slightly extended if special requirements are encountered), without comment and explanation, is a short essay with independence and integrity. The Chinese abstract generally explains the purpose, methods, results and conclusions of the research work, which should include the main information equivalent to the paper, and to highlight the creative results of the paper, and the drawings, tables, chemical equations, nonpublic symbols and terminology should not appear.
+
+Keywords in the abstract content after another line, generally 3$\sim$8, separated by semicolons. The key words are the words or terms that are selected from the paper to express the full text information of the subject content in order to facilitate the document indexing and retrieval work.
+
+\vspace{0.8cm}
+\noindent \textbf{Key Words:} Terminology; up to 7 Chinese characters; at least 3 groups, with a maximum of 8 sets.
+
+% ---------------- 目录 ----------------
+\tableofcontents
+
+% ==================== 6. 正文主体 ====================
+\mainmatter
+\pagestyle{mainmatterstyle}
+\pagenumbering{arabic}
+
+% 强制正文第一页及各章首页均保持完整页眉
+\makeatletter
+\let\ps@plain\ps@mainmatterstyle
+\makeatother
+
+% ---------------- 第 1 章 前言 ----------------
+\chapter{前言}
+\section{问题的提出}
+本部分主要介绍选题背景，根据实际情况自行填写。
+
+自行确定是否使用三级或四级标题。论文中出现英文时需要使用 Times New Roman 字体。这个结构可以根据自己论文需要进行调整。
+
+$\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times$
+
+\section{选题的目的意义}
+本部分主要撰写选题的目的，根据实际情况自行填写。$\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times$
+
+\subsection{选题目的}
+本部分主要撰写选题的意义，根据实际情况自行填写。$\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times$
+
+\subsection{选题意义}
+本部分主要撰写选题的理论与应用价值，根据实际情况自行填写。$\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times$
+
+% ---------------- 第 2 章 文献综述 ----------------
+\clearpage
+\chapter{文献综述}
+\section{相关概念界定}
+文献综述不能是文献资料的简单摘录，需要分类、总结、归纳。自行确定是否使用三级或四级标题。自行确定是否使用三级或四级标题。论文中出现英文时需要使用 Times New Roman 字体。这个结构可以根据自己论文需要进行调整。$\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times$
+
+\section{相关研究现状}
+$\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times$
+
+\section{文献综述述评}
+本部分是对上述 2.1、2.2 的小结，重点说明以往研究对本研究的基础贡献、影响，指出以往研究不足等。
+
+$\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times$
+
+% ---------------- 第 3 章 研究设计 ----------------
+\clearpage
+\chapter{研究设计}
+\section{研究对象}
+$\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times$
+
+\section{研究方法}
+本部分应当对使用的研究方法做简要的介绍，根据实际情况填写。
+
+$\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times$
+
+\subsection{调查法}
+$\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times$
+
+\subsection{实验法}
+$\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times$
+
+\subsection{统计分析法}
+量化研究，需要详细撰写统计分析方法。$\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times$
+
+\section{技术路线}
+本部分是对论文研究的技术路线与整体结构做一个阐述，就是第一部分主要研究什么，第二部分主要研究什么等等，可以加上研究的技术路线图。
+
+$\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times$。
+
+% ---------------- 第 4 章 研究结果与分析 ----------------
+\clearpage
+\chapter{研究结果与分析}
+\section{研究结果1}
+当广义控制截面具有式（3）的广义本构关系时，可定义如下的截面示性数
+\begin{equation}
+  \Phi(\theta) = 
+  \begin{cases}
+    0, & \text{公式居中，序号顶右} \\
+    1, &
+  \end{cases}
+\end{equation}
+$\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times$，如图 1。
+
+\begin{figure}[htbp]
+  \centering
+  \insertschoollogo{5.5cm}
+  \vspace{6pt}
+  \caption{$\times\times\times\times\times\times\times\times$示意图}
+  \vspace{12pt}
+\end{figure}
+
+$\times\times\times\times\times\times\times\times$如表 1。
+
+\begin{table}[htbp]
+  \centering
+  \caption{杆件状态与非线性构形状态对应关系}
+  \vspace{6pt}
+  \fontsize{10pt}{14pt}\selectfont
+  \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}ccccccccc@{}}
+    \toprule
+    $\times\times\times\times\times$ & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 \\
+    \midrule
+    $\times\quad\times\times$ & -- & $\circledast_2$ & $\circledast_3$ & $\circledast_1$ & $\circledast_2,\circledast_3$ & $\circledast_1,\circledast_2$ & $\circledast_1,\circledast_3$ & $\circledast_1,\circledast_2,\circledast_3$ \\
+    $\times\quad\times\times\times$ & $\circledast_1,\circledast_2,\circledast_3$ & $\circledast_1,\circledast_3$ & $\circledast_1,\circledast_2$ & $\circledast_2,\circledast_3$ & $\circledast_1$ & $\circledast_3$ & $\circledast_2$ & -- \\
+    \bottomrule
+  \end{tabular*}
+\end{table}
+
+\section{研究结果2}
+
+% ---------------- 第 5 章 讨论 ----------------
+\clearpage
+\chapter{讨论}
+讨论内容一般采用漏斗式结构（从具体到一般，再从一般回到具体）
+
+\section{重申核心发现}
+不要直接复制摘要或结论的句子，而是用新的、更概括的语言重申你的主要发现，作为讨论的开始。
+
+\section{解释与比较：与已有文献对话}
+这是讨论部分的核心。你需要逐条解释你的主要发现，并将其与前人的研究进行比较。
+
+如果结果与前人一致：说明你的研究验证/支持了前人的结论。
+
+如果结果与前人不同或更新：不要回避差异。大胆提出你的解释（可能是方法不同、样本不同、或者发现了新的特殊情况）。
+
+\section{机理/原因分析：深挖"为什么"}
+不要停留在表面描述，要深入探讨这些结果背后的机制、原因或逻辑。
+
+\section{引申意义：理论和实践价值}
+阐述研究有什么用处。
+
+理论意义：对现有理论有什么补充、修正或挑战？
+
+实践意义：对现实生活、政策制定、体质健康等有什么指导作用？
+
+\section{研究局限性：坦诚研究的不足}
+任何研究都有局限。主动指出局限性不仅不会减分，反而显得你严谨、客观。通常从样本、方法、范围三个角度考虑。
+
+\section{未来展望：为后续研究铺路}
+基于上述局限性，或者基于你发现的新问题，提出下一步的研究方向。
+
+% ---------------- 第 6 章 结论与建议 ----------------
+\clearpage
+\chapter{结论与建议}
+\section{结论}
+这是对研究结果的最终总结。不要简单重复摘要，也不要复制结果部分的每一条数据，而是要对核心发现进行提炼和升华。
+
+建议使用分点（1., 2., 3.）或分段的形式，清晰罗列。
+\begin{enumerate}
+  \item $\times\times\times\times\times$
+  \item $\times\times\times\times\times$
+  \item $\times\times\times\times\times$
+\end{enumerate}
+
+\section{建议}
+这是"学以致用"的部分。研究结果对于现实世界有什么指导意义。
+
+根据论文实际情况撰写。一般情况下，论文的建议 2--3 条即可，不宜过多，根据本人论文的实际情况填写。
+
+% ==================== 7. 参考文献 ====================
+\clearpage
+\chapter{参考文献}
+{\fontsize{10.5pt}{16pt}\selectfont
+{\color{red} 参考以下各类文献的撰写方法，使用顺序编码制编写，从 1 开始排序，是大排序而不是分类排序，以下仅演示各类参考文献的格式及字体字号等。}
+
+\vspace{0.4cm}
+\noindent {\color{red} \textbf{1．普通图书}}\\
+{[1]} 美国妇产科医师学会．新生儿脑病和脑性瘫痪发病机制与病理生理[M]．段涛，杨慧霞，译．北京：人民卫生出版社，2010:38-39．\\
+{[2]} 汪昂．增订本草备要:四卷[M]．刻本．京都：老二酉堂，1881(清光绪七年)．\\
+{[3]} 蒋有绪，郭泉水，马娟，等．中国森林群落分类及其群落学特征[M]．北京：科学出版社，1998．\\
+{[4]} 侯文顺．高分子物理：高分子材料分析、选择与改性[M/OL]．北京：化学工业出版社，2010：119[2012-11-27]．\url{http://apabi.lib.pku.edu.cn/usp/pku/pub.mvc?pid=book.detail&metaid=m.20111114-HGS-889-0228}．\\
+{[5]} CRA WFP RD W，GORMAN M．Future libraries：dreams，madness，\& reality[M]．Chicago：American Library Association，1995．\\
+{[6]} International Federation of Library Association and Institutions．Names of persons: national usages for entry in catalogues[M]．3rd ed．London:IFLA International Office for UBC，1977．\\
+{[7]} O'BRIEN J A．Introduction to information systems[M]．7th ed．Burr Ridge，III：Irwin，1994．
+
+\vspace{0.4cm}
+\noindent {\color{red} \textbf{2．论文集、会议录}}\\
+{[1]} 中国职工教育研究会．职工教育研究论文集[G]．北京：人民教育出版社，1985．\\
+{[2]} 雷光春．综合湿地管理：综合湿地管理国际研讨会论文集[C]．北京：海洋出版社，2012．\\
+{[3]} BABU B V, NAGAR A K, DEEP K, et al. Proceedings of the Second International Conference on Soft Computing for Problem Solving, December 28-30, 2012[C]. New Delhi: Springer, 2014.
+
+\vspace{0.4cm}
+\noindent {\color{red} \textbf{3．报告}}\\
+{[1]} 中华人民共和国国务院新闻办公室．国防白皮书：中国武装力量的多样化运用[R/OL]．(2013-04-16)[2014-06-11]．\url{http://www.mod.gov.cn/affair/2013-04/16/content_4442839.htm}．\\
+{[2]} World Health Organization．Factors regulating the immune response：report of WHO Scientific Group[R]．Geneva：WHO，1970．
+
+\vspace{0.4cm}
+\noindent {\color{red} \textbf{4．学位论文}}\\
+{[1]} 吴云芳．面向中文信息处理的现代汉语并列结构研究[D/OL]．北京：北京大学，2003[2013-10-14]．\url{http://thesis.lib.pku.edu.cn/dlib/List.asp?lang=gb&type=Reader&DocGroupID=4&DocID=6328}．\\
+{[2]} CALMS R B．Infrared spectroscopic studies on solid oxygen[D]．Berkeley：Univ．of California，1965．
+
+\vspace{0.4cm}
+\noindent {\color{red} \textbf{5．专利文献}}\\
+{[1]} 张凯军．轨道火车及高速轨道火车紧急安全制动辅助装置：201220158825．2[P]．2012-04-05．\\
+{[2]} 河北绿洲生态环境科技有限公司．一种荒漠化地区生态植被综合培植方法：01129210．5[P/OL]．2001-10-24[2002-05-28]．\url{http://211.152.9.47/sipoasp/zlijs/hyjs-yx-new.asp?recid=01129210.5&leixin=0}．\\
+{[3]} KOSEKI A, MOMOSE H, KAWAHITO M, et al. Compiler: US828402[P/OL]. 2002-05-25[2002-05-28]. \url{http://FF&p=1&u=netahtml/PTO/search-bool.html&r=5&f=G&l=50&col=AND&d=PG01&sl=IBM.AS.&OS=AN/IBM&RS=AN/IBM}.
+
+\vspace{0.4cm}
+\noindent {\color{red} \textbf{6．标准文献}}\\
+{[1]} 全国信息与文献标准化技术委员会．文献著录：第4部分 非书资料：GB/T 3792.4-2009[S]．北京：中国标准出版社，2010:3．
+
+\vspace{0.4cm}
+\noindent {\color{red} \textbf{7．专著中析出的文献}}\\
+{[1]} 国家标准局信息分类编码研究所．世界各国和地区名称代码：GB/T 2659-1986[S]//全国文献工作标准化委员会．文献工作国家标准汇编：3．北京：中国标准出版社，1988：59-92．\\
+{[2]} BUSECK P R, NORD G L, Jr, VEBLEN D R. Subsolidus phenomena in pyroxenes[M]//Pyroxenes. Washington, D.C.: Mineralogical Society of America, c1980: 117-211. \\
+{[3]} FOURNEY M E. Advances in holographic photoelasticity[C]//Symposium on Applications of Holography in Mechanics, August 23-25, 1971, University of Southern California, Los Angeles, California. New York: ASME, c1971: 17-38.
+
+\vspace{0.4cm}
+\noindent {\color{red} \textbf{8．期刊中析出的文献}}\\
+{[1]} 李炳穆．韩国图书馆法[J]．图书情报工作，2008，52（6）：6-21．\\
+{[2]} 于潇，刘义，柴跃廷，等．互联网药品可信交易环境中主体资质审核备案模式[J]．清华大学学报(自然科学版)，2012，52(11)：1518-1523．\\
+{[3]} DES MARAIS D J, STRAUSS H, SUMMONS R E, et al. Carbon isotope evidence for the stepwise oxidation of the Proterozoic environment[J]. Nature, 1992, 359: 605-609.
+
+\vspace{0.4cm}
+\noindent {\color{red} \textbf{9．报纸中析出的文献}}\\
+{[1]} 丁文祥．数字革命与竞争国际化[N]．中国青年报，2000-11-20（15）．\\
+{[2]} 张田勤．罪犯DNA库与生命伦理学计划[N]．大众科技报，2000-11-12（7）．
+
+\vspace{0.4cm}
+\noindent {\color{red} \textbf{10．电子资源（不包括电子专著、电子连续出版物、电子学位论文、电子专利）}}\\
+{[1]} 萧钰．出版业信息化迈入快车道[EB/OL]．(2001-12-19)[2002-04-15]．\url{http://www.creader.com/news/20011219/200112190019.html}．\\
+{[2]} 李强．化解医患矛盾需釜底抽薪[EB/OL]．(2012-05-03)[2013-03-25]．\url{http://wenku.baidu.com/view/47e4f206b52acfc789ebc92f.html}．\\
+{[3]} Dublin core metadata element set: version 1.1[EB/OL]. (2012-06-14)[2014-06-11]. \url{http://dublincore.org/documents/dces/}．
+}
+
+\vspace{0.6cm}
+\begin{table}[htbp]
+  \centering
+  \caption{文献类型、标识代码和电子资源载体、标识代码}
+  \vspace{6pt}
+  \fontsize{10.5pt}{14pt}\selectfont
+  \begin{tabular}{|m{3.5cm}|m{2.5cm}|m{4.5cm}|m{2.5cm}|}
+    \hline
+    \multicolumn{2}{|c|}{\textbf{文献类型和标识代码}} & \multicolumn{2}{c|}{\textbf{电子资源载体和标识代码}} \\ \hline
+    \centering 参考文献类型 & \centering 标识代码 & \centering 电子资源的载体类型 & \centering 标识代码 \tabularnewline \hline
+    \centering 普通图书 & \centering M & \centering 磁带（magnetic tape） & \centering MT \tabularnewline \hline
+    \centering 会议录 & \centering C & \centering 磁盘（disk） & \centering DK \tabularnewline \hline
+    \centering 汇编 & \centering G & \centering 光盘（CD-ROM） & \centering CD \tabularnewline \hline
+    \centering 报纸 & \centering N & \centering 联机网络（online） & \centering OL \tabularnewline \hline
+    \centering 期刊 & \centering J & & \tabularnewline \hline
+    \centering 学位论文 & \centering D & & \tabularnewline \hline
+    \centering 报告 & \centering R & & \tabularnewline \hline
+    \centering 标准 & \centering S & & \tabularnewline \hline
+    \centering 专利 & \centering P & & \tabularnewline \hline
+    \centering 数据库 & \centering DB & & \tabularnewline \hline
+    \centering 计算机程序 & \centering CP & & \tabularnewline \hline
+    \centering 电子公告 & \centering EB & & \tabularnewline \hline
+    \centering 档案 & \centering A & & \tabularnewline \hline
+    \centering 舆图 & \centering CM & & \tabularnewline \hline
+    \centering 数据集 & \centering DS & & \tabularnewline \hline
+    \centering 其他 & \centering Z & & \tabularnewline \hline
+  \end{tabular}
+\end{table}
+
+% ==================== 8. 附录 ====================
+\clearpage
+\addcontentsline{toc}{chapter}{\texorpdfstring{附录 A $\times\times\times\times\times$}{附录 A XXXXX}}
+\begin{center}
+  {\heiti\bfseries\fontsize{16pt}{16pt}\selectfont 附录 A $\times\times\times\times\times$}
+  \vspace{18pt}
+\end{center}
+
+……
+
+% ==================== 9. 致谢 ====================
+\clearpage
+\addcontentsline{toc}{chapter}{\texorpdfstring{致\quad 谢}{致谢}}
+\begin{center}
+  {\heiti\bfseries\fontsize{16pt}{16pt}\selectfont 致\quad 谢}
+  \vspace{18pt}
+\end{center}
+
+% 严格执行批注：仿宋 12 磅，行距 1.5 倍
+\begin{spacing}{1.5}
+{\fangsong\fontsize{12pt}{12pt}\selectfont
+致谢应放置在参考文献、附录页后，另起页。致谢是作者对该论文的形成作出过贡献的组织或个人予以感谢的文字记载，语言要诚恳、恰当、简短。致谢对象应包括国家科学基金；资助研究工作的奖学金基金、合同单位、资助或支持的企业、组织或个人；协助完成研究工作和提供便利条件的组织或个人；在研究工作中提出建议和提供帮助的人。
+
+字数一般不超过 1000 字。
+
+\vspace{3.5cm}
+\begin{flushright}
+  学生姓名\qquad\qquad\quad \\[0.4cm]
+  \dateunderline 于广州体育学院
+\end{flushright}
+}
+\end{spacing}
+
+% ==================== 10. 个人简历 ====================
+\clearpage
+\addcontentsline{toc}{chapter}{个人简历}
+\begin{center}
+  {\heiti\bfseries\fontsize{16pt}{16pt}\selectfont 个人简历}
+  \vspace{18pt}
+\end{center}
+
+% 严格执行批注：仿宋 12 磅（英文 Times New Roman 12 磅），行距 1.5 倍，特定词组加粗
+\begin{spacing}{1.5}
+{\fangsong\fontsize{12pt}{12pt}\selectfont
+\noindent \textbf{个人经历：}\\
+$\times\times\times\times$，男，1975年8月生。\\
+1997年7月毕业于$\times\times$大学体育教育专业，获学士学位。\\
+1997年9月进入广州体育学院攻读硕士学位。
+
+\vspace{0.4cm}
+\noindent \textbf{在读期间发表论文：}\\
+{[1]} $\times\times\times$.$\times\times\times\times\times$.$\times\times\times\times\times$, 2001, Vol.21 (3):70-74
+
+\vspace{0.4cm}
+……
+
+\vspace{0.4cm}
+\noindent \textbf{研究成果：}\\
+{[1]} $\times\times$, $\times\times$, $\times\times$. $\times\times\times\times\times\times\times$研究. 2025
+
+\vspace{0.4cm}
+……
+}
+\end{spacing}
+
+\end{document}

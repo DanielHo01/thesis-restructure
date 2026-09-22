@@ -1,0 +1,168 @@
+! BEGIN_META
+! META_CMD_NAME	= Pipeline_Compare_Finish_Gait
+! META_PARAM	= working_directory  :   string ::yes
+! META_PARAM	= includes_OFM  :   string ::yes
+! META_PARAM	= report_template_directory  :   string ::yes
+! META_PARAM	= comparative_report_template_OFM  :   string ::yes
+! META_PARAM	= first_EMG_page  :   string ::yes
+! META_PARAM	= count_EMG_signals_left  :   string ::yes
+! META_PARAM	= count_EMG_signals_right  :   string ::yes
+! META_PARAM	= cmo_file  :   string ::yes
+! META_PARAM	= EMG_pre_exists  :   string ::yes
+! META_PARAM	= EMG_post_exists  :   string ::yes
+! END_META
+
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!  Copyright notice
+!  This PAF and its content is copyright of Qualisys AB © 2012-2017. All rights reserved. 
+!  The PAF script is only to be used in conjunction with a Qualisys Motion Capture System. 
+!  Only legal PAF owners are entitled to use the script and only in relation with related PAF.
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+! Update the Recalc pipeline
+! ==================================
+Recalc
+;
+
+!delete EMG pages with "all trials"
+Set_Pipeline_Parameter
+/PARAMETER_NAME=j
+/PARAMETER_VALUE=::first_EMG_page
+! /PARAMETER_VALUE_SEARCH_FOR=
+! /PARAMETER_VALUE_REPLACE_WITH=
+! /PARAMETER_VALUE_PREFIX=
+! /PARAMETER_VALUE_APPEND=
+! /MULTI_PASS=FALSE
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(&::count_EMG_signals_left& <= 4) &::AMP& (&::count_EMG_signals_right& <= 4)
+! /AS_INTEGER=TRUE
+;
+
+	Set_Pipeline_Parameter_From_Expression
+	/PARAMETER_NAME=k
+	/EXPRESSION=&::j& + 1
+	! /AS_INTEGER=TRUE
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(&::count_EMG_signals_left& > 4) | (&::count_EMG_signals_right& > 4)
+! /AS_INTEGER=TRUE
+;
+
+	Set_Pipeline_Parameter_From_Expression
+	/PARAMETER_NAME=k
+	/EXPRESSION=&::j& + 3
+	! /AS_INTEGER=TRUE
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Set_Pipeline_Parameter_From_For_Loop
+/PARAMETER_NAME=lop
+/PARAMETER_INDEX_START=::j
+/PARAMETER_INDEX_END=::k
+/PARAMETER_INDEX_STEP=1
+! /PARAMETER_INDEX_TYPE=INTEGER
+;
+
+For_Each
+/ITERATION_PARAMETER_NAME=i
+! /ITERATION_PARAMETER_COUNT_NAME=
+/ITEMS=::lop
+;
+
+	Delete_Report_Page
+	/PAGE_NUMBER=::j
+	;
+
+End_For_Each
+/ITERATION_PARAMETER_NAME=i
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::includes_OFM&" = "TRUE")
+! /AS_INTEGER=TRUE
+;
+
+	Append_Report_Template
+	/REPORT_TEMPLATE=&::report_template_directory&&::comparative_report_template_OFM
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Select_Active_File
+/FILE_NAME=GLOBAL
+! /QUERY=
+;
+
+Export_Data_To_Ascii_File
+/FILE_NAME=&::working_directory&normative.txt
+/SIGNAL_TYPES=DERIVED
+! /SIGNAL_NAMES=
+/SIGNAL_FOLDER=NORM_LOWER+NORM_RANGE
+! /SIGNAL_COMPONENTS=
+! /START_LABEL=
+! /END_LABEL=
+! /EVENT_SEQUENCE=
+! /EXCLUDE_EVENTS=
+! /USE_POINT_RATE=FALSE
+! /NORMALIZE_DATA=FALSE
+! /NORMALIZE_POINTS=101
+! /EXPORT_MEAN_AND_STD_DEV=FALSE
+! /USE_P2D_FORMAT=FALSE
+! /USE_SHORT_FILENAME=FALSE
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::EMG_pre_exists&" = "yes") | ("&::EMG_post_exists&" = "yes")
+! /AS_INTEGER=TRUE
+;
+
+	! Export EMG maxima to xml file (to be used to set maximum of y-axis scale for Word report)
+	Export_Data_To_Ascii_File
+	/FILE_NAME=&::working_directory&metrics_EMG_compare.xml
+	/SIGNAL_TYPES=METRIC
+	! /SIGNAL_NAMES=
+	/SIGNAL_FOLDER=EMG
+	! /SIGNAL_COMPONENTS=
+	/COMPONENT_SEQUENCE=ALL
+	! /SIGNAL_PRECISION=
+	! /START_LABEL=
+	! /END_LABEL=
+	/EVENT_SEQUENCE=BOF+EOF
+	! /EXCLUDE_EVENTS=
+	! /USE_POINT_RATE=FALSE
+	! /NORMALIZE_DATA=FALSE
+	! /NORMALIZE_POINTS=101
+	! /EXPORT_MEAN_AND_STD_DEV=FALSE
+	! /USE_P2D_FORMAT=FALSE
+	/USE_XML_FORMAT=TRUE
+	! /USE_SHORT_FILENAME=FALSE
+	! /EXPORT_EMPTY_SIGNALS=FALSE
+	! /EXPORT_WITHOUT_HEADER=FALSE
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+File_Save_As
+/FILE_NAME=::cmo_file
+;
+
+Exit_Workspace
+;

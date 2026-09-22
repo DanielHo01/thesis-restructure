@@ -1,0 +1,69 @@
+<?php
+// Include php variables.
+include_once($template_directory . 'Scripts\\src\\Visual3D\\prepare_variables.php');
+
+?> 
+
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!  Copyright notice
+!  This PAF and its content is copyright of Qualisys AB © 2012-2018. All rights reserved. 
+!  The PAF script is only to be used in conjunction with a Qualisys Motion Capture System. 
+!  Only legal PAF owners are entitled to use the script and only in relation with related PAF.
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Pipeline_Export_Gait
+/working_directory						= <?=$working_directory;?> 
+/openfile								= <?=$openfile;?> 
+/analysis_name							= <?=$analysis_name;?> 
+/event_mode								= <?=$event_mode;?> 
+/auto_range_str							= <?=$auto_range_str;?> 
+/normative_data 						= <?=$normative_data;?> 
+/normative_file_exists 					= <?=$normative_file_exists;?> 
+/normative_directory					= <?=$normativeDirectory;?> 
+/normative_file							= <?=$normative_file;?> 
+/select_tags_list						= <?=$select_tags_list;?> 
+/select_tags_arr_list					= <?=$select_tags_arr_list;?> 
+/link_signal_names						= <?=$link_signal_names;?> 
+/event_seq								= <?=$event_seq;?> 
+/includes_OFM							= <?=$includes_OFM;?> 
+/includes_RFM							= <?=$includes_RFM;?> 
+/noraxon_exists 						= <?=$noraxon_exists;?> 
+/mega_me6000_exists						= <?=$mega_me6000_exists;?> 
+/delsys_trigno_exists					= <?=$delsys_trigno_exists;?> 
+/myon_exists							= <?=$myon_exists;?> 
+/analog_EMG_exists						= <?=$analog_EMG_exists;?> 
+/EMG_signal_names						= <?=$EMG_signal_names;?> 
+/EMG_type								= <?=$EMG_type;?> 
+/EMG_folder								= <?=$EMG_folder;?> 
+/EMG_exclude_seq						= <?=$EMG_exclude_seq;?> 
+/EMG_event_seq							= <?=$EMG_event_seq;?> 
+/EMG_points								= <?=$EMG_points;?> 
+/EMG_names_norm							= <?=$EMG_names_norm;?> 
+/EMG_type_norm							= <?=$EMG_type_norm;?> 
+/EMG_folder_norm						= <?=$EMG_folder_norm;?> 
+/EMG_points_norm						= <?=$EMG_points_norm;?> 
+/normative_non_noraxon_file_exists		= <?=$normative_non_noraxon_file_exists;?> 
+/EMG_graph_signals_name_left			= <?=$EMG_graph_signals_name_left;?> 
+/EMG_graph_signals_name_right			= <?=$EMG_graph_signals_name_right;?> 
+/includes_thorax						= <?=$includes_thorax;?> 
+/includes_arms							= <?=$includes_arms;?> 
+/event_sq								= <?=$event_sq;?> 
+/sig_types								= <?=$sig_types;?> 
+/sig_names								= <?=$sig_names;?> 
+/sig_folder								= <?=$sig_folder;?> 
+/sig_types_web							= <?=$sig_types_web;?> 
+/sig_names_web							= <?=$sig_names_web;?> 
+/sig_folder_web							= <?=$sig_folder_web;?> 
+/ev_segence								= <?=$ev_segence;?> 
+/ev_exclude								= <?=$ev_exclude;?> 
+/norm_points							= <?=$norm_points;?> 
+/EMG_units_pct_str						= <?=$EMG_units_pct_str;?> 
+/sig_type_n								= <?=$sig_type_n;?> 
+/sig_names_n							= <?=$sig_names_n;?> 
+/sig_folder_n							= <?=$sig_folder_n;?> 
+/norm_points_n							= <?=$norm_points_n;?> 
+/sig_type_3dv							= <?=$sig_type_3dv;?> 
+/sig_folder_3dv							= <?=$sig_folder_3dv;?> 
+/marker_list_3dv						= <?=$marker_list_3dv;?> 
+/cmo_file								= <?=$cmo_file;?> 
+;

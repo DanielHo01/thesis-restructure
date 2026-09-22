@@ -1,0 +1,75 @@
+% setup/package.tex - 宏包引入
+
+% PDF页面插入（官方Word封面保底方案）
+\usepackage{pdfpages}
+
+% 中文支持（ctexbook已自动加载ctex，禁止重复加载）
+
+% 页面布局 (匹配官方Word模板)
+\usepackage[
+  a4paper,
+  top=3.8cm,
+  bottom=3.8cm,
+  left=3.2cm,
+  right=3.2cm,
+  headheight=1cm,
+  footskip=1.2cm
+]{geometry}
+
+% 数学公式
+\usepackage{amsmath,amssymb,amsfonts}
+
+% Dingbats符号（用于表格判定符号）
+\usepackage{pifont}
+
+% 表格增强
+\usepackage{array}          % 增强表格列控制
+\usepackage{makecell}       % 单元格换行
+\usepackage{booktabs}       % 三线表
+\usepackage{longtable}      % 跨页表格
+\usepackage{multirow}        % 合并行
+\usepackage{float}         % 浮动体位置
+\usepackage{threeparttable} % 表格+表注一体化
+\usepackage{siunitx}       % 数字对齐
+\usepackage{pdflscape}     % 横版页面
+\usepackage{afterpage}     % 控制横版页面位置
+
+% 图表
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+
+% 颜色
+\usepackage{xcolor}
+
+% 超链接
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    citecolor=black,
+    urlcolor=blue
+}
+
+% 参考文献（GB/T 7714-2015）
+\usepackage[backend=biber, style=gb7714-2015]{biblatex}
+
+% 代码
+\usepackage{listings}
+\usepackage{algorithm}
+
+% 行距 (匹配Word 1.5倍行距)
+\usepackage{setspace}
+\linespread{1.6}\selectfont
+
+% 标题编号
+\usepackage{chngcntr}
+\counterwithin{figure}{chapter}
+\counterwithin{table}{chapter}
+\counterwithin{equation}{chapter}
+
+% 表格全局参数
+\setlength{\heavyrulewidth}{1.2pt}   % 顶线/底线粗
+\setlength{\lightrulewidth}{0.5pt}      % 中线细
+\setlength{\cmidrulewidth}{0.4pt}       % 分组线
+\endinput

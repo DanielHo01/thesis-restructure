@@ -1,0 +1,2646 @@
+! BEGIN_META
+! META_CMD_NAME	= EMG_Make_Graphs_Gait
+! META_PARAM	= page_number  :   string ::yes						
+! META_PARAM	= first_EMG_page  :   string ::yes						
+! META_PARAM	= last_EMG_page  :   string ::yes						
+! META_PARAM	= EMG_names_array_left_exists  :   string ::yes						
+! META_PARAM	= EMG_names_array_right_exists  :   string ::yes						
+! META_PARAM	= EMG_graph_signals_name_left  :   string ::yes						
+! META_PARAM	= EMG_graph_signals_name_right  :   string ::yes						
+! META_PARAM	= count_EMG_signals_left  :   string ::yes						
+! META_PARAM	= count_EMG_signals_right  :   string ::yes						
+! META_PARAM	= add_test_condition_pre  :   string ::yes						
+! META_PARAM	= test_condition  :   string ::yes						
+! META_PARAM	= event_mode  :   string ::yes						
+! META_PARAM	= analysis_name  :   string ::yes						
+! META_PARAM	= c3d_files_count  :   string ::yes						
+! META_PARAM	= noraxon_exists  :   string ::yes						
+! META_PARAM	= normative_non_noraxon_file_exists  :   string ::yes						
+! META_PARAM	= hide_messages  :   string ::yes						
+! META_PARAM	= EMG_valid_names_list  :   string ::yes						
+! META_PARAM	= p2d_signal_names_list  :   string ::yes						
+! META_PARAM	= left_norm_event  :   string ::yes						
+! META_PARAM	= right_norm_event  :   string ::yes						
+! META_PARAM	= selected_files  :   string ::yes						
+! META_PARAM	= sd_line_style  :   string ::yes						
+! META_PARAM	= sd_line_bold  :   string ::yes						
+! META_PARAM	= EMG_pages_nums_list  :   string ::yes						
+! META_PARAM	= picturesDirectory  :   string ::yes						
+! META_PARAM	= col_num  :   string ::yes						
+! END_META
+
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!  Copyright notice
+!  This PAF and its content is copyright of Qualisys AB © 2012-2017. All rights reserved. 
+!  The PAF script is only to be used in conjunction with a Qualisys Motion Capture System. 
+!  Only legal PAF owners are entitled to use the script and only in relation with related PAF.
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+! ==================================
+! EMG Report pages
+! ==================================
+
+! FILTERED Left --------------------
+Select_Active_File
+/FILE_NAME=GLOBAL
+! /QUERY=
+;
+
+Set_Pipeline_Parameter
+/PARAMETER_NAME=row
+/PARAMETER_VALUE=1
+;
+
+Set_Pipeline_Parameter
+/PARAMETER_NAME=col
+/PARAMETER_VALUE=1
+;
+
+Set_Pipeline_Parameter
+/PARAMETER_NAME=left
+/PARAMETER_VALUE=0
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::EMG_names_array_left_exists&" = "TRUE")
+! /AS_INTEGER=TRUE
+;
+
+	Set_Report_Page_Title
+	/PAGE_NUMBER=&::page_number
+	/PAGE_TITLE=EMG data - filtered&::add_test_condition_pre& - &::test_condition 
+	;
+
+	For_Each
+	/ITERATION_PARAMETER_NAME=EMG_graph_signal_name_left
+	/ITERATION_PARAMETER_COUNT_NAME=inc
+	/ITEMS=::EMG_graph_signals_name_left
+	;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=(&::left& = 4) &::AMP& (&::count_EMG_signals_left& > 4)
+		! /AS_INTEGER=TRUE
+		;
+
+			Set_Pipeline_Parameter_From_Expression
+			/PARAMETER_NAME=page_number
+			/EXPRESSION=&::page_number& + 1
+			! /AS_INTEGER=TRUE
+			;
+		
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=row
+			/PARAMETER_VALUE=1
+			;
+
+			Set_Report_Page_Title
+			/PAGE_NUMBER=&::page_number
+			/PAGE_TITLE=EMG data - filtered&::add_test_condition_pre& - &::test_condition 
+			;
+
+			Select_Active_File
+			/FILE_NAME=Dynamic
+			! /QUERY=
+			;
+			
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond2
+		/EXPRESSION=("&::event_mode&" = "Instrumented treadmill")
+		! /AS_INTEGER=TRUE
+		;
+
+			Conditional_Statement
+			/ITERATION_PARAMETER_NAME=cond3
+			/EXPRESSION=("&::analysis_name&" <> "Internal Compare sessions")
+			! /AS_INTEGER=TRUE
+			;
+
+				Set_Pipeline_Parameter_From_For_Loop
+				/PARAMETER_NAME=index
+				/PARAMETER_INDEX_START=0
+				/PARAMETER_INDEX_END=&::c3d_files_count& - 1
+				/PARAMETER_INDEX_STEP=1
+				! /PARAMETER_INDEX_TYPE=INTEGER
+				;	
+
+				For_Each
+				/ITERATION_PARAMETER_NAME=i
+				! /ITERATION_PARAMETER_COUNT_NAME=
+				/ITEMS=::index
+				;
+			
+					Make_Line_Graph
+					/PAGE_NUMBER=::page_number
+					/COLUMN_NUMBER=::col
+					/ROW_NUMBER=::row
+					! /COLUMN_SPAN=1
+					! /ROW_SPAN=1
+					/GRAPH_TITLE=::EMG_graph_signal_name_left
+					/GRAPH_TITLE_FONT_SIZE=12
+					/GRAPH_TITLE_FONT_BOLD=TRUE
+					! /GRAPH_TITLE_FONT_ITALIC=FALSE
+					! /GRAPH_TITLE_FONT_UNDERLINE=FALSE
+					! /GRAPH_TITLE_ALIGN=ALIGN_CENTER
+					/GRAPH_TITLE_COLOR=Dark Red
+					/FILES_TO_GRAPH=::i
+					! /DISPLAY_LEGEND=FALSE
+					! /LEGEND_LOCATION=UR
+					! /LEGEND_TEXT=
+					/LINE_STYLE=NULL
+					/LINE_COLOR=Red
+					! /LINE_BOLD=FALSE
+					! /SHOW_POINTS=FALSE
+					/GRAPH_MEAN=TRUE
+					/GRAPH_STDDEV=FALSE
+					! /MEAN_STDDEV_LINE_STYLE=Solid
+					/MEAN_STDDEV_LINE_COLOR=Blue
+					! /MEAN_STDDEV_LINE_BOLD=FALSE
+					/USE_EVENT_RANGE=TRUE
+					/START_EVENT_LABEL=LHS 
+					/END_EVENT_LABEL=LHS 
+					! /INTERMEDIATE_EVENTS=
+					! /EXCLUDE_EVENTS=
+					/X_AXIS_LABEL=% gait cycle
+					/X_DATA_TYPE=FRAME_NUMBERS
+					/X_DATA_NAME=TIME
+					/X_DATA_COMPONENT=0
+					! /X_DATA_PROCESSED=ORIGINAL
+					! /X_AXIS_SCALE=Normalize 0% to 100%
+					! /Y_AXIS_LABEL=
+					/Y_DATA_TYPE=ANALOG
+					/Y_DATA_NAME=::EMG_graph_signal_name_left
+					/Y_DATA_COMPONENT=0
+					/Y_DATA_PROCESSED=EMG_PROCESSED
+					! /Y_AXIS_SCALE=Global Min to Max
+					! /Y_USE_SCIENTIFIC_NOTATION=FALSE
+					;
+					
+				End_For_Each
+				/ITERATION_PARAMETER_NAME=i
+				;
+
+			Conditional_Statement_End
+			/ITERATION_PARAMETER_NAME=cond3
+			;
+
+			Conditional_Statement
+			/ITERATION_PARAMETER_NAME=cond3
+			/EXPRESSION=("&::analysis_name&" = "Internal Compare sessions")
+			! /AS_INTEGER=TRUE
+			;
+
+				Make_Line_Graph
+				/PAGE_NUMBER=&::page_number
+				/COLUMN_NUMBER=&::col
+				/ROW_NUMBER=&::row
+				! /COLUMN_SPAN=1
+				! /ROW_SPAN=1
+				/GRAPH_TITLE=&::EMG_graph_signal_name_left
+				/GRAPH_TITLE_FONT_SIZE=12
+				/GRAPH_TITLE_FONT_BOLD=TRUE
+				! /GRAPH_TITLE_FONT_ITALIC=FALSE
+				! /GRAPH_TITLE_FONT_UNDERLINE=FALSE
+				! /GRAPH_TITLE_ALIGN=ALIGN_CENTER
+				/GRAPH_TITLE_COLOR=Dark Red
+				/FILES_TO_GRAPH=pre
+				! /DISPLAY_LEGEND=FALSE
+				! /LEGEND_LOCATION=UR
+				! /LEGEND_TEXT=
+				/LINE_STYLE=NULL
+				/LINE_COLOR=Red
+				! /LINE_BOLD=FALSE
+				! /SHOW_POINTS=FALSE
+				/GRAPH_MEAN=TRUE
+				/GRAPH_STDDEV=TRUE
+				! /MEAN_STDDEV_LINE_STYLE=Solid
+				/MEAN_STDDEV_LINE_COLOR=Blue
+				! /MEAN_STDDEV_LINE_BOLD=FALSE
+				/USE_EVENT_RANGE=TRUE
+				/START_EVENT_LABEL=LHS 
+				/END_EVENT_LABEL=LHS 
+				! /INTERMEDIATE_EVENTS=
+				! /EXCLUDE_EVENTS=
+				/X_AXIS_LABEL=% gait cycle
+				/X_DATA_TYPE=FRAME_NUMBERS
+				/X_DATA_NAME=TIME
+				/X_DATA_COMPONENT=0
+				! /X_DATA_PROCESSED=ORIGINAL
+				! /X_AXIS_SCALE=Normalize 0% to 100%
+				! /Y_AXIS_LABEL=
+				/Y_DATA_TYPE=ANALOG
+				/Y_DATA_NAME=&::EMG_graph_signal_name_left
+				/Y_DATA_COMPONENT=0
+				/Y_DATA_PROCESSED=EMG_PROCESSED
+				! /Y_AXIS_SCALE=Global Min to Max
+				! /Y_USE_SCIENTIFIC_NOTATION=FALSE
+				;
+
+				Make_Line_Graph
+				/PAGE_NUMBER=&::page_number
+				/COLUMN_NUMBER=&::col
+				/ROW_NUMBER=&::row
+				! /COLUMN_SPAN=1
+				! /ROW_SPAN=1
+				/GRAPH_TITLE=&::EMG_graph_signal_name_left
+				/GRAPH_TITLE_FONT_SIZE=12
+				/GRAPH_TITLE_FONT_BOLD=TRUE
+				! /GRAPH_TITLE_FONT_ITALIC=FALSE
+				! /GRAPH_TITLE_FONT_UNDERLINE=FALSE
+				! /GRAPH_TITLE_ALIGN=ALIGN_CENTER
+				/GRAPH_TITLE_COLOR=Dark Red
+				/FILES_TO_GRAPH=post
+				! /DISPLAY_LEGEND=FALSE
+				! /LEGEND_LOCATION=UR
+				! /LEGEND_TEXT=
+				/LINE_STYLE=NULL
+				/LINE_COLOR=Red
+				! /LINE_BOLD=FALSE
+				! /SHOW_POINTS=FALSE
+				/GRAPH_MEAN=TRUE
+				/GRAPH_STDDEV=TRUE
+				! /MEAN_STDDEV_LINE_STYLE=Solid
+				/MEAN_STDDEV_LINE_COLOR=Red
+				! /MEAN_STDDEV_LINE_BOLD=FALSE
+				/USE_EVENT_RANGE=TRUE
+				/START_EVENT_LABEL=LHS 
+				/END_EVENT_LABEL=LHS 
+				! /INTERMEDIATE_EVENTS=
+				! /EXCLUDE_EVENTS=
+				/X_AXIS_LABEL=% gait cycle
+				/X_DATA_TYPE=FRAME_NUMBERS
+				/X_DATA_NAME=TIME
+				/X_DATA_COMPONENT=0
+				! /X_DATA_PROCESSED=ORIGINAL
+				! /X_AXIS_SCALE=Normalize 0% to 100%
+				! /Y_AXIS_LABEL=
+				/Y_DATA_TYPE=ANALOG
+				/Y_DATA_NAME=&::EMG_graph_signal_name_left
+				/Y_DATA_COMPONENT=0
+				/Y_DATA_PROCESSED=EMG_PROCESSED
+				! /Y_AXIS_SCALE=Global Min to Max
+				! /Y_USE_SCIENTIFIC_NOTATION=FALSE
+				;
+
+			Conditional_Statement_End
+			/ITERATION_PARAMETER_NAME=cond3
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond2
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond2
+		/EXPRESSION=("&::event_mode&" <> "Instrumented treadmill")
+		! /AS_INTEGER=TRUE
+		;
+
+			Conditional_Statement
+			/ITERATION_PARAMETER_NAME=cond3
+			/EXPRESSION=("&::analysis_name&" <> "Internal Compare sessions")
+			! /AS_INTEGER=TRUE
+			;
+
+				Make_Line_Graph
+				/PAGE_NUMBER=&::page_number
+				/COLUMN_NUMBER=&::col
+				/ROW_NUMBER=&::row
+				! /COLUMN_SPAN=1
+				! /ROW_SPAN=1
+				/GRAPH_TITLE=&::EMG_graph_signal_name_left
+				/GRAPH_TITLE_FONT_SIZE=12
+				/GRAPH_TITLE_FONT_BOLD=TRUE
+				! /GRAPH_TITLE_FONT_ITALIC=FALSE
+				! /GRAPH_TITLE_FONT_UNDERLINE=FALSE
+				! /GRAPH_TITLE_ALIGN=ALIGN_CENTER
+				/GRAPH_TITLE_COLOR=Dark Red
+				/FILES_TO_GRAPH=Dynamic
+				! /DISPLAY_LEGEND=FALSE
+				! /LEGEND_LOCATION=UR
+				! /LEGEND_TEXT=
+				! /LINE_STYLE=Solid
+				/LINE_COLOR=Red
+				! /LINE_BOLD=FALSE
+				! /SHOW_POINTS=FALSE
+				! /GRAPH_MEAN=FALSE
+				! /GRAPH_STDDEV=FALSE
+				! /MEAN_STDDEV_LINE_STYLE=Solid
+				! /MEAN_STDDEV_LINE_COLOR=Black
+				! /MEAN_STDDEV_LINE_BOLD=FALSE
+				/USE_EVENT_RANGE=TRUE
+				/START_EVENT_LABEL=LHS 
+				/END_EVENT_LABEL=LHS 
+				! /INTERMEDIATE_EVENTS=
+				! /EXCLUDE_EVENTS=
+				/X_AXIS_LABEL=% gait cycle
+				/X_DATA_TYPE=FRAME_NUMBERS
+				/X_DATA_NAME=TIME
+				/X_DATA_COMPONENT=0
+				! /X_DATA_PROCESSED=ORIGINAL
+				! /X_AXIS_SCALE=Normalize 0% to 100%
+				! /Y_AXIS_LABEL=
+				/Y_DATA_TYPE=ANALOG
+				/Y_DATA_NAME=&::EMG_graph_signal_name_left
+				/Y_DATA_COMPONENT=0
+				/Y_DATA_PROCESSED=EMG_PROCESSED
+				! /Y_AXIS_SCALE=Global Min to Max
+				! /Y_USE_SCIENTIFIC_NOTATION=FALSE
+				;
+
+			Conditional_Statement_End
+			/ITERATION_PARAMETER_NAME=cond3
+			;
+		
+			Conditional_Statement
+			/ITERATION_PARAMETER_NAME=cond3
+			/EXPRESSION=("&::analysis_name&" = "Internal Compare sessions")
+			! /AS_INTEGER=TRUE
+			;
+
+				Make_Line_Graph
+				/PAGE_NUMBER=&::page_number
+				/COLUMN_NUMBER=&::col
+				/ROW_NUMBER=&::row
+				! /COLUMN_SPAN=1
+				! /ROW_SPAN=1
+				/GRAPH_TITLE=&::EMG_graph_signal_name_left
+				/GRAPH_TITLE_FONT_SIZE=12
+				/GRAPH_TITLE_FONT_BOLD=TRUE
+				! /GRAPH_TITLE_FONT_ITALIC=FALSE
+				! /GRAPH_TITLE_FONT_UNDERLINE=FALSE
+				! /GRAPH_TITLE_ALIGN=ALIGN_CENTER
+				/GRAPH_TITLE_COLOR=Dark Red
+				/FILES_TO_GRAPH=pre
+				! /DISPLAY_LEGEND=FALSE
+				! /LEGEND_LOCATION=UR
+				! /LEGEND_TEXT=
+				/LINE_STYLE=NULL
+				/LINE_COLOR=Red
+				! /LINE_BOLD=FALSE
+				! /SHOW_POINTS=FALSE
+				/GRAPH_MEAN=TRUE
+				/GRAPH_STDDEV=TRUE
+				! /MEAN_STDDEV_LINE_STYLE=Solid
+				/MEAN_STDDEV_LINE_COLOR=Red
+				! /MEAN_STDDEV_LINE_BOLD=FALSE
+				/USE_EVENT_RANGE=TRUE
+				/START_EVENT_LABEL=LHS 
+				/END_EVENT_LABEL=LHS 
+				! /INTERMEDIATE_EVENTS=
+				! /EXCLUDE_EVENTS=
+				/X_AXIS_LABEL=% gait cycle
+				/X_DATA_TYPE=FRAME_NUMBERS
+				/X_DATA_NAME=TIME
+				/X_DATA_COMPONENT=0
+				! /X_DATA_PROCESSED=ORIGINAL
+				! /X_AXIS_SCALE=Normalize 0% to 100%
+				! /Y_AXIS_LABEL=
+				/Y_DATA_TYPE=ANALOG
+				/Y_DATA_NAME=&::EMG_graph_signal_name_left
+				/Y_DATA_COMPONENT=0
+				/Y_DATA_PROCESSED=EMG_PROCESSED
+				! /Y_AXIS_SCALE=Global Min to Max
+				! /Y_USE_SCIENTIFIC_NOTATION=FALSE
+				;
+
+				Make_Line_Graph
+				/PAGE_NUMBER=&::page_number
+				/COLUMN_NUMBER=&::col
+				/ROW_NUMBER=&::row
+				! /COLUMN_SPAN=1
+				! /ROW_SPAN=1
+				/GRAPH_TITLE=&::EMG_graph_signal_name_left
+				/GRAPH_TITLE_FONT_SIZE=12
+				/GRAPH_TITLE_FONT_BOLD=TRUE
+				! /GRAPH_TITLE_FONT_ITALIC=FALSE
+				! /GRAPH_TITLE_FONT_UNDERLINE=FALSE
+				! /GRAPH_TITLE_ALIGN=ALIGN_CENTER
+				/GRAPH_TITLE_COLOR=Dark Red
+				/FILES_TO_GRAPH=post
+				! /DISPLAY_LEGEND=FALSE
+				! /LEGEND_LOCATION=UR
+				! /LEGEND_TEXT=
+				/LINE_STYLE=NULL
+				/LINE_COLOR=Red
+				! /LINE_BOLD=FALSE
+				! /SHOW_POINTS=FALSE
+				/GRAPH_MEAN=TRUE
+				/GRAPH_STDDEV=TRUE
+				! /MEAN_STDDEV_LINE_STYLE=Solid
+				/MEAN_STDDEV_LINE_COLOR=Red
+				! /MEAN_STDDEV_LINE_BOLD=FALSE
+				/USE_EVENT_RANGE=TRUE
+				/START_EVENT_LABEL=LHS 
+				/END_EVENT_LABEL=LHS 
+				! /INTERMEDIATE_EVENTS=
+				! /EXCLUDE_EVENTS=
+				/X_AXIS_LABEL=% gait cycle
+				/X_DATA_TYPE=FRAME_NUMBERS
+				/X_DATA_NAME=TIME
+				/X_DATA_COMPONENT=0
+				! /X_DATA_PROCESSED=ORIGINAL
+				! /X_AXIS_SCALE=Normalize 0% to 100%
+				! /Y_AXIS_LABEL=
+				/Y_DATA_TYPE=ANALOG
+				/Y_DATA_NAME=&::EMG_graph_signal_name_left
+				/Y_DATA_COMPONENT=0
+				/Y_DATA_PROCESSED=EMG_PROCESSED
+				! /Y_AXIS_SCALE=Global Min to Max
+				! /Y_USE_SCIENTIFIC_NOTATION=FALSE
+				;
+
+			Conditional_Statement_End
+			/ITERATION_PARAMETER_NAME=cond3
+			;
+		
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond2
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond2
+		/EXPRESSION=((("&::noraxon_exists&" = "TRUE") | (("&::noraxon_exists&" = "FALSE") &::AMP& ("&::normative_non_noraxon_file_exists&" = "TRUE")) | ("&::hide_messages&" = "FALSE")) > 0)
+		! /AS_INTEGER=TRUE
+		;
+
+			Get_Pipeline_Parameter_Index_Value
+			/PARAMETER_NAME=p2d_signal_name
+			/PARAMETER_VALUE=::p2d_signal_names_list
+			/INDEX=::inc
+			;
+	
+			Make_Line_Graph
+			/PAGE_NUMBER=&::page_number
+			/COLUMN_NUMBER=&::col
+			/ROW_NUMBER=&::row
+			! /COLUMN_SPAN=1
+			! /ROW_SPAN=1
+			/GRAPH_TITLE=&::EMG_graph_signal_name_left
+			/GRAPH_TITLE_FONT_SIZE=12
+			/GRAPH_TITLE_FONT_BOLD=TRUE
+			! /GRAPH_TITLE_FONT_ITALIC=FALSE
+			! /GRAPH_TITLE_FONT_UNDERLINE=FALSE
+			! /GRAPH_TITLE_ALIGN=ALIGN_CENTER
+			/GRAPH_TITLE_COLOR=Dark Red
+			/FILES_TO_GRAPH=GLOBAL
+			! /DISPLAY_LEGEND=FALSE
+			! /LEGEND_LOCATION=UR
+			! /LEGEND_TEXT=
+			/LINE_STYLE=NULL
+			/LINE_COLOR=#808080
+			/LINE_BOLD=TRUE
+			! /SHOW_POINTS=FALSE
+			! /GRAPH_MEAN=FALSE
+			! /GRAPH_STDDEV=TRUE
+			! /MEAN_STDDEV_LINE_STYLE=Solid
+			! /MEAN_STDDEV_LINE_COLOR=Black
+			! /MEAN_STDDEV_LINE_BOLD=FALSE
+			/USE_EVENT_RANGE=FALSE
+			! /START_EVENT_LABEL=LHS 
+			! /END_EVENT_LABEL=LHS 
+			! /INTERMEDIATE_EVENTS=
+			! /EXCLUDE_EVENTS=
+			/X_AXIS_LABEL=% gait cycle
+			/X_DATA_TYPE=P2D
+			/X_DATA_NAME=::p2d_signal_name
+			/X_DATA_COMPONENT=1
+			/X_DATA_PROCESSED=PROCESSED
+			/X_AXIS_SCALE=Normalize 0% to 100%
+			! /Y_AXIS_LABEL=
+			/Y_DATA_TYPE=P2D
+			/Y_DATA_NAME=&::EMG_graph_signal_name_left
+			/Y_DATA_COMPONENT=2
+			/Y_DATA_PROCESSED=EMG
+			/Y_AXIS_SCALE=Global Min to Max
+			! /Y_USE_SCIENTIFIC_NOTATION=FALSE
+			/USE_P2D_STDDEV=TRUE
+			/STDDEV_COMPONENT=3
+			! /USE_P2D_BARGRAPH=FALSE
+			! /P2D_BARGRAPH_POSITION=
+			! /P2D_BARGRAPH_WIDTH=
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond2
+		;
+
+		Add_Graph_Annotation
+		/PAGE_NUMBER=&::page_number
+		/COLUMN_NUMBER=&::col
+		/ROW_NUMBER=&::row
+		/DRAW_ORDER=1
+		/ANNOTATION_EVENT=RHS
+		/ANNOTATION_STYLE=Top Ticks
+		/ANNOTATION_COLOR=Blue
+		/ANNOTATION_SIZE=Large
+		/ANNOTATION_GLOBAL=True
+		/ANNOTATION_AVERAGE_EVENT=False
+		/OVERWRITE_EVENT_ANNOTATION=False
+		/USE_LEGACY_CODE=TRUE
+		;
+
+		Add_Graph_Annotation
+		/PAGE_NUMBER=&::page_number
+		/COLUMN_NUMBER=&::col
+		/ROW_NUMBER=&::row
+		/DRAW_ORDER=1
+		/ANNOTATION_EVENT=LTO
+		/ANNOTATION_STYLE=Vertical Line
+		/ANNOTATION_COLOR=Red
+		/ANNOTATION_SIZE=Normal
+		/ANNOTATION_GLOBAL=True
+		/ANNOTATION_AVERAGE_EVENT=False
+		/OVERWRITE_EVENT_ANNOTATION=False
+		/USE_LEGACY_CODE=TRUE
+		;
+
+		Add_Graph_Annotation
+		/PAGE_NUMBER=&::page_number
+		/COLUMN_NUMBER=&::col
+		/ROW_NUMBER=&::row
+		/DRAW_ORDER=1
+		/ANNOTATION_EVENT=RTO
+		/ANNOTATION_STYLE=Top Ticks
+		/ANNOTATION_COLOR=Blue
+		/ANNOTATION_SIZE=Large
+		/ANNOTATION_GLOBAL=True
+		/ANNOTATION_AVERAGE_EVENT=False
+		/OVERWRITE_EVENT_ANNOTATION=False
+		/USE_LEGACY_CODE=TRUE
+		;
+
+		Add_Graph_Annotation
+		/PAGE_NUMBER=&::page_number
+		/COLUMN_NUMBER=&::col
+		/ROW_NUMBER=&::row
+		/DRAW_ORDER=1
+		/ANNOTATION_EVENT=::left_norm_event
+		/ANNOTATION_STYLE=Bottom TICKS
+		/ANNOTATION_COLOR=Red
+		/ANNOTATION_SIZE=Large
+		/ANNOTATION_GLOBAL=True
+		/ANNOTATION_AVERAGE_EVENT=True
+		/OVERWRITE_EVENT_ANNOTATION=False
+		/USE_LEGACY_CODE=TRUE
+		;
+		
+		Set_Pipeline_Parameter_From_Expression
+		/PARAMETER_NAME=row
+		/EXPRESSION=&::row& + 1
+		! /AS_INTEGER=TRUE
+		;
+		
+		Set_Pipeline_Parameter_From_Expression
+		/PARAMETER_NAME=left
+		/EXPRESSION=&::left& + 1
+		! /AS_INTEGER=TRUE
+		;
+
+	End_For_Each
+	/ITERATION_PARAMETER_NAME=EMG_graph_signal_name_left
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+! FILTERED Right -----------------------------
+Set_Pipeline_Parameter
+/PARAMETER_NAME=row
+/PARAMETER_VALUE=1
+;
+
+Set_Pipeline_Parameter
+/PARAMETER_NAME=col
+/PARAMETER_VALUE=2
+;
+
+Set_Pipeline_Parameter
+/PARAMETER_NAME=right
+/PARAMETER_VALUE=0
+;
+
+Set_Pipeline_Parameter
+/PARAMETER_NAME=page_number
+/PARAMETER_VALUE=::first_EMG_page
+;
+
+Select_Active_File
+/FILE_NAME=Dynamic
+! /QUERY=
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::EMG_names_array_right_exists&" = "TRUE")
+! /AS_INTEGER=TRUE
+;
+
+	Set_Report_Page_Title
+	/PAGE_NUMBER=&::page_number
+	/PAGE_TITLE=EMG data - filtered&::add_test_condition_pre& - &::test_condition 
+	;
+
+	For_Each
+	/ITERATION_PARAMETER_NAME=EMG_graph_signal_name_right
+	/ITERATION_PARAMETER_COUNT_NAME=inc
+	/ITEMS=::EMG_graph_signals_name_right
+	;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=(&::right& = 4) &::AMP& (&::count_EMG_signals_right& > 4)
+		! /AS_INTEGER=TRUE
+		;
+
+			Set_Pipeline_Parameter_From_Expression
+			/PARAMETER_NAME=page_number
+			/EXPRESSION=&::page_number& + 1
+			! /AS_INTEGER=TRUE
+			;
+		
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=row
+			/PARAMETER_VALUE=1
+			;
+
+			Set_Report_Page_Title
+			/PAGE_NUMBER=&::page_number
+			/PAGE_TITLE=EMG data - filtered&::add_test_condition_pre& - &::test_condition 
+			;
+
+			Select_Active_File
+			/FILE_NAME=Dynamic
+			! /QUERY=
+			;
+			
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond2
+		/EXPRESSION=("&::event_mode&" = "Instrumented treadmill")
+		! /AS_INTEGER=TRUE
+		;
+
+			Conditional_Statement
+			/ITERATION_PARAMETER_NAME=cond3
+			/EXPRESSION=("&::analysis_name&" <> "Internal Compare sessions")
+			! /AS_INTEGER=TRUE
+			;
+
+				Set_Pipeline_Parameter_From_For_Loop
+				/PARAMETER_NAME=index
+				/PARAMETER_INDEX_START=0
+				/PARAMETER_INDEX_END=&::c3d_files_count& - 1
+				/PARAMETER_INDEX_STEP=1
+				! /PARAMETER_INDEX_TYPE=INTEGER
+				;	
+
+				For_Each
+				/ITERATION_PARAMETER_NAME=i
+				! /ITERATION_PARAMETER_COUNT_NAME=
+				/ITEMS=::index
+				;
+			
+					Make_Line_Graph
+					/PAGE_NUMBER=::page_number
+					/COLUMN_NUMBER=::col
+					/ROW_NUMBER=::row
+					! /COLUMN_SPAN=1
+					! /ROW_SPAN=1
+					/GRAPH_TITLE=::EMG_graph_signal_name_right
+					/GRAPH_TITLE_FONT_SIZE=12
+					/GRAPH_TITLE_FONT_BOLD=TRUE
+					! /GRAPH_TITLE_FONT_ITALIC=FALSE
+					! /GRAPH_TITLE_FONT_UNDERLINE=FALSE
+					! /GRAPH_TITLE_ALIGN=ALIGN_CENTER
+					/GRAPH_TITLE_COLOR=Dark Red
+					/FILES_TO_GRAPH=::i
+					! /DISPLAY_LEGEND=FALSE
+					! /LEGEND_LOCATION=UR
+					! /LEGEND_TEXT=
+					/LINE_STYLE=NULL
+					/LINE_COLOR=Blue
+					! /LINE_BOLD=FALSE
+					! /SHOW_POINTS=FALSE
+					/GRAPH_MEAN=TRUE
+					/GRAPH_STDDEV=FALSE
+					! /MEAN_STDDEV_LINE_STYLE=Solid
+					/MEAN_STDDEV_LINE_COLOR=Blue
+					! /MEAN_STDDEV_LINE_BOLD=FALSE
+					/USE_EVENT_RANGE=TRUE
+					/START_EVENT_LABEL=RHS 
+					/END_EVENT_LABEL=RHS 
+					! /INTERMEDIATE_EVENTS=
+					! /EXCLUDE_EVENTS=
+					/X_AXIS_LABEL=% gait cycle
+					/X_DATA_TYPE=FRAME_NUMBERS
+					/X_DATA_NAME=TIME
+					/X_DATA_COMPONENT=0
+					! /X_DATA_PROCESSED=ORIGINAL
+					! /X_AXIS_SCALE=Normalize 0% to 100%
+					! /Y_AXIS_LABEL=
+					/Y_DATA_TYPE=ANALOG
+					/Y_DATA_NAME=::EMG_graph_signal_name_right
+					/Y_DATA_COMPONENT=0
+					/Y_DATA_PROCESSED=EMG_PROCESSED
+					! /Y_AXIS_SCALE=Global Min to Max
+					! /Y_USE_SCIENTIFIC_NOTATION=FALSE
+					;
+					
+				End_For_Each
+				/ITERATION_PARAMETER_NAME=i
+				;
+
+			Conditional_Statement_End
+			/ITERATION_PARAMETER_NAME=cond3
+			;
+
+			Conditional_Statement
+			/ITERATION_PARAMETER_NAME=cond3
+			/EXPRESSION=("&::analysis_name&" = "Internal Compare sessions")
+			! /AS_INTEGER=TRUE
+			;
+
+				Make_Line_Graph
+				/PAGE_NUMBER=&::page_number
+				/COLUMN_NUMBER=&::col
+				/ROW_NUMBER=&::row
+				! /COLUMN_SPAN=1
+				! /ROW_SPAN=1
+				/GRAPH_TITLE=&::EMG_graph_signal_name_right
+				/GRAPH_TITLE_FONT_SIZE=12
+				/GRAPH_TITLE_FONT_BOLD=TRUE
+				! /GRAPH_TITLE_FONT_ITALIC=FALSE
+				! /GRAPH_TITLE_FONT_UNDERLINE=FALSE
+				! /GRAPH_TITLE_ALIGN=ALIGN_CENTER
+				/GRAPH_TITLE_COLOR=Dark Red
+				/FILES_TO_GRAPH=pre
+				! /DISPLAY_LEGEND=FALSE
+				! /LEGEND_LOCATION=UR
+				! /LEGEND_TEXT=
+				/LINE_STYLE=NULL
+				/LINE_COLOR=Blue
+				! /LINE_BOLD=FALSE
+				! /SHOW_POINTS=FALSE
+				/GRAPH_MEAN=TRUE
+				/GRAPH_STDDEV=TRUE
+				! /MEAN_STDDEV_LINE_STYLE=Solid
+				/MEAN_STDDEV_LINE_COLOR=Blue
+				! /MEAN_STDDEV_LINE_BOLD=FALSE
+				/USE_EVENT_RANGE=TRUE
+				/START_EVENT_LABEL=RHS 
+				/END_EVENT_LABEL=RHS 
+				! /INTERMEDIATE_EVENTS=
+				! /EXCLUDE_EVENTS=
+				/X_AXIS_LABEL=% gait cycle
+				/X_DATA_TYPE=FRAME_NUMBERS
+				/X_DATA_NAME=TIME
+				/X_DATA_COMPONENT=0
+				! /X_DATA_PROCESSED=ORIGINAL
+				! /X_AXIS_SCALE=Normalize 0% to 100%
+				! /Y_AXIS_LABEL=
+				/Y_DATA_TYPE=ANALOG
+				/Y_DATA_NAME=&::EMG_graph_signal_name_right
+				/Y_DATA_COMPONENT=0
+				/Y_DATA_PROCESSED=EMG_PROCESSED
+				! /Y_AXIS_SCALE=Global Min to Max
+				! /Y_USE_SCIENTIFIC_NOTATION=FALSE
+				;
+
+				Make_Line_Graph
+				/PAGE_NUMBER=&::page_number
+				/COLUMN_NUMBER=&::col
+				/ROW_NUMBER=&::row
+				! /COLUMN_SPAN=1
+				! /ROW_SPAN=1
+				/GRAPH_TITLE=&::EMG_graph_signal_name_right
+				/GRAPH_TITLE_FONT_SIZE=12
+				/GRAPH_TITLE_FONT_BOLD=TRUE
+				! /GRAPH_TITLE_FONT_ITALIC=FALSE
+				! /GRAPH_TITLE_FONT_UNDERLINE=FALSE
+				! /GRAPH_TITLE_ALIGN=ALIGN_CENTER
+				/GRAPH_TITLE_COLOR=Dark Red
+				/FILES_TO_GRAPH=post
+				! /DISPLAY_LEGEND=FALSE
+				! /LEGEND_LOCATION=UR
+				! /LEGEND_TEXT=
+				/LINE_STYLE=NULL
+				/LINE_COLOR=Blue
+				! /LINE_BOLD=FALSE
+				! /SHOW_POINTS=FALSE
+				/GRAPH_MEAN=TRUE
+				/GRAPH_STDDEV=TRUE
+				! /MEAN_STDDEV_LINE_STYLE=Solid
+				/MEAN_STDDEV_LINE_COLOR=Blue
+				! /MEAN_STDDEV_LINE_BOLD=FALSE
+				/USE_EVENT_RANGE=TRUE
+				/START_EVENT_LABEL=RHS 
+				/END_EVENT_LABEL=RHS 
+				! /INTERMEDIATE_EVENTS=
+				! /EXCLUDE_EVENTS=
+				/X_AXIS_LABEL=% gait cycle
+				/X_DATA_TYPE=FRAME_NUMBERS
+				/X_DATA_NAME=TIME
+				/X_DATA_COMPONENT=0
+				! /X_DATA_PROCESSED=ORIGINAL
+				! /X_AXIS_SCALE=Normalize 0% to 100%
+				! /Y_AXIS_LABEL=
+				/Y_DATA_TYPE=ANALOG
+				/Y_DATA_NAME=&::EMG_graph_signal_name_right
+				/Y_DATA_COMPONENT=0
+				/Y_DATA_PROCESSED=EMG_PROCESSED
+				! /Y_AXIS_SCALE=Global Min to Max
+				! /Y_USE_SCIENTIFIC_NOTATION=FALSE
+				;
+
+			Conditional_Statement_End
+			/ITERATION_PARAMETER_NAME=cond3
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond2
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond2
+		/EXPRESSION=("&::event_mode&" <> "Instrumented treadmill")
+		! /AS_INTEGER=TRUE
+		;
+
+			Conditional_Statement
+			/ITERATION_PARAMETER_NAME=cond3
+			/EXPRESSION=("&::analysis_name&" <> "Internal Compare sessions")
+			! /AS_INTEGER=TRUE
+			;
+
+				Make_Line_Graph
+				/PAGE_NUMBER=&::page_number
+				/COLUMN_NUMBER=&::col
+				/ROW_NUMBER=&::row
+				! /COLUMN_SPAN=1
+				! /ROW_SPAN=1
+				/GRAPH_TITLE=&::EMG_graph_signal_name_right
+				/GRAPH_TITLE_FONT_SIZE=12
+				/GRAPH_TITLE_FONT_BOLD=TRUE
+				! /GRAPH_TITLE_FONT_ITALIC=FALSE
+				! /GRAPH_TITLE_FONT_UNDERLINE=FALSE
+				! /GRAPH_TITLE_ALIGN=ALIGN_CENTER
+				/GRAPH_TITLE_COLOR=Dark Red
+				/FILES_TO_GRAPH=Dynamic
+				! /DISPLAY_LEGEND=FALSE
+				! /LEGEND_LOCATION=UR
+				! /LEGEND_TEXT=
+				! /LINE_STYLE=Solid
+				/LINE_COLOR=Blue
+				! /LINE_BOLD=FALSE
+				! /SHOW_POINTS=FALSE
+				! /GRAPH_MEAN=FALSE
+				! /GRAPH_STDDEV=FALSE
+				! /MEAN_STDDEV_LINE_STYLE=Solid
+				! /MEAN_STDDEV_LINE_COLOR=Black
+				! /MEAN_STDDEV_LINE_BOLD=FALSE
+				/USE_EVENT_RANGE=TRUE
+				/START_EVENT_LABEL=RHS 
+				/END_EVENT_LABEL=RHS 
+				! /INTERMEDIATE_EVENTS=
+				! /EXCLUDE_EVENTS=
+				/X_AXIS_LABEL=% gait cycle
+				/X_DATA_TYPE=FRAME_NUMBERS
+				/X_DATA_NAME=TIME
+				/X_DATA_COMPONENT=0
+				! /X_DATA_PROCESSED=ORIGINAL
+				! /X_AXIS_SCALE=Normalize 0% to 100%
+				! /Y_AXIS_LABEL=
+				/Y_DATA_TYPE=ANALOG
+				/Y_DATA_NAME=&::EMG_graph_signal_name_right
+				/Y_DATA_COMPONENT=0
+				/Y_DATA_PROCESSED=EMG_PROCESSED
+				! /Y_AXIS_SCALE=Global Min to Max
+				! /Y_USE_SCIENTIFIC_NOTATION=FALSE
+				;
+
+			Conditional_Statement_End
+			/ITERATION_PARAMETER_NAME=cond3
+			;
+		
+			Conditional_Statement
+			/ITERATION_PARAMETER_NAME=cond3
+			/EXPRESSION=("&::analysis_name&" = "Internal Compare sessions")
+			! /AS_INTEGER=TRUE
+			;
+
+				Make_Line_Graph
+				/PAGE_NUMBER=&::page_number
+				/COLUMN_NUMBER=&::col
+				/ROW_NUMBER=&::row
+				! /COLUMN_SPAN=1
+				! /ROW_SPAN=1
+				/GRAPH_TITLE=&::EMG_graph_signal_name_right
+				/GRAPH_TITLE_FONT_SIZE=12
+				/GRAPH_TITLE_FONT_BOLD=TRUE
+				! /GRAPH_TITLE_FONT_ITALIC=FALSE
+				! /GRAPH_TITLE_FONT_UNDERLINE=FALSE
+				! /GRAPH_TITLE_ALIGN=ALIGN_CENTER
+				/GRAPH_TITLE_COLOR=Dark Red
+				/FILES_TO_GRAPH=pre
+				! /DISPLAY_LEGEND=FALSE
+				! /LEGEND_LOCATION=UR
+				! /LEGEND_TEXT=
+				/LINE_STYLE=NULL
+				/LINE_COLOR=Blue
+				! /LINE_BOLD=FALSE
+				! /SHOW_POINTS=FALSE
+				/GRAPH_MEAN=TRUE
+				/GRAPH_STDDEV=TRUE
+				! /MEAN_STDDEV_LINE_STYLE=Solid
+				/MEAN_STDDEV_LINE_COLOR=Blue
+				! /MEAN_STDDEV_LINE_BOLD=FALSE
+				/USE_EVENT_RANGE=TRUE
+				/START_EVENT_LABEL=RHS 
+				/END_EVENT_LABEL=RHS 
+				! /INTERMEDIATE_EVENTS=
+				! /EXCLUDE_EVENTS=
+				/X_AXIS_LABEL=% gait cycle
+				/X_DATA_TYPE=FRAME_NUMBERS
+				/X_DATA_NAME=TIME
+				/X_DATA_COMPONENT=0
+				! /X_DATA_PROCESSED=ORIGINAL
+				! /X_AXIS_SCALE=Normalize 0% to 100%
+				! /Y_AXIS_LABEL=
+				/Y_DATA_TYPE=ANALOG
+				/Y_DATA_NAME=&::EMG_graph_signal_name_right
+				/Y_DATA_COMPONENT=0
+				/Y_DATA_PROCESSED=EMG_PROCESSED
+				! /Y_AXIS_SCALE=Global Min to Max
+				! /Y_USE_SCIENTIFIC_NOTATION=FALSE
+				;
+
+				Make_Line_Graph
+				/PAGE_NUMBER=&::page_number
+				/COLUMN_NUMBER=&::col
+				/ROW_NUMBER=&::row
+				! /COLUMN_SPAN=1
+				! /ROW_SPAN=1
+				/GRAPH_TITLE=&::EMG_graph_signal_name_right
+				/GRAPH_TITLE_FONT_SIZE=12
+				/GRAPH_TITLE_FONT_BOLD=TRUE
+				! /GRAPH_TITLE_FONT_ITALIC=FALSE
+				! /GRAPH_TITLE_FONT_UNDERLINE=FALSE
+				! /GRAPH_TITLE_ALIGN=ALIGN_CENTER
+				/GRAPH_TITLE_COLOR=Dark Red
+				/FILES_TO_GRAPH=post
+				! /DISPLAY_LEGEND=FALSE
+				! /LEGEND_LOCATION=UR
+				! /LEGEND_TEXT=
+				/LINE_STYLE=NULL
+				/LINE_COLOR=Blue
+				! /LINE_BOLD=FALSE
+				! /SHOW_POINTS=FALSE
+				/GRAPH_MEAN=TRUE
+				/GRAPH_STDDEV=TRUE
+				! /MEAN_STDDEV_LINE_STYLE=Solid
+				/MEAN_STDDEV_LINE_COLOR=Blue
+				! /MEAN_STDDEV_LINE_BOLD=FALSE
+				/USE_EVENT_RANGE=TRUE
+				/START_EVENT_LABEL=RHS 
+				/END_EVENT_LABEL=RHS 
+				! /INTERMEDIATE_EVENTS=
+				! /EXCLUDE_EVENTS=
+				/X_AXIS_LABEL=% gait cycle
+				/X_DATA_TYPE=FRAME_NUMBERS
+				/X_DATA_NAME=TIME
+				/X_DATA_COMPONENT=0
+				! /X_DATA_PROCESSED=ORIGINAL
+				! /X_AXIS_SCALE=Normalize 0% to 100%
+				! /Y_AXIS_LABEL=
+				/Y_DATA_TYPE=ANALOG
+				/Y_DATA_NAME=&::EMG_graph_signal_name_right
+				/Y_DATA_COMPONENT=0
+				/Y_DATA_PROCESSED=EMG_PROCESSED
+				! /Y_AXIS_SCALE=Global Min to Max
+				! /Y_USE_SCIENTIFIC_NOTATION=FALSE
+				;
+
+			Conditional_Statement_End
+			/ITERATION_PARAMETER_NAME=cond3
+			;
+		
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond2
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond2
+		/EXPRESSION=((("&::noraxon_exists&" = "TRUE") | (("&::noraxon_exists&" = "FALSE") &::AMP& ("&::normative_non_noraxon_file_exists&" = "TRUE")) | ("&::hide_messages&" = "FALSE")) > 0)
+		! /AS_INTEGER=TRUE
+		;
+
+			Get_Pipeline_Parameter_Index_Value
+			/PARAMETER_NAME=p2d_signal_name
+			/PARAMETER_VALUE=::p2d_signal_names_list
+			/INDEX=::inc
+			;
+	
+			Make_Line_Graph
+			/PAGE_NUMBER=&::page_number
+			/COLUMN_NUMBER=&::col
+			/ROW_NUMBER=&::row
+			! /COLUMN_SPAN=1
+			! /ROW_SPAN=1
+			/GRAPH_TITLE=&::EMG_graph_signal_name_right
+			/GRAPH_TITLE_FONT_SIZE=12
+			/GRAPH_TITLE_FONT_BOLD=TRUE
+			! /GRAPH_TITLE_FONT_ITALIC=FALSE
+			! /GRAPH_TITLE_FONT_UNDERLINE=FALSE
+			! /GRAPH_TITLE_ALIGN=ALIGN_CENTER
+			/GRAPH_TITLE_COLOR=Dark Red
+			/FILES_TO_GRAPH=GLOBAL
+			! /DISPLAY_LEGEND=FALSE
+			! /LEGEND_LOCATION=UR
+			! /LEGEND_TEXT=
+			/LINE_STYLE=NULL
+			/LINE_COLOR=#808080
+			/LINE_BOLD=TRUE
+			! /SHOW_POINTS=FALSE
+			! /GRAPH_MEAN=FALSE
+			! /GRAPH_STDDEV=TRUE
+			! /MEAN_STDDEV_LINE_STYLE=Solid
+			! /MEAN_STDDEV_LINE_COLOR=Black
+			! /MEAN_STDDEV_LINE_BOLD=FALSE
+			/USE_EVENT_RANGE=FALSE
+			! /START_EVENT_LABEL=LHS 
+			! /END_EVENT_LABEL=LHS 
+			! /INTERMEDIATE_EVENTS=
+			! /EXCLUDE_EVENTS=
+			/X_AXIS_LABEL=% gait cycle
+			/X_DATA_TYPE=P2D
+			/X_DATA_NAME=::p2d_signal_name
+			/X_DATA_COMPONENT=1
+			/X_DATA_PROCESSED=PROCESSED
+			/X_AXIS_SCALE=Normalize 0% to 100%
+			! /Y_AXIS_LABEL=
+			/Y_DATA_TYPE=P2D
+			/Y_DATA_NAME=&::EMG_graph_signal_name_right
+			/Y_DATA_COMPONENT=2
+			/Y_DATA_PROCESSED=EMG
+			/Y_AXIS_SCALE=Global Min to Max
+			! /Y_USE_SCIENTIFIC_NOTATION=FALSE
+			/USE_P2D_STDDEV=TRUE
+			/STDDEV_COMPONENT=3
+			! /USE_P2D_BARGRAPH=FALSE
+			! /P2D_BARGRAPH_POSITION=
+			! /P2D_BARGRAPH_WIDTH=
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond2
+		;
+
+		Add_Graph_Annotation
+		/PAGE_NUMBER=&::page_number
+		/COLUMN_NUMBER=&::col
+		/ROW_NUMBER=&::row
+		/DRAW_ORDER=1
+		/ANNOTATION_EVENT=LHS
+		/ANNOTATION_STYLE=Top Ticks
+		/ANNOTATION_COLOR=Red
+		/ANNOTATION_SIZE=Large
+		/ANNOTATION_GLOBAL=True
+		/ANNOTATION_AVERAGE_EVENT=False
+		/OVERWRITE_EVENT_ANNOTATION=False
+		/USE_LEGACY_CODE=TRUE
+		;
+
+		Add_Graph_Annotation
+		/PAGE_NUMBER=&::page_number
+		/COLUMN_NUMBER=&::col
+		/ROW_NUMBER=&::row
+		/DRAW_ORDER=1
+		/ANNOTATION_EVENT=RTO
+		/ANNOTATION_STYLE=Vertical Line
+		/ANNOTATION_COLOR=Blue
+		/ANNOTATION_SIZE=Normal
+		/ANNOTATION_GLOBAL=True
+		/ANNOTATION_AVERAGE_EVENT=False
+		/OVERWRITE_EVENT_ANNOTATION=False
+		/USE_LEGACY_CODE=TRUE
+		;
+
+		Add_Graph_Annotation
+		/PAGE_NUMBER=&::page_number
+		/COLUMN_NUMBER=&::col
+		/ROW_NUMBER=&::row
+		/DRAW_ORDER=1
+		/ANNOTATION_EVENT=LTO
+		/ANNOTATION_STYLE=Top Ticks
+		/ANNOTATION_COLOR=Red
+		/ANNOTATION_SIZE=Large
+		/ANNOTATION_GLOBAL=True
+		/ANNOTATION_AVERAGE_EVENT=False
+		/OVERWRITE_EVENT_ANNOTATION=False
+		/USE_LEGACY_CODE=TRUE
+		;
+
+		Add_Graph_Annotation
+		/PAGE_NUMBER=&::page_number
+		/COLUMN_NUMBER=&::col
+		/ROW_NUMBER=&::row
+		/DRAW_ORDER=1
+		/ANNOTATION_EVENT=::right_norm_event
+		/ANNOTATION_STYLE=Bottom TICKS
+		/ANNOTATION_COLOR=Blue
+		/ANNOTATION_SIZE=Large
+		/ANNOTATION_GLOBAL=True
+		/ANNOTATION_AVERAGE_EVENT=True
+		/OVERWRITE_EVENT_ANNOTATION=False
+		/USE_LEGACY_CODE=TRUE
+		;
+		
+		Set_Pipeline_Parameter_From_Expression
+		/PARAMETER_NAME=row
+		/EXPRESSION=&::row& + 1
+		! /AS_INTEGER=TRUE
+		;
+		
+		Set_Pipeline_Parameter_From_Expression
+		/PARAMETER_NAME=right
+		/EXPRESSION=&::right& + 1
+		! /AS_INTEGER=TRUE
+		;
+
+	End_For_Each
+	/ITERATION_PARAMETER_NAME=EMG_graph_signal_name_right
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+! RAW Left -------------------------------
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(&::count_EMG_signals_left& <= 4)
+! /AS_INTEGER=TRUE
+;
+
+	Set_Pipeline_Parameter_From_Expression
+	/PARAMETER_NAME=page_number
+	/EXPRESSION=&::first_EMG_page& + 1
+	! /AS_INTEGER=TRUE
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(&::count_EMG_signals_left& > 4)
+! /AS_INTEGER=TRUE
+;
+
+	Set_Pipeline_Parameter_From_Expression
+	/PARAMETER_NAME=page_number
+	/EXPRESSION=&::first_EMG_page& + 2
+	! /AS_INTEGER=TRUE
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Set_Pipeline_Parameter
+/PARAMETER_NAME=row
+/PARAMETER_VALUE=1
+;
+
+Set_Pipeline_Parameter
+/PARAMETER_NAME=col
+/PARAMETER_VALUE=1
+;
+
+Set_Pipeline_Parameter
+/PARAMETER_NAME=left
+/PARAMETER_VALUE=0
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::EMG_names_array_left_exists&" = "TRUE")
+! /AS_INTEGER=TRUE
+;
+
+	Set_Report_Page_Title
+	/PAGE_NUMBER=&::page_number
+	/PAGE_TITLE=EMG data - raw&::add_test_condition_pre& - &::test_condition 
+	;
+
+	For_Each
+	/ITERATION_PARAMETER_NAME=EMG_graph_signal_name_left
+	/ITERATION_PARAMETER_COUNT_NAME=inc
+	/ITEMS=::EMG_graph_signals_name_left
+	;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=(&::left& = 4) &::AMP& (&::count_EMG_signals_left& > 4)
+		! /AS_INTEGER=TRUE
+		;
+
+			Set_Pipeline_Parameter_From_Expression
+			/PARAMETER_NAME=page_number
+			/EXPRESSION=&::page_number& + 1
+			! /AS_INTEGER=TRUE
+			;
+		
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=row
+			/PARAMETER_VALUE=1
+			;
+
+			Set_Report_Page_Title
+			/PAGE_NUMBER=&::page_number
+			/PAGE_TITLE=EMG data - raw&::add_test_condition_pre& - &::test_condition 
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+		Make_Line_Graph
+		/PAGE_NUMBER=&::page_number
+		/COLUMN_NUMBER=&::col
+		/ROW_NUMBER=&::row
+		! /COLUMN_SPAN=1
+		! /ROW_SPAN=1
+		/GRAPH_TITLE=&::EMG_graph_signal_name_left&
+		/GRAPH_TITLE_FONT_SIZE=12
+		/GRAPH_TITLE_FONT_BOLD=TRUE
+		! /GRAPH_TITLE_FONT_ITALIC=FALSE
+		! /GRAPH_TITLE_FONT_UNDERLINE=FALSE
+		! /GRAPH_TITLE_ALIGN=ALIGN_CENTER
+		/GRAPH_TITLE_COLOR=Dark Red
+		/FILES_TO_GRAPH=Dynamic
+		! /DISPLAY_LEGEND=FALSE
+		! /LEGEND_LOCATION=UR
+		! /LEGEND_TEXT=
+		! /LINE_STYLE=Solid
+		/LINE_COLOR=Red
+		! /LINE_BOLD=FALSE
+		! /SHOW_POINTS=FALSE
+		! /GRAPH_MEAN=FALSE
+		! /GRAPH_STDDEV=FALSE
+		! /MEAN_STDDEV_LINE_STYLE=Solid
+		! /MEAN_STDDEV_LINE_COLOR=Black
+		! /MEAN_STDDEV_LINE_BOLD=FALSE
+		/USE_EVENT_RANGE=TRUE
+		/START_EVENT_LABEL=LHS
+		/END_EVENT_LABEL=LHS
+		! /INTERMEDIATE_EVENTS=
+		! /EXCLUDE_EVENTS=
+		/X_AXIS_LABEL=% gait cycle
+		/X_DATA_TYPE=FRAME_NUMBERS
+		/X_DATA_NAME=TIME
+		/X_DATA_COMPONENT=0
+		! /X_DATA_PROCESSED=ORIGINAL
+		! /X_AXIS_SCALE=Normalize 0% to 100%
+		! /Y_AXIS_LABEL=
+		/Y_DATA_TYPE=ANALOG
+		/Y_DATA_NAME=&::EMG_graph_signal_name_left&
+		/Y_DATA_COMPONENT=0
+		/Y_DATA_PROCESSED=EMG_RAW
+		! /Y_AXIS_SCALE=Global Min to Max
+		! /Y_USE_SCIENTIFIC_NOTATION=FALSE
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond2
+		/EXPRESSION=((("&::noraxon_exists&" = "TRUE") | (("&::noraxon_exists&" = "FALSE") &::AMP& ("&::normative_non_noraxon_file_exists&" = "TRUE")) | ("&::hide_messages&" = "FALSE")) > 0)
+		! /AS_INTEGER=TRUE
+		;
+
+			Get_Pipeline_Parameter_Index_Value
+			/PARAMETER_NAME=p2d_signal_name
+			/PARAMETER_VALUE=::p2d_signal_names_list
+			/INDEX=::inc
+			;
+	
+			Make_Line_Graph
+			/PAGE_NUMBER=&::page_number
+			/COLUMN_NUMBER=&::col
+			/ROW_NUMBER=&::row
+			! /COLUMN_SPAN=1
+			! /ROW_SPAN=1
+			/GRAPH_TITLE=&::EMG_graph_signal_name_left&
+			/GRAPH_TITLE_FONT_SIZE=12
+			/GRAPH_TITLE_FONT_BOLD=TRUE
+			! /GRAPH_TITLE_FONT_ITALIC=FALSE
+			! /GRAPH_TITLE_FONT_UNDERLINE=FALSE
+			! /GRAPH_TITLE_ALIGN=ALIGN_CENTER
+			/GRAPH_TITLE_COLOR=Dark Red
+			/FILES_TO_GRAPH=GLOBAL
+			! /DISPLAY_LEGEND=FALSE
+			! /LEGEND_LOCATION=UR
+			! /LEGEND_TEXT=
+			/LINE_STYLE=NULL
+			/LINE_COLOR=#808080
+			/LINE_BOLD=TRUE
+			! /SHOW_POINTS=FALSE
+			! /GRAPH_MEAN=FALSE
+			! /GRAPH_STDDEV=TRUE
+			! /MEAN_STDDEV_LINE_STYLE=Solid
+			! /MEAN_STDDEV_LINE_COLOR=Black
+			! /MEAN_STDDEV_LINE_BOLD=FALSE
+			/USE_EVENT_RANGE=FALSE
+			! /START_EVENT_LABEL=LHS 
+			! /END_EVENT_LABEL=LHS 
+			! /INTERMEDIATE_EVENTS=
+			! /EXCLUDE_EVENTS=
+			/X_AXIS_LABEL=% gait cycle
+			/X_DATA_TYPE=P2D
+			/X_DATA_NAME=::p2d_signal_name
+			/X_DATA_COMPONENT=1
+			/X_DATA_PROCESSED=PROCESSED
+			/X_AXIS_SCALE=Normalize 0% to 100%
+			! /Y_AXIS_LABEL=
+			/Y_DATA_TYPE=P2D
+			/Y_DATA_NAME=&::EMG_graph_signal_name_left&_raw
+			/Y_DATA_COMPONENT=2
+			/Y_DATA_PROCESSED=EMG
+			/Y_AXIS_SCALE=Global Min to Max
+			! /Y_USE_SCIENTIFIC_NOTATION=FALSE
+			/USE_P2D_STDDEV=TRUE
+			/STDDEV_COMPONENT=3
+			! /USE_P2D_BARGRAPH=FALSE
+			! /P2D_BARGRAPH_POSITION=
+			! /P2D_BARGRAPH_WIDTH=
+			;
+
+			Make_Line_Graph
+			/PAGE_NUMBER=&::page_number
+			/COLUMN_NUMBER=&::col
+			/ROW_NUMBER=&::row
+			! /COLUMN_SPAN=1
+			! /ROW_SPAN=1
+			/GRAPH_TITLE=&::EMG_graph_signal_name_left&
+			/GRAPH_TITLE_FONT_SIZE=12
+			/GRAPH_TITLE_FONT_BOLD=TRUE
+			! /GRAPH_TITLE_FONT_ITALIC=FALSE
+			! /GRAPH_TITLE_FONT_UNDERLINE=FALSE
+			! /GRAPH_TITLE_ALIGN=ALIGN_CENTER
+			/GRAPH_TITLE_COLOR=Dark Red
+			/FILES_TO_GRAPH=GLOBAL
+			! /DISPLAY_LEGEND=FALSE
+			! /LEGEND_LOCATION=UR
+			! /LEGEND_TEXT=
+			/LINE_STYLE=NULL
+			/LINE_COLOR=#808080
+			/LINE_BOLD=TRUE
+			! /SHOW_POINTS=FALSE
+			! /GRAPH_MEAN=FALSE
+			! /GRAPH_STDDEV=TRUE
+			! /MEAN_STDDEV_LINE_STYLE=Solid
+			! /MEAN_STDDEV_LINE_COLOR=Black
+			! /MEAN_STDDEV_LINE_BOLD=FALSE
+			/USE_EVENT_RANGE=FALSE
+			! /START_EVENT_LABEL=LHS 
+			! /END_EVENT_LABEL=LHS 
+			! /INTERMEDIATE_EVENTS=
+			! /EXCLUDE_EVENTS=
+			/X_AXIS_LABEL=% gait cycle
+			/X_DATA_TYPE=P2D
+			/X_DATA_NAME=::p2d_signal_name
+			/X_DATA_COMPONENT=1
+			/X_DATA_PROCESSED=PROCESSED
+			/X_AXIS_SCALE=Normalize 0% to 100%
+			! /Y_AXIS_LABEL=
+			/Y_DATA_TYPE=P2D
+			/Y_DATA_NAME=&::EMG_graph_signal_name_left&_raw_inv
+			/Y_DATA_COMPONENT=2
+			/Y_DATA_PROCESSED=EMG
+			/Y_AXIS_SCALE=Global Min to Max
+			! /Y_USE_SCIENTIFIC_NOTATION=FALSE
+			/USE_P2D_STDDEV=TRUE
+			/STDDEV_COMPONENT=3
+			! /USE_P2D_BARGRAPH=FALSE
+			! /P2D_BARGRAPH_POSITION=
+			! /P2D_BARGRAPH_WIDTH=
+			;
+		
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond2
+		;
+
+		Add_Graph_Annotation
+		/PAGE_NUMBER=&::page_number
+		/COLUMN_NUMBER=&::col
+		/ROW_NUMBER=&::row
+		/DRAW_ORDER=1
+		/ANNOTATION_EVENT=RHS
+		/ANNOTATION_STYLE=Top Ticks
+		/ANNOTATION_COLOR=Blue
+		/ANNOTATION_SIZE=Large
+		/ANNOTATION_GLOBAL=True
+		/ANNOTATION_AVERAGE_EVENT=False
+		/OVERWRITE_EVENT_ANNOTATION=False
+		/USE_LEGACY_CODE=TRUE
+		;
+
+
+		Add_Graph_Annotation
+		/PAGE_NUMBER=&::page_number
+		/COLUMN_NUMBER=&::col
+		/ROW_NUMBER=&::row
+		/DRAW_ORDER=1
+		/ANNOTATION_EVENT=LTO
+		/ANNOTATION_STYLE=Vertical Line
+		/ANNOTATION_COLOR=Red
+		/ANNOTATION_SIZE=Normal
+		/ANNOTATION_GLOBAL=True
+		/ANNOTATION_AVERAGE_EVENT=False
+		/OVERWRITE_EVENT_ANNOTATION=False
+		/USE_LEGACY_CODE=TRUE
+		;
+
+		Add_Graph_Annotation
+		/PAGE_NUMBER=&::page_number
+		/COLUMN_NUMBER=&::col
+		/ROW_NUMBER=&::row
+		/DRAW_ORDER=1
+		/ANNOTATION_EVENT=RTO
+		/ANNOTATION_STYLE=Top Ticks
+		/ANNOTATION_COLOR=Blue
+		/ANNOTATION_SIZE=Large
+		/ANNOTATION_GLOBAL=True
+		/ANNOTATION_AVERAGE_EVENT=False
+		/OVERWRITE_EVENT_ANNOTATION=False
+		/USE_LEGACY_CODE=TRUE
+		;
+
+		Add_Graph_Annotation
+		/PAGE_NUMBER=&::page_number
+		/COLUMN_NUMBER=&::col
+		/ROW_NUMBER=&::row
+		/DRAW_ORDER=1
+		/ANNOTATION_EVENT=::left_norm_event
+		/ANNOTATION_STYLE=Bottom TICKS
+		/ANNOTATION_COLOR=Red
+		/ANNOTATION_SIZE=Large
+		/ANNOTATION_GLOBAL=True
+		/ANNOTATION_AVERAGE_EVENT=True
+		/OVERWRITE_EVENT_ANNOTATION=False
+		/USE_LEGACY_CODE=TRUE
+		;
+
+		Set_Pipeline_Parameter_From_Expression
+		/PARAMETER_NAME=row
+		/EXPRESSION=&::row& + 1
+		! /AS_INTEGER=TRUE
+		;
+		
+		Set_Pipeline_Parameter_From_Expression
+		/PARAMETER_NAME=left
+		/EXPRESSION=&::left& + 1
+		! /AS_INTEGER=TRUE
+		;
+
+	End_For_Each
+	/ITERATION_PARAMETER_NAME=EMG_graph_signal_name_left
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+!RAW Right -------------------
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(&::count_EMG_signals_right& <= 4)
+! /AS_INTEGER=TRUE
+;
+
+	Set_Pipeline_Parameter_From_Expression
+	/PARAMETER_NAME=page_number
+	/EXPRESSION=&::first_EMG_page& + 1
+	! /AS_INTEGER=TRUE
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(&::count_EMG_signals_right& > 4)
+! /AS_INTEGER=TRUE
+;
+
+	Set_Pipeline_Parameter_From_Expression
+	/PARAMETER_NAME=page_number
+	/EXPRESSION=&::first_EMG_page& + 2
+	! /AS_INTEGER=TRUE
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Set_Pipeline_Parameter
+/PARAMETER_NAME=row
+/PARAMETER_VALUE=1
+;
+
+Set_Pipeline_Parameter
+/PARAMETER_NAME=col
+/PARAMETER_VALUE=2
+;
+
+Set_Pipeline_Parameter
+/PARAMETER_NAME=right
+/PARAMETER_VALUE=0
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::EMG_names_array_right_exists&" = "TRUE")
+! /AS_INTEGER=TRUE
+;
+
+	Set_Report_Page_Title
+	/PAGE_NUMBER=&::page_number
+	/PAGE_TITLE=EMG data - raw&::add_test_condition_pre& - &::test_condition 
+	;
+
+	For_Each
+	/ITERATION_PARAMETER_NAME=EMG_graph_signal_name_right
+	/ITERATION_PARAMETER_COUNT_NAME=inc
+	/ITEMS=::EMG_graph_signals_name_right
+	;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=(&::right& = 4) &::AMP& (&::count_EMG_signals_right& > 4)
+		! /AS_INTEGER=TRUE
+		;
+
+			Set_Pipeline_Parameter_From_Expression
+			/PARAMETER_NAME=page_number
+			/EXPRESSION=&::page_number& + 1
+			! /AS_INTEGER=TRUE
+			;
+		
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=row
+			/PARAMETER_VALUE=1
+			;
+
+			Set_Report_Page_Title
+			/PAGE_NUMBER=&::page_number
+			/PAGE_TITLE=EMG data - raw&::add_test_condition_pre& - &::test_condition 
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+		Make_Line_Graph
+		/PAGE_NUMBER=&::page_number
+		/COLUMN_NUMBER=&::col
+		/ROW_NUMBER=&::row
+		! /COLUMN_SPAN=1
+		! /ROW_SPAN=1
+		/GRAPH_TITLE=&::EMG_graph_signal_name_right
+		/GRAPH_TITLE_FONT_SIZE=12
+		/GRAPH_TITLE_FONT_BOLD=TRUE
+		! /GRAPH_TITLE_FONT_ITALIC=FALSE
+		! /GRAPH_TITLE_FONT_UNDERLINE=FALSE
+		! /GRAPH_TITLE_ALIGN=ALIGN_CENTER
+		/GRAPH_TITLE_COLOR=Dark Red
+		/FILES_TO_GRAPH=Dynamic
+		! /DISPLAY_LEGEND=FALSE
+		! /LEGEND_LOCATION=UR
+		! /LEGEND_TEXT=
+		! /LINE_STYLE=Solid
+		/LINE_COLOR=Blue
+		! /LINE_BOLD=FALSE
+		! /SHOW_POINTS=FALSE
+		! /GRAPH_MEAN=FALSE
+		! /GRAPH_STDDEV=FALSE
+		! /MEAN_STDDEV_LINE_STYLE=Solid
+		! /MEAN_STDDEV_LINE_COLOR=Black
+		! /MEAN_STDDEV_LINE_BOLD=FALSE
+		/USE_EVENT_RANGE=TRUE
+		/START_EVENT_LABEL=RHS
+		/END_EVENT_LABEL=RHS
+		! /INTERMEDIATE_EVENTS=
+		! /EXCLUDE_EVENTS=
+		/X_AXIS_LABEL=% gait cycle
+		/X_DATA_TYPE=FRAME_NUMBERS
+		/X_DATA_NAME=TIME
+		/X_DATA_COMPONENT=0
+		! /X_DATA_PROCESSED=ORIGINAL
+		! /X_AXIS_SCALE=Normalize 0% to 100%
+		! /Y_AXIS_LABEL=
+		/Y_DATA_TYPE=ANALOG
+		/Y_DATA_NAME=&::EMG_graph_signal_name_right
+		/Y_DATA_COMPONENT=0
+		/Y_DATA_PROCESSED=EMG_RAW
+		! /Y_AXIS_SCALE=Global Min to Max
+		! /Y_USE_SCIENTIFIC_NOTATION=FALSE
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond2
+		/EXPRESSION=((("&::noraxon_exists&" = "TRUE") | (("&::noraxon_exists&" = "FALSE") &::AMP& ("&::normative_non_noraxon_file_exists&" = "TRUE")) | ("&::hide_messages&" = "FALSE")) > 0)
+		! /AS_INTEGER=TRUE
+		;
+
+			Get_Pipeline_Parameter_Index_Value
+			/PARAMETER_NAME=p2d_signal_name
+			/PARAMETER_VALUE=::p2d_signal_names_list
+			/INDEX=::inc
+			;
+	
+			Make_Line_Graph
+			/PAGE_NUMBER=&::page_number
+			/COLUMN_NUMBER=&::col
+			/ROW_NUMBER=&::row
+			! /COLUMN_SPAN=1
+			! /ROW_SPAN=1
+			/GRAPH_TITLE=&::EMG_graph_signal_name_right
+			/GRAPH_TITLE_FONT_SIZE=12
+			/GRAPH_TITLE_FONT_BOLD=TRUE
+			! /GRAPH_TITLE_FONT_ITALIC=FALSE
+			! /GRAPH_TITLE_FONT_UNDERLINE=FALSE
+			! /GRAPH_TITLE_ALIGN=ALIGN_CENTER
+			/GRAPH_TITLE_COLOR=Dark Red
+			/FILES_TO_GRAPH=GLOBAL
+			! /DISPLAY_LEGEND=FALSE
+			! /LEGEND_LOCATION=UR
+			! /LEGEND_TEXT=
+			/LINE_STYLE=NULL
+			/LINE_COLOR=#808080
+			/LINE_BOLD=TRUE
+			! /SHOW_POINTS=FALSE
+			! /GRAPH_MEAN=FALSE
+			! /GRAPH_STDDEV=TRUE
+			! /MEAN_STDDEV_LINE_STYLE=Solid
+			! /MEAN_STDDEV_LINE_COLOR=Black
+			! /MEAN_STDDEV_LINE_BOLD=FALSE
+			/USE_EVENT_RANGE=FALSE
+			! /START_EVENT_LABEL=LHS 
+			! /END_EVENT_LABEL=LHS 
+			! /INTERMEDIATE_EVENTS=
+			! /EXCLUDE_EVENTS=
+			/X_AXIS_LABEL=% gait cycle
+			/X_DATA_TYPE=P2D
+			/X_DATA_NAME=::p2d_signal_name
+			/X_DATA_COMPONENT=1
+			/X_DATA_PROCESSED=PROCESSED
+			/X_AXIS_SCALE=Normalize 0% to 100%
+			! /Y_AXIS_LABEL=
+			/Y_DATA_TYPE=P2D
+			/Y_DATA_NAME=&::EMG_graph_signal_name_right&_raw
+			/Y_DATA_COMPONENT=2
+			/Y_DATA_PROCESSED=EMG
+			/Y_AXIS_SCALE=Global Min to Max
+			! /Y_USE_SCIENTIFIC_NOTATION=FALSE
+			/USE_P2D_STDDEV=TRUE
+			/STDDEV_COMPONENT=3
+			! /USE_P2D_BARGRAPH=FALSE
+			! /P2D_BARGRAPH_POSITION=
+			! /P2D_BARGRAPH_WIDTH=
+			;
+
+			Make_Line_Graph
+			/PAGE_NUMBER=&::page_number
+			/COLUMN_NUMBER=&::col
+			/ROW_NUMBER=&::row
+			! /COLUMN_SPAN=1
+			! /ROW_SPAN=1
+			/GRAPH_TITLE=&::EMG_graph_signal_name_right
+			/GRAPH_TITLE_FONT_SIZE=12
+			/GRAPH_TITLE_FONT_BOLD=TRUE
+			! /GRAPH_TITLE_FONT_ITALIC=FALSE
+			! /GRAPH_TITLE_FONT_UNDERLINE=FALSE
+			! /GRAPH_TITLE_ALIGN=ALIGN_CENTER
+			/GRAPH_TITLE_COLOR=Dark Red
+			/FILES_TO_GRAPH=GLOBAL
+			! /DISPLAY_LEGEND=FALSE
+			! /LEGEND_LOCATION=UR
+			! /LEGEND_TEXT=
+			/LINE_STYLE=NULL
+			/LINE_COLOR=#808080
+			/LINE_BOLD=TRUE
+			! /SHOW_POINTS=FALSE
+			! /GRAPH_MEAN=FALSE
+			! /GRAPH_STDDEV=TRUE
+			! /MEAN_STDDEV_LINE_STYLE=Solid
+			! /MEAN_STDDEV_LINE_COLOR=Black
+			! /MEAN_STDDEV_LINE_BOLD=FALSE
+			/USE_EVENT_RANGE=FALSE
+			! /START_EVENT_LABEL=LHS 
+			! /END_EVENT_LABEL=LHS 
+			! /INTERMEDIATE_EVENTS=
+			! /EXCLUDE_EVENTS=
+			/X_AXIS_LABEL=% gait cycle
+			/X_DATA_TYPE=P2D
+			/X_DATA_NAME=::p2d_signal_name
+			/X_DATA_COMPONENT=1
+			/X_DATA_PROCESSED=PROCESSED
+			/X_AXIS_SCALE=Normalize 0% to 100%
+			! /Y_AXIS_LABEL=
+			/Y_DATA_TYPE=P2D
+			/Y_DATA_NAME=&::EMG_graph_signal_name_right&_raw_inv
+			/Y_DATA_COMPONENT=2
+			/Y_DATA_PROCESSED=EMG
+			/Y_AXIS_SCALE=Global Min to Max
+			! /Y_USE_SCIENTIFIC_NOTATION=FALSE
+			/USE_P2D_STDDEV=TRUE
+			/STDDEV_COMPONENT=3
+			! /USE_P2D_BARGRAPH=FALSE
+			! /P2D_BARGRAPH_POSITION=
+			! /P2D_BARGRAPH_WIDTH=
+			;
+		
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond2
+		;
+
+		Add_Graph_Annotation
+		/PAGE_NUMBER=&::page_number
+		/COLUMN_NUMBER=&::col
+		/ROW_NUMBER=&::row
+		/DRAW_ORDER=1
+		/ANNOTATION_EVENT=LHS
+		/ANNOTATION_STYLE=Top Ticks
+		/ANNOTATION_COLOR=REd
+		/ANNOTATION_SIZE=Large
+		/ANNOTATION_GLOBAL=True
+		/ANNOTATION_AVERAGE_EVENT=False
+		/OVERWRITE_EVENT_ANNOTATION=False
+		/USE_LEGACY_CODE=TRUE
+		;
+
+
+		Add_Graph_Annotation
+		/PAGE_NUMBER=&::page_number
+		/COLUMN_NUMBER=&::col
+		/ROW_NUMBER=&::row
+		/DRAW_ORDER=1
+		/ANNOTATION_EVENT=RTO
+		/ANNOTATION_STYLE=Vertical Line
+		/ANNOTATION_COLOR=Blue
+		/ANNOTATION_SIZE=Normal
+		/ANNOTATION_GLOBAL=True
+		/ANNOTATION_AVERAGE_EVENT=False
+		/OVERWRITE_EVENT_ANNOTATION=False
+		/USE_LEGACY_CODE=TRUE
+		;
+
+		Add_Graph_Annotation
+		/PAGE_NUMBER=&::page_number
+		/COLUMN_NUMBER=&::col
+		/ROW_NUMBER=&::row
+		/DRAW_ORDER=1
+		/ANNOTATION_EVENT=LTO
+		/ANNOTATION_STYLE=Top Ticks
+		/ANNOTATION_COLOR=Red
+		/ANNOTATION_SIZE=Large
+		/ANNOTATION_GLOBAL=True
+		/ANNOTATION_AVERAGE_EVENT=False
+		/OVERWRITE_EVENT_ANNOTATION=False
+		/USE_LEGACY_CODE=TRUE
+		;
+
+		Add_Graph_Annotation
+		/PAGE_NUMBER=&::page_number
+		/COLUMN_NUMBER=&::col
+		/ROW_NUMBER=&::row
+		/DRAW_ORDER=1
+		/ANNOTATION_EVENT=::right_norm_event
+		/ANNOTATION_STYLE=Bottom TICKS
+		/ANNOTATION_COLOR=Blue
+		/ANNOTATION_SIZE=Large
+		/ANNOTATION_GLOBAL=True
+		/ANNOTATION_AVERAGE_EVENT=True
+		/OVERWRITE_EVENT_ANNOTATION=False
+		/USE_LEGACY_CODE=TRUE
+		;
+
+		Set_Pipeline_Parameter_From_Expression
+		/PARAMETER_NAME=row
+		/EXPRESSION=&::row& + 1
+		! /AS_INTEGER=TRUE
+		;
+		
+		Set_Pipeline_Parameter_From_Expression
+		/PARAMETER_NAME=right
+		/EXPRESSION=&::right& + 1
+		! /AS_INTEGER=TRUE
+		;
+
+	End_For_Each
+	/ITERATION_PARAMETER_NAME=EMG_graph_signal_name_right
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+!MEANS Left ---------------------  
+Set_Pipeline_Parameter
+/PARAMETER_NAME=row
+/PARAMETER_VALUE=1
+;
+
+Set_Pipeline_Parameter
+/PARAMETER_NAME=col
+/PARAMETER_VALUE=1
+;
+
+Set_Pipeline_Parameter
+/PARAMETER_NAME=left
+/PARAMETER_VALUE=0
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::EMG_names_array_left_exists&" = "TRUE") &::AMP& ("&::EMG_names_array_right_exists&" = "FALSE")
+! /AS_INTEGER=TRUE
+;
+
+	Set_Pipeline_Parameter_From_Expression
+	/PARAMETER_NAME=page_number1
+	/EXPRESSION=&::page_number& + 3
+	! /AS_INTEGER=TRUE
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::EMG_names_array_right_exists&" = "TRUE")
+! /AS_INTEGER=TRUE
+;
+
+	Set_Pipeline_Parameter_From_Expression
+	/PARAMETER_NAME=page_number1
+	/EXPRESSION=&::page_number& + 1
+	! /AS_INTEGER=TRUE
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Select_Active_File
+/FILE_NAME=Dynamic
+! /QUERY=
+;
+	
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::EMG_names_array_left_exists&" = "TRUE")
+! /AS_INTEGER=TRUE
+;
+
+	Set_Report_Page_Title
+	/PAGE_NUMBER=&::page_number1
+	/PAGE_TITLE=EMG data - filtered (mean)&::add_test_condition_pre& - &::test_condition 
+	;
+
+	For_Each
+	/ITERATION_PARAMETER_NAME=EMG_graph_signal_name_left
+	/ITERATION_PARAMETER_COUNT_NAME=inc
+	/ITEMS=::EMG_graph_signals_name_left
+	;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=(&::left& = 4) &::AMP& (&::count_EMG_signals_left& > 4)
+		! /AS_INTEGER=TRUE
+		;
+
+			Set_Pipeline_Parameter_From_Expression
+			/PARAMETER_NAME=page_number1
+			/EXPRESSION=&::page_number1& + 1
+			! /AS_INTEGER=TRUE
+			;
+		
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=row
+			/PARAMETER_VALUE=1
+			;
+
+			Set_Report_Page_Title
+			/PAGE_NUMBER=&::page_number1
+			/PAGE_TITLE=EMG data - filtered (mean)&::add_test_condition_pre& - &::test_condition 
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+		Make_Line_Graph
+		/PAGE_NUMBER=&::page_number1
+		/COLUMN_NUMBER=&::col
+		/ROW_NUMBER=&::row
+		! /COLUMN_SPAN=1
+		! /ROW_SPAN=1
+		/GRAPH_TITLE=&::EMG_graph_signal_name_left
+		/GRAPH_TITLE_FONT_SIZE=12
+		/GRAPH_TITLE_FONT_BOLD=TRUE
+		! /GRAPH_TITLE_FONT_ITALIC=FALSE
+		! /GRAPH_TITLE_FONT_UNDERLINE=FALSE
+		! /GRAPH_TITLE_ALIGN=ALIGN_CENTER
+		/GRAPH_TITLE_COLOR=Dark Red
+		/FILES_TO_GRAPH=&::selected_files
+		! /DISPLAY_LEGEND=FALSE
+		! /LEGEND_LOCATION=UR
+		! /LEGEND_TEXT=
+		/LINE_STYLE=NULL
+		/LINE_COLOR=Red
+		/LINE_BOLD=TRUE
+		! /SHOW_POINTS=FALSE
+		/GRAPH_MEAN=TRUE
+		! /GRAPH_STDDEV=FALSE
+		/MEAN_STDDEV_LINE_STYLE=::sd_line_style
+		/MEAN_STDDEV_LINE_BOLD=::sd_line_bold
+		/MEAN_STDDEV_LINE_COLOR=Red
+		/USE_EVENT_RANGE=TRUE
+		/START_EVENT_LABEL=LHS 
+		/END_EVENT_LABEL=LHS 
+		! /INTERMEDIATE_EVENTS=
+		! /EXCLUDE_EVENTS=
+		/X_AXIS_LABEL=% gait cycle
+		/X_DATA_TYPE=FRAME_NUMBERS
+		/X_DATA_NAME=TIME
+		/X_DATA_COMPONENT=0
+		! /X_DATA_PROCESSED=ORIGINAL
+		! /X_AXIS_SCALE=Normalize 0% to 100%
+		! /Y_AXIS_LABEL=
+		/Y_DATA_TYPE=ANALOG
+		/Y_DATA_NAME=&::EMG_graph_signal_name_left
+		/Y_DATA_COMPONENT=0
+		/Y_DATA_PROCESSED=EMG_PROCESSED
+		! /Y_AXIS_SCALE=Global Min to Max
+		! /Y_USE_SCIENTIFIC_NOTATION=FALSE
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=("&::analysis_name&" = "Internal Compare sessions")
+		! /AS_INTEGER=TRUE
+		;
+
+			Make_Line_Graph
+			/PAGE_NUMBER=&::page_number1
+			/COLUMN_NUMBER=&::col
+			/ROW_NUMBER=&::row
+			! /COLUMN_SPAN=1
+			! /ROW_SPAN=1
+			/GRAPH_TITLE=&::EMG_graph_signal_name_left
+			/GRAPH_TITLE_FONT_SIZE=12
+			/GRAPH_TITLE_FONT_BOLD=TRUE
+			! /GRAPH_TITLE_FONT_ITALIC=FALSE
+			! /GRAPH_TITLE_FONT_UNDERLINE=FALSE
+			! /GRAPH_TITLE_ALIGN=ALIGN_CENTER
+			/GRAPH_TITLE_COLOR=Dark Red
+			/FILES_TO_GRAPH=Dynamic_post
+			! /DISPLAY_LEGEND=FALSE
+			! /LEGEND_LOCATION=UR
+			! /LEGEND_TEXT=
+			/LINE_STYLE=NULL
+			/LINE_COLOR=Red
+			/LINE_BOLD=TRUE
+			! /SHOW_POINTS=FALSE
+			/GRAPH_MEAN=TRUE
+			! /GRAPH_STDDEV=FALSE
+			! /MEAN_STDDEV_LINE_STYLE=Solid
+			/MEAN_STDDEV_LINE_COLOR=Red
+			/MEAN_STDDEV_LINE_BOLD=::sd_line_bold
+			/USE_EVENT_RANGE=TRUE
+			/START_EVENT_LABEL=LHS 
+			/END_EVENT_LABEL=LHS 
+			! /INTERMEDIATE_EVENTS=
+			! /EXCLUDE_EVENTS=
+			/X_AXIS_LABEL=% gait cycle
+			/X_DATA_TYPE=FRAME_NUMBERS
+			/X_DATA_NAME=TIME
+			/X_DATA_COMPONENT=0
+			! /X_DATA_PROCESSED=ORIGINAL
+			! /X_AXIS_SCALE=Normalize 0% to 100%
+			! /Y_AXIS_LABEL=
+			/Y_DATA_TYPE=ANALOG
+			/Y_DATA_NAME=&::EMG_graph_signal_name_left
+			/Y_DATA_COMPONENT=0
+			/Y_DATA_PROCESSED=EMG_PROCESSED
+			! /Y_AXIS_SCALE=Global Min to Max
+			! /Y_USE_SCIENTIFIC_NOTATION=FALSE
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=((("&::noraxon_exists&" = "TRUE") | (("&::noraxon_exists&" = "FALSE") &::AMP& ("&::normative_non_noraxon_file_exists&" = "TRUE")) | ("&::hide_messages&" = "FALSE")) > 0)
+		! /AS_INTEGER=TRUE
+		;
+
+			Get_Pipeline_Parameter_Index_Value
+			/PARAMETER_NAME=p2d_signal_name
+			/PARAMETER_VALUE=::p2d_signal_names_list
+			/INDEX=::inc
+			;
+
+			Make_Line_Graph
+			/PAGE_NUMBER=&::page_number1
+			/COLUMN_NUMBER=&::col
+			/ROW_NUMBER=&::row
+			! /COLUMN_SPAN=1
+			! /ROW_SPAN=1
+			/GRAPH_TITLE=&::EMG_graph_signal_name_left
+			/GRAPH_TITLE_FONT_SIZE=12
+			/GRAPH_TITLE_FONT_BOLD=TRUE
+			! /GRAPH_TITLE_FONT_ITALIC=FALSE
+			! /GRAPH_TITLE_FONT_UNDERLINE=FALSE
+			! /GRAPH_TITLE_ALIGN=ALIGN_CENTER
+			/GRAPH_TITLE_COLOR=Dark Red
+			/FILES_TO_GRAPH=GLOBAL
+			! /DISPLAY_LEGEND=FALSE
+			! /LEGEND_LOCATION=UR
+			! /LEGEND_TEXT=
+			/LINE_STYLE=NULL
+			/LINE_COLOR=#808080
+			! /SHOW_POINTS=FALSE
+			! /GRAPH_MEAN=FALSE
+			! /GRAPH_STDDEV=FALSE
+			! /MEAN_STDDEV_LINE_STYLE=Solid
+			! /MEAN_STDDEV_LINE_COLOR=Black
+			! /MEAN_STDDEV_LINE_BOLD=FALSE
+			/USE_EVENT_RANGE=FALSE
+			! /START_EVENT_LABEL=LHS 
+			! /END_EVENT_LABEL=LHS 
+			! /INTERMEDIATE_EVENTS=
+			! /EXCLUDE_EVENTS=
+			/X_AXIS_LABEL=% gait cycle
+			/X_DATA_TYPE=P2D
+			/X_DATA_NAME=::p2d_signal_name
+			/X_DATA_COMPONENT=1
+			/X_DATA_PROCESSED=PROCESSED
+			/X_AXIS_SCALE=Normalize 0% to 100%
+			! /Y_AXIS_LABEL=
+			/Y_DATA_TYPE=P2D
+			/Y_DATA_NAME=&::EMG_graph_signal_name_left
+			/Y_DATA_COMPONENT=2
+			/Y_DATA_PROCESSED=EMG
+			/Y_AXIS_SCALE=Global Min to Max
+			! /Y_USE_SCIENTIFIC_NOTATION=FALSE
+			/USE_P2D_STDDEV=TRUE
+			/STDDEV_COMPONENT=3
+			! /USE_P2D_BARGRAPH=FALSE
+			! /P2D_BARGRAPH_POSITION=
+			! /P2D_BARGRAPH_WIDTH=
+			;
+			
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+		Add_Graph_Annotation
+		/PAGE_NUMBER=&::page_number1
+		/COLUMN_NUMBER=&::col
+		/ROW_NUMBER=&::row
+		/DRAW_ORDER=1
+		/ANNOTATION_EVENT=RHS
+		/ANNOTATION_STYLE=Top Ticks
+		/ANNOTATION_COLOR=Blue
+		/ANNOTATION_SIZE=Large
+		/ANNOTATION_GLOBAL=True
+		/ANNOTATION_AVERAGE_EVENT=True
+		/OVERWRITE_EVENT_ANNOTATION=False
+		/USE_LEGACY_CODE=TRUE
+		;
+
+		Add_Graph_Annotation
+		/PAGE_NUMBER=&::page_number1
+		/COLUMN_NUMBER=&::col
+		/ROW_NUMBER=&::row
+		/DRAW_ORDER=1
+		/ANNOTATION_EVENT=LTO
+		/ANNOTATION_STYLE=Vertical Line
+		/ANNOTATION_COLOR=Red
+		/ANNOTATION_SIZE=Normal
+		/ANNOTATION_GLOBAL=True
+		/ANNOTATION_AVERAGE_EVENT=True
+		/OVERWRITE_EVENT_ANNOTATION=False
+		/USE_LEGACY_CODE=TRUE
+		;
+
+		Add_Graph_Annotation
+		/PAGE_NUMBER=&::page_number1
+		/COLUMN_NUMBER=&::col
+		/ROW_NUMBER=&::row
+		/DRAW_ORDER=1
+		/ANNOTATION_EVENT=RTO
+		/ANNOTATION_STYLE=Top Ticks
+		/ANNOTATION_COLOR=Blue
+		/ANNOTATION_SIZE=Large
+		/ANNOTATION_GLOBAL=True
+		/ANNOTATION_AVERAGE_EVENT=True
+		/OVERWRITE_EVENT_ANNOTATION=False
+		/USE_LEGACY_CODE=TRUE
+		;
+
+		Add_Graph_Annotation
+		/PAGE_NUMBER=&::page_number1
+		/COLUMN_NUMBER=&::col
+		/ROW_NUMBER=&::row
+		/DRAW_ORDER=1
+		/ANNOTATION_EVENT=&::left_norm_event
+		/ANNOTATION_STYLE=Bottom TICKS
+		/ANNOTATION_COLOR=Red
+		/ANNOTATION_SIZE=Large
+		/ANNOTATION_GLOBAL=True
+		/ANNOTATION_AVERAGE_EVENT=False
+		/OVERWRITE_EVENT_ANNOTATION=False
+		/USE_LEGACY_CODE=TRUE
+		;
+
+		Set_Pipeline_Parameter_From_Expression
+		/PARAMETER_NAME=row
+		/EXPRESSION=&::row& + 1
+		! /AS_INTEGER=TRUE
+		;
+		
+		Set_Pipeline_Parameter_From_Expression
+		/PARAMETER_NAME=left
+		/EXPRESSION=&::left& + 1
+		! /AS_INTEGER=TRUE
+		;
+
+	End_For_Each
+	/ITERATION_PARAMETER_NAME=EMG_graph_signal_name_left
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+! MEANS Right -----------------------
+Set_Pipeline_Parameter
+/PARAMETER_NAME=row
+/PARAMETER_VALUE=1
+;
+
+Set_Pipeline_Parameter
+/PARAMETER_NAME=col
+/PARAMETER_VALUE=2
+;
+
+Set_Pipeline_Parameter
+/PARAMETER_NAME=right
+/PARAMETER_VALUE=0
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::EMG_names_array_left_exists&" = "TRUE") &::AMP& ("&::EMG_names_array_right_exists&" = "FALSE")
+! /AS_INTEGER=TRUE
+;
+
+	Set_Pipeline_Parameter_From_Expression
+	/PARAMETER_NAME=page_number1
+	/EXPRESSION=&::page_number& + 3
+	! /AS_INTEGER=TRUE
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(&::count_EMG_signals_right& > 4)
+! /AS_INTEGER=TRUE
+;
+
+	Set_Pipeline_Parameter_From_Expression
+	/PARAMETER_NAME=page_number1
+	/EXPRESSION=&::page_number& - 1
+	! /AS_INTEGER=TRUE
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(&::count_EMG_signals_right& <= 4)
+! /AS_INTEGER=TRUE
+;
+
+	Set_Pipeline_Parameter_From_Expression
+	/PARAMETER_NAME=page_number1
+	/EXPRESSION=&::page_number&
+	! /AS_INTEGER=TRUE
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Select_Active_File
+/FILE_NAME=Dynamic
+! /QUERY=
+;
+	
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::EMG_names_array_right_exists&" = "TRUE")
+! /AS_INTEGER=TRUE
+;
+
+	Set_Report_Page_Title
+	/PAGE_NUMBER=&::page_number1
+	/PAGE_TITLE=EMG data - filtered (mean)&::add_test_condition_pre& - &::test_condition 
+	;
+
+	For_Each
+	/ITERATION_PARAMETER_NAME=EMG_graph_signal_name_right
+	/ITERATION_PARAMETER_COUNT_NAME=inc
+	/ITEMS=::EMG_graph_signals_name_right
+	;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=(&::right& = 4) &::AMP& (&::count_EMG_signals_right& > 4)
+		! /AS_INTEGER=TRUE
+		;
+
+			Set_Pipeline_Parameter_From_Expression
+			/PARAMETER_NAME=page_number1
+			/EXPRESSION=&::page_number1& + 1
+			! /AS_INTEGER=TRUE
+			;
+		
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=row
+			/PARAMETER_VALUE=1
+			;
+
+			Set_Report_Page_Title
+			/PAGE_NUMBER=&::page_number1
+			/PAGE_TITLE=EMG data - filtered (mean)&::add_test_condition_pre& - &::test_condition 
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+		Make_Line_Graph
+		/PAGE_NUMBER=&::page_number1
+		/COLUMN_NUMBER=&::col
+		/ROW_NUMBER=&::row
+		! /COLUMN_SPAN=1
+		! /ROW_SPAN=1
+		/GRAPH_TITLE=&::EMG_graph_signal_name_right
+		/GRAPH_TITLE_FONT_SIZE=12
+		/GRAPH_TITLE_FONT_BOLD=TRUE
+		! /GRAPH_TITLE_FONT_ITALIC=FALSE
+		! /GRAPH_TITLE_FONT_UNDERLINE=FALSE
+		! /GRAPH_TITLE_ALIGN=ALIGN_CENTER
+		/GRAPH_TITLE_COLOR=Dark Red
+		/FILES_TO_GRAPH=&::selected_files
+		! /DISPLAY_LEGEND=FALSE
+		! /LEGEND_LOCATION=UR
+		! /LEGEND_TEXT=
+		/LINE_STYLE=NULL
+		/LINE_COLOR=Blue
+		/LINE_BOLD=TRUE
+		! /SHOW_POINTS=FALSE
+		/GRAPH_MEAN=TRUE
+		! /GRAPH_STDDEV=FALSE
+		/MEAN_STDDEV_LINE_STYLE=::sd_line_style
+		/MEAN_STDDEV_LINE_BOLD=::sd_line_bold
+		/MEAN_STDDEV_LINE_COLOR=Blue
+		/USE_EVENT_RANGE=TRUE
+		/START_EVENT_LABEL=RHS 
+		/END_EVENT_LABEL=RHS 
+		! /INTERMEDIATE_EVENTS=
+		! /EXCLUDE_EVENTS=
+		/X_AXIS_LABEL=% gait cycle
+		/X_DATA_TYPE=FRAME_NUMBERS
+		/X_DATA_NAME=TIME
+		/X_DATA_COMPONENT=0
+		! /X_DATA_PROCESSED=ORIGINAL
+		! /X_AXIS_SCALE=Normalize 0% to 100%
+		! /Y_AXIS_LABEL=
+		/Y_DATA_TYPE=ANALOG
+		/Y_DATA_NAME=&::EMG_graph_signal_name_right
+		/Y_DATA_COMPONENT=0
+		/Y_DATA_PROCESSED=EMG_PROCESSED
+		! /Y_AXIS_SCALE=Global Min to Max
+		! /Y_USE_SCIENTIFIC_NOTATION=FALSE
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=("&::analysis_name&" = "Internal Compare sessions")
+		! /AS_INTEGER=TRUE
+		;
+
+			Make_Line_Graph
+			/PAGE_NUMBER=&::page_number1
+			/COLUMN_NUMBER=&::col
+			/ROW_NUMBER=&::row
+			! /COLUMN_SPAN=1
+			! /ROW_SPAN=1
+			/GRAPH_TITLE=&::EMG_graph_signal_name_right
+			/GRAPH_TITLE_FONT_SIZE=12
+			/GRAPH_TITLE_FONT_BOLD=TRUE
+			! /GRAPH_TITLE_FONT_ITALIC=FALSE
+			! /GRAPH_TITLE_FONT_UNDERLINE=FALSE
+			! /GRAPH_TITLE_ALIGN=ALIGN_CENTER
+			/GRAPH_TITLE_COLOR=Dark Red
+			/FILES_TO_GRAPH=Dynamic_post
+			! /DISPLAY_LEGEND=FALSE
+			! /LEGEND_LOCATION=UR
+			! /LEGEND_TEXT=
+			/LINE_STYLE=NULL
+			/LINE_COLOR=Blue
+			/LINE_BOLD=TRUE
+			! /SHOW_POINTS=FALSE
+			/GRAPH_MEAN=TRUE
+			! /GRAPH_STDDEV=FALSE
+			! /MEAN_STDDEV_LINE_STYLE=Solid
+			/MEAN_STDDEV_LINE_COLOR=Blue
+			/MEAN_STDDEV_LINE_BOLD=::sd_line_bold
+			/USE_EVENT_RANGE=TRUE
+			/START_EVENT_LABEL=RHS 
+			/END_EVENT_LABEL=RHS 
+			! /INTERMEDIATE_EVENTS=
+			! /EXCLUDE_EVENTS=
+			/X_AXIS_LABEL=% gait cycle
+			/X_DATA_TYPE=FRAME_NUMBERS
+			/X_DATA_NAME=TIME
+			/X_DATA_COMPONENT=0
+			! /X_DATA_PROCESSED=ORIGINAL
+			! /X_AXIS_SCALE=Normalize 0% to 100%
+			! /Y_AXIS_LABEL=
+			/Y_DATA_TYPE=ANALOG
+			/Y_DATA_NAME=&::EMG_graph_signal_name_right
+			/Y_DATA_COMPONENT=0
+			/Y_DATA_PROCESSED=EMG_PROCESSED
+			! /Y_AXIS_SCALE=Global Min to Max
+			! /Y_USE_SCIENTIFIC_NOTATION=FALSE
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=((("&::noraxon_exists&" = "TRUE") | (("&::noraxon_exists&" = "FALSE") &::AMP& ("&::normative_non_noraxon_file_exists&" = "TRUE")) | ("&::hide_messages&" = "FALSE")) > 0)
+		! /AS_INTEGER=TRUE
+		;
+
+			Get_Pipeline_Parameter_Index_Value
+			/PARAMETER_NAME=p2d_signal_name
+			/PARAMETER_VALUE=::p2d_signal_names_list
+			/INDEX=::inc
+			;
+
+			Make_Line_Graph
+			/PAGE_NUMBER=&::page_number1
+			/COLUMN_NUMBER=&::col
+			/ROW_NUMBER=&::row
+			! /COLUMN_SPAN=1
+			! /ROW_SPAN=1
+			/GRAPH_TITLE=&::EMG_graph_signal_name_right
+			/GRAPH_TITLE_FONT_SIZE=12
+			/GRAPH_TITLE_FONT_BOLD=TRUE
+			! /GRAPH_TITLE_FONT_ITALIC=FALSE
+			! /GRAPH_TITLE_FONT_UNDERLINE=FALSE
+			! /GRAPH_TITLE_ALIGN=ALIGN_CENTER
+			/GRAPH_TITLE_COLOR=Dark Red
+			/FILES_TO_GRAPH=GLOBAL
+			! /DISPLAY_LEGEND=FALSE
+			! /LEGEND_LOCATION=UR
+			! /LEGEND_TEXT=
+			/LINE_STYLE=NULL
+			/LINE_COLOR=#808080
+			! /SHOW_POINTS=FALSE
+			! /GRAPH_MEAN=FALSE
+			! /GRAPH_STDDEV=FALSE
+			! /MEAN_STDDEV_LINE_STYLE=Solid
+			! /MEAN_STDDEV_LINE_COLOR=Black
+			! /MEAN_STDDEV_LINE_BOLD=FALSE
+			/USE_EVENT_RANGE=FALSE
+			! /START_EVENT_LABEL=LHS 
+			! /END_EVENT_LABEL=LHS 
+			! /INTERMEDIATE_EVENTS=
+			! /EXCLUDE_EVENTS=
+			/X_AXIS_LABEL=% gait cycle
+			/X_DATA_TYPE=P2D
+			/X_DATA_NAME=::p2d_signal_name
+			/X_DATA_COMPONENT=1
+			/X_DATA_PROCESSED=PROCESSED
+			/X_AXIS_SCALE=Normalize 0% to 100%
+			! /Y_AXIS_LABEL=
+			/Y_DATA_TYPE=P2D
+			/Y_DATA_NAME=&::EMG_graph_signal_name_right
+			/Y_DATA_COMPONENT=2
+			/Y_DATA_PROCESSED=EMG
+			/Y_AXIS_SCALE=Global Min to Max
+			! /Y_USE_SCIENTIFIC_NOTATION=FALSE
+			/USE_P2D_STDDEV=TRUE
+			/STDDEV_COMPONENT=3
+			! /USE_P2D_BARGRAPH=FALSE
+			! /P2D_BARGRAPH_POSITION=
+			! /P2D_BARGRAPH_WIDTH=
+			;
+			
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+		Add_Graph_Annotation
+		/PAGE_NUMBER=&::page_number1
+		/COLUMN_NUMBER=&::col
+		/ROW_NUMBER=&::row
+		/DRAW_ORDER=1
+		/ANNOTATION_EVENT=LHS
+		/ANNOTATION_STYLE=Top Ticks
+		/ANNOTATION_COLOR=Red
+		/ANNOTATION_SIZE=Large
+		/ANNOTATION_GLOBAL=True
+		/ANNOTATION_AVERAGE_EVENT=True
+		/OVERWRITE_EVENT_ANNOTATION=False
+		/USE_LEGACY_CODE=TRUE
+		;
+
+		Add_Graph_Annotation
+		/PAGE_NUMBER=&::page_number1
+		/COLUMN_NUMBER=&::col
+		/ROW_NUMBER=&::row
+		/DRAW_ORDER=1
+		/ANNOTATION_EVENT=RTO
+		/ANNOTATION_STYLE=Vertical Line
+		/ANNOTATION_COLOR=Blue
+		/ANNOTATION_SIZE=Normal
+		/ANNOTATION_GLOBAL=True
+		/ANNOTATION_AVERAGE_EVENT=True
+		/OVERWRITE_EVENT_ANNOTATION=False
+		/USE_LEGACY_CODE=TRUE
+		;
+
+		Add_Graph_Annotation
+		/PAGE_NUMBER=&::page_number1
+		/COLUMN_NUMBER=&::col
+		/ROW_NUMBER=&::row
+		/DRAW_ORDER=1
+		/ANNOTATION_EVENT=LTO
+		/ANNOTATION_STYLE=Top Ticks
+		/ANNOTATION_COLOR=Red
+		/ANNOTATION_SIZE=Large
+		/ANNOTATION_GLOBAL=True
+		/ANNOTATION_AVERAGE_EVENT=True
+		/OVERWRITE_EVENT_ANNOTATION=False
+		/USE_LEGACY_CODE=TRUE
+		;
+
+		Add_Graph_Annotation
+		/PAGE_NUMBER=&::page_number1
+		/COLUMN_NUMBER=&::col
+		/ROW_NUMBER=&::row
+		/DRAW_ORDER=1
+		/ANNOTATION_EVENT=&::right_norm_event
+		/ANNOTATION_STYLE=Bottom TICKS
+		/ANNOTATION_COLOR=Blue
+		/ANNOTATION_SIZE=Large
+		/ANNOTATION_GLOBAL=True
+		/ANNOTATION_AVERAGE_EVENT=False
+		/OVERWRITE_EVENT_ANNOTATION=False
+		/USE_LEGACY_CODE=TRUE
+		;
+
+		Set_Pipeline_Parameter_From_Expression
+		/PARAMETER_NAME=row
+		/EXPRESSION=&::row& + 1
+		! /AS_INTEGER=TRUE
+		;
+		
+		Set_Pipeline_Parameter_From_Expression
+		/PARAMETER_NAME=right
+		/EXPRESSION=&::right& + 1
+		! /AS_INTEGER=TRUE
+		;
+
+	End_For_Each
+	/ITERATION_PARAMETER_NAME=EMG_graph_signal_name_right
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+! Add empty picture to all rows without graph up to 4 rows to keep the size of graphs same for first and second page
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=((&::row& - 1) < 4)
+! /AS_INTEGER=TRUE
+;
+
+	Set_Pipeline_Parameter_From_For_Loop
+	/PARAMETER_NAME=rows
+	/PARAMETER_INDEX_START=&::row
+	/PARAMETER_INDEX_END=4
+	/PARAMETER_INDEX_STEP=1
+	! /PARAMETER_INDEX_TYPE=INTEGER
+	;
+
+	Conditional_Statement
+	/ITERATION_PARAMETER_NAME=cond1
+	/EXPRESSION=((&::count_EMG_signals_left& > 4) | (&::count_EMG_signals_right& > 4))
+	! /AS_INTEGER=TRUE
+	;
+
+		Set_Pipeline_Parameter_From_For_Loop
+		/PARAMETER_NAME=EMG_pages_even
+		/PARAMETER_INDEX_START=&::first_EMG_page& + 1
+		/PARAMETER_INDEX_END=::last_EMG_page
+		/PARAMETER_INDEX_STEP=2
+		! /PARAMETER_INDEX_TYPE=INTEGER
+		;
+
+	Conditional_Statement_End
+	/ITERATION_PARAMETER_NAME=cond1
+	;
+
+	Conditional_Statement
+	/ITERATION_PARAMETER_NAME=cond1
+	/EXPRESSION=((&::count_EMG_signals_left& < 4) &::AMP& (&::count_EMG_signals_right& < 4))
+	! /AS_INTEGER=TRUE
+	;
+
+		Set_Pipeline_Parameter_From_For_Loop
+		/PARAMETER_NAME=EMG_pages_even
+		/PARAMETER_INDEX_START=&::first_EMG_page
+		/PARAMETER_INDEX_END=::last_EMG_page
+		/PARAMETER_INDEX_STEP=1
+		! /PARAMETER_INDEX_TYPE=INTEGER
+		;
+
+	Conditional_Statement_End
+	/ITERATION_PARAMETER_NAME=cond1
+	;
+
+	For_Each
+	/ITERATION_PARAMETER_NAME=row
+	! /ITERATION_PARAMETER_COUNT_NAME=
+	/ITEMS=::rows
+	;		
+
+		For_Each
+		/ITERATION_PARAMETER_NAME=p_num
+		! /ITERATION_PARAMETER_COUNT_NAME=
+		/ITEMS=::EMG_pages_even
+		;		
+
+			Make_Image_Item
+			/IMAGE_FILE=&::picturesDirectory&EMG_dummy_placeholder.jpg
+			/PAGE_NUMBER=::p_num
+			/COLUMN_NUMBER=::col_num
+			/ROW_NUMBER=::row
+			! /COLUMN_SPAN=1
+			! /ROW_SPAN=1
+			;
+
+		End_For_Each
+		/ITERATION_PARAMETER_NAME=p_num
+		;
+
+	End_For_Each
+	/ITERATION_PARAMETER_NAME=row
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;

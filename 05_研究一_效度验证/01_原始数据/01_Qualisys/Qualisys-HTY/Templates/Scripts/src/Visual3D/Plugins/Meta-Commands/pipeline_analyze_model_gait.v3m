@@ -1,0 +1,1603 @@
+! BEGIN_META
+! META_CMD_NAME	= Pipeline_Analyze_Model_Gait
+! META_PARAM	= r3d_template_directory  :   string ::yes
+! META_PARAM	= template_directory  :   string ::yes
+! META_PARAM	= working_directory  :   string ::yes
+! META_PARAM	= model_directory  :   string ::yes
+! META_PARAM	= normative_directory  :   string ::yes
+! META_PARAM	= picture_directory  :   string ::yes
+! META_PARAM	= script_directory  :   string ::yes
+! META_PARAM	= is_second_part  :   string ::yes
+! META_PARAM	= cmo_file  :   string ::yes
+! META_PARAM	= event_mode  :   string ::yes		
+! META_PARAM	= CGM_pipeline_breakpoint  :   string ::yes						
+! META_PARAM	= includes_thorax  :   string ::yes						
+! META_PARAM	= includes_arms  :   string ::yes						
+! META_PARAM	= full_body  :   string ::yes						
+! META_PARAM	= includes_OFM  :   string ::yes						
+! META_PARAM	= includes_RFM  :   string ::yes						
+! META_PARAM	= instrumented_treadmill  :   string ::yes						
+! META_PARAM	= model_template  :   string ::yes						
+! META_PARAM	= append_model  :   string ::yes						
+! META_PARAM	= include_alternative_pelvis  :   string ::yes						
+! META_PARAM	= model_used  :   string ::yes						
+! META_PARAM	= left_foot_normalization  :   string ::yes						
+! META_PARAM	= right_foot_normalization  :   string ::yes						
+! META_PARAM	= pose_algorithm  :   string ::yes						
+! META_PARAM	= weight  :   string ::yes						
+! META_PARAM	= height  :   string ::yes						
+! META_PARAM	= leg_length_left  :   string ::yes						
+! META_PARAM	= leg_length_right  :   string ::yes						
+! META_PARAM	= ankle_width_left  :   string ::yes						
+! META_PARAM	= knee_width_left  :   string ::yes						
+! META_PARAM	= ankle_width_right  :   string ::yes						
+! META_PARAM	= knee_width_right  :   string ::yes						
+! META_PARAM	= window_size_divisor  :   string ::yes						
+! META_PARAM	= force_threshold  :   string ::yes		
+! META_PARAM	= fp_zero_start  :   string ::yes		
+! META_PARAM	= fp_zero_end  :   string ::yes		
+! META_PARAM	= max_gap  :   string ::yes		
+! META_PARAM	= marker_filter_fq  :   string ::yes		
+! META_PARAM	= analog_filter_fq_graphs  :   string ::yes		
+! META_PARAM	= static_filename  :   string ::yes		
+! META_PARAM	= filenames  :   string ::yes		
+! META_PARAM	= treadmill_speeds  :   string ::yes		
+! META_PARAM	= treadmill_type  :   string ::yes		
+! END_META
+
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!  Copyright notice
+!  This PAF and its content is copyright of Qualisys AB © 2012-2020. All rights reserved. 
+!  The PAF script is only to be used in conjunction with a Qualisys Motion Capture System. 
+!  Only legal PAF owners are entitled to use the script and only in relation with related PAF.
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Set_View_Processing_Results
+! /ACCUMULATE_PIPELINE_RESULTS=ALL
+! /ACCUMULATE_BUILDMODEL_RESULTS=ALL
+! /RESET_PIPELINE_RESULTS=FALSE
+! /RESET_BUILDMODEL_RESULTS=FALSE
+! /VIEW_PIPELINE_RESULTS=1
+! /VIEW_BUILDMODEL_RESULTS=2
+! /VIEW_RECALC_PIPELINE_WARNINGS=2
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=break
+/EXPRESSION=("&::CGM_pipeline_breakpoint&" = "TRUE")
+! /AS_INTEGER=TRUE
+;
+
+		Pipeline_Breakpoint
+		/PAUSE_MESSAGE=Leg length, knee width and ankle width are required parameters. Please halt the script execution, enter the values in QTM pane and then click Analyze button again.
+		;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=break
+;
+
+! ==================================
+! Start with an empty file
+! ==================================
+
+File_New
+;
+
+! ==================================
+! Visual3D Settings (in case user has modified the default settings)
+! ==================================
+
+!Set the force threshold for the FP 
+! Note: threshold value can be different for instrumented treadmill based on setting at settings.php
+Set_Force_Platform_Threshold
+/THRESHOLD=::force_threshold
+! /SET_AS_DEFAULT=FALSE
+;
+
+Set_Use_Processed_Analog
+/USE_PROCESSED=TRUE
+;
+
+Set_Use_Processed_Targets
+/USE_PROCESSED=TRUE
+;
+
+! ==================================
+! Load movement trials, assign tag.
+! It is assumed that only files that should be included in the report were ticked in QTM.
+! ==================================
+
+File_Open
+/FILE_NAME=&::working_directory&Gait*.c3d
+;
+
+! Create TAG for all dynamic trials (to be used for file selection later)
+Assign_Tags_To_Files
+/MOTION_FILE_NAMES=&::working_directory&Gait*.c3d
+! /QUERY=
+/TAGS=Dynamic
+;
+
+!Also open static file so that it is available for plots.
+File_Open
+/FILE_NAME=&::working_directory&&::static_filename
+;
+
+For_Each
+/ITERATION_PARAMETER_NAME=filename
+/ITERATION_PARAMETER_COUNT_NAME=inc
+/ITEMS=::filenames
+;
+
+	Select_Active_File
+	/FILE_NAME=&::working_directory&&::filename
+	! /QUERY=
+	;
+
+	Set_Pipeline_Parameter_From_Expression
+	/PARAMETER_NAME=tag_num
+	/EXPRESSION=&::inc& - 1
+	! /AS_INTEGER=TRUE
+	;
+
+	Conditional_Statement
+	/ITERATION_PARAMETER_NAME=cond
+	/EXPRESSION=("&::instrumented_treadmill&" = "TRUE")
+	! /AS_INTEGER=TRUE
+	;
+
+		Get_Pipeline_Parameter_Index_Value
+		/PARAMETER_NAME=spd
+		/PARAMETER_VALUE=::treadmill_speeds
+		/INDEX=::inc
+		;
+
+		! Save treadmill speed (in m/s)
+		Metric_Explicit
+		/RESULT_METRIC_FOLDER=TREADMILL
+		/RESULT_METRIC_NAME=SPEED
+		/METRIC_VALUE=::spd
+		;
+
+	Conditional_Statement_End
+	/ITERATION_PARAMETER_NAME=cond
+	;
+
+	Conditional_Statement
+	/ITERATION_PARAMETER_NAME=cond
+	/EXPRESSION=("&::instrumented_treadmill&" = "FALSE")
+	! /AS_INTEGER=TRUE
+	;
+
+			Metric_Explicit
+			/RESULT_METRIC_FOLDER=TREADMILL
+			/RESULT_METRIC_NAME=SPEED
+			/METRIC_VALUE=vector(0,0,0)
+			;
+
+	Conditional_Statement_End
+	/ITERATION_PARAMETER_NAME=cond
+	;
+
+	! add unique number to each file to be used for instrumented treadmill EMG report graphs
+	Assign_Tags_To_Files
+	/MOTION_FILE_NAMES=&::working_directory&&::filename
+	! /QUERY=
+	/TAGS=::tag_num
+	;
+
+End_For_Each
+/ITERATION_PARAMETER_NAME=filename
+;
+
+!Rename static to avoid name conflict with model.
+File_Rename
+/EXISTING_FILE_NAME=&::working_directory&&::static_filename
+/NEW_FILE_NAME=&::working_directory&Static.c3d 
+! /USE_SEARCH_REPLACE=FALSE
+! /SEARCH_FOR=
+! /REPLACE_WITH=
+! /REMOVE_FILE_PATH=FALSE
+! /RENAME_STATIC_CALIBRATION_FILES=TRUE
+;
+
+Assign_Tags_To_Files
+/MOTION_FILE_NAMES=&::working_directory&Static.c3d
+! /QUERY=
+/TAGS=Static
+;
+
+! ==================================
+! Fill gaps and filter trajectories
+! ==================================
+
+Select_Active_File
+/FILE_NAME=ALL_FILES
+! /QUERY=
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=((&::fp_zero_start& <> &::fp_zero_end&) &::AMP& (STRING_FIND("&::event_mode&", "Instrumented treadmill",0) = -1))
+
+! /AS_INTEGER=TRUE
+;
+
+	Modify_Force_Platform_Parameters
+	/FP_ZERO=&::fp_zero_start&+&::fp_zero_end& 
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(&::max_gap& <> 0)
+! /AS_INTEGER=TRUE
+;
+
+	Interpolate
+	/SIGNAL_TYPES=TARGET
+	! /SIGNAL_NAMES=
+	/SIGNAL_FOLDER=ORIGINAL
+	/MAXIMUM_GAP=&::max_gap&
+	! /NUM_FIT=3
+	! /POLYNOMIAL_ORDER=3
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(&::marker_filter_fq& <> 0)
+! /AS_INTEGER=TRUE
+;
+
+	Lowpass_Filter
+	/SIGNAL_TYPES=TARGET
+	! /SIGNAL_NAMES=
+	/SIGNAL_FOLDER=PROCESSED
+	! /NUM_REFLECTED=6
+	/FREQUENCY_CUTOFF=&::marker_filter_fq
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(&::analog_filter_fq_graphs& <> 0)
+! /AS_INTEGER=TRUE
+;
+
+	Lowpass_Filter
+	/SIGNAL_TYPES=ANALOG
+	! /SIGNAL_NAMES=
+	/SIGNAL_FOLDER=ORIGINAL
+	! /RESULT_SUFFIX=
+	/RESULT_FOLDER=PROCESSED
+	! /FILTER_CLASS=BUTTERWORTH
+	/FREQUENCY_CUTOFF=&::analog_filter_fq_graphs
+	/NUM_REFLECTED=0
+	! /TOTAL_BUFFER_SIZE=6
+	! /NUM_BIDIRECTIONAL_PASSES=1
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+! ==================================
+! Create model and apply template
+! ==================================
+
+Create_Hybrid_Model
+/FILE_NAME=&::working_directory&&::static_filename
+;
+
+!Apply model template. It is assumed that the model file is in the Templates folder.
+
+!Lower body
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=olga
+/EXPRESSION=((Data_Exists(TARGET::ORIGINAL::R_SIAS) = 1) | (Data_Exists(TARGET::ORIGINAL::L_SIPS) = 1))
+! /AS_INTEGER=TRUE
+;
+
+	Apply_Model_Template
+	/MODEL_TEMPLATE=&::model_directory&Lower_Body_Olga_gait.mdh
+	/CALIBRATION_FILE=&::working_directory&Static*.c3d
+	/SET_PROMPT=Open lower body Olga file
+	;
+	
+	Set_Pipeline_Parameter
+	/PARAMETER_NAME=append_model
+	/PARAMETER_VALUE=::append_model
+	/PARAMETER_VALUE_SEARCH_FOR=_gait
+	/PARAMETER_VALUE_REPLACE_WITH=_Olga_gait
+	! /PARAMETER_VALUE_PREFIX=
+	! /PARAMETER_VALUE_APPEND=
+	! /MULTI_PASS=FALSE
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=olga
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=not_olga
+/EXPRESSION=((Data_Exists(TARGET::ORIGINAL::R_SIAS) <> 1) | (Data_Exists(TARGET::ORIGINAL::L_SIPS) <> 1))
+! /AS_INTEGER=TRUE
+;
+
+	Apply_Model_Template
+	/MODEL_TEMPLATE=&::model_directory&&::model_template&.mdh
+	/CALIBRATION_FILE=&::working_directory&Static*.c3d
+	/SET_PROMPT=Open lower body file
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=not_olga
+;
+
+!Upper body
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=full_body
+/EXPRESSION=("&::full_body&" = "TRUE")
+! /AS_INTEGER=TRUE
+;
+
+	For_Each
+	/ITERATION_PARAMETER_NAME=APPEND
+	/ITEMS=::append_model
+	;
+
+		Append_Model_Template
+		/MODEL_TEMPLATE=&::model_directory&&::APPEND&.mdh
+		/CALIBRATION_FILE=&::working_directory&Static*.c3d
+		;
+
+	End_For_Each
+	/ITERATION_PARAMETER_NAME=APPEND
+	;
+
+	Conditional_Statement
+	/ITERATION_PARAMETER_NAME=cast
+	/EXPRESSION=(("&::model_used&" = "CAST") | ("&::model_used&" = "IOR"))
+	! /AS_INTEGER=TRUE
+	;
+
+		!If FAR markers exist append Arms_FAR_gait.mdh
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=far
+		/EXPRESSION=(Data_Exists(TARGET::ORIGINAL::R_FAR))
+		! /AS_INTEGER=TRUE
+		;
+
+			Append_Model_Template
+			/MODEL_TEMPLATE=&::model_directory&Arms_FAR_gait.mdh
+			/CALIBRATION_FILE=&::working_directory&Static*.c3d
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=far
+		;
+
+		!If SJN and SXS markers exist append Thorax_SJN_SXS_gait.mdh (only for CAST)
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=thorax
+		/EXPRESSION=((Data_Exists(TARGET::ORIGINAL::SJN) | Data_Exists(TARGET::ORIGINAL::SXS)) &::AMP& ("&::model_used&" = "CAST"))
+		! /AS_INTEGER=TRUE
+		;
+
+			Append_Model_Template
+			/MODEL_TEMPLATE=&::model_directory&Thorax_SJN_SXS_gait.mdh
+			/CALIBRATION_FILE=&::working_directory&Static*.c3d
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=thorax
+		;
+
+		!Modify L/R_ELJC landmark if HLE marker exist in static trial
+		Select_Active_File
+		/FILE_NAME=Static
+		! /QUERY=
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=elbow
+		/EXPRESSION=(Data_Exists(TARGET::ORIGINAL::R_HME))
+		! /AS_INTEGER=TRUE
+		;
+		
+			Modify_Landmark
+			/LANDMARK_NAME=R_ELJC
+			/CALIBRATION_FILE=&::working_directory&Static*.c3d
+			! /USER_GENERATED=TRUE
+			/USE_PERCENTAGE=TRUE
+			! /CALIBRATION_ONLY=FALSE
+			/USE_TARGETS=TRUE
+			! /SEGMENT_NAME=
+			/TARGET_TYPES=TARGET+TARGET
+			/TARGET_NAMES=R_HLE+R_HME
+			/MCS_ML=
+			/MCS_AP=
+			/MCS_AXIAL=0.5
+			! /LANDMARK_LOCATION=
+			! /REFERENCE_LOCATION_TYPE=
+			! /REFERENCE_LOCATION_NAME=
+			! /USE_REFERENCE_LOCATION=FALSE
+			;
+			
+			Modify_Landmark
+			/LANDMARK_NAME=L_ELJC
+			/CALIBRATION_FILE=&::working_directory&Static*.c3d
+			! /USER_GENERATED=TRUE
+			/USE_PERCENTAGE=TRUE
+			! /CALIBRATION_ONLY=FALSE
+			/USE_TARGETS=TRUE
+			! /SEGMENT_NAME=
+			/TARGET_TYPES=TARGET+TARGET
+			/TARGET_NAMES=L_HLE+L_HME
+			/MCS_ML=
+			/MCS_AP=
+			/MCS_AXIAL=0.5
+			! /LANDMARK_LOCATION=
+			! /REFERENCE_LOCATION_TYPE=
+			! /REFERENCE_LOCATION_NAME=
+			! /USE_REFERENCE_LOCATION=FALSE
+			;
+
+			Build_Model
+			/CALIBRATION_FILE=&::working_directory&Static*.c3d
+			! /REBUILD_ALL_MODELS=FALSE
+			! /DISPLAY_RESULTS=TRUE
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=elbow
+		;
+
+	Conditional_Statement_End
+	/ITERATION_PARAMETER_NAME=cast
+	;
+
+	Select_Active_File
+	/FILE_NAME=ALL_FILES
+	! /QUERY=
+	;
+
+	Conditional_Statement
+	/ITERATION_PARAMETER_NAME=model
+	/EXPRESSION=("&::model_used&" <> "CGM")
+	! /AS_INTEGER=TRUE
+	;
+
+		Expression_Loop
+		/ITERATION_PARAMETER_NAME=check
+		/EXPRESSION=((isnan(maximum(TARGET::ORIGINAL::SGL::R) = -1) * isnan(maximum(TARGET::ORIGINAL::R_HEAD::R) = -1) * isnan(maximum(TARGET::ORIGINAL::L_HEAD::R) = -1)) < 1)
+		/AS_INTEGER=FALSE
+		;
+		
+			Append_Model_Template
+			/MODEL_TEMPLATE=&::model_directory&Head_gait.mdh
+			/CALIBRATION_FILE=&::working_directory&Static*.c3d
+			;
+
+		Expression_Loop_End
+		/ITERATION_PARAMETER_NAME=check
+		;
+
+		Expression_Loop
+		/ITERATION_PARAMETER_NAME=notOlga
+		/EXPRESSION=((Data_Exists(TARGET::ORIGINAL::R_SIAS) <> 1) &::AMP& (Data_Exists(TARGET::ORIGINAL::L_HM2) | Data_Exists(TARGET::ORIGINAL::R_HM2) | Data_Exists(TARGET::ORIGINAL::L_HM3) | Data_Exists(TARGET::ORIGINAL::R_HM3)))
+		/AS_INTEGER=FALSE
+		;
+		
+			Append_Model_Template
+			/MODEL_TEMPLATE=&::model_directory&Hands_gait.mdh
+			/CALIBRATION_FILE=&::working_directory&Static*.c3d
+			;
+			
+		Expression_Loop_End
+		/ITERATION_PARAMETER_NAME=notOlga
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=olga
+		/EXPRESSION=(Data_Exists(TARGET::ORIGINAL::R_SIAS) &::AMP& Data_Exists(TARGET::ORIGINAL::R_RADIUS)) !legacy Olga hands
+		! /AS_INTEGER=TRUE
+		;
+
+			Append_Model_Template
+			/MODEL_TEMPLATE=&::model_directory&Hands_Olga_gait.mdh
+			/CALIBRATION_FILE=&::working_directory&Static*.c3d
+			;
+			
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=olga
+		;
+
+	Conditional_Statement_End
+	/ITERATION_PARAMETER_NAME=model
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=full_body
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::includes_OFM&" = "TRUE")
+! /AS_INTEGER=TRUE
+;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=olga
+		/EXPRESSION=((Data_Exists(TARGET::ORIGINAL::R_HEEL_CALC2) = 1) | (Data_Exists(TARGET::ORIGINAL::L_HEEL_CALC2) = 1))
+		! /AS_INTEGER=TRUE
+		;
+
+			Append_Model_Template
+			/MODEL_TEMPLATE=&::model_directory&OxfordFM_Olga_gait.mdh
+			/CALIBRATION_FILE=&::working_directory&Static*.c3d
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=olga
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=notolga
+		/EXPRESSION=((Data_Exists(TARGET::ORIGINAL::R_HEEL_CALC2) <> 1) | (Data_Exists(TARGET::ORIGINAL::L_HEEL_CALC2) <> 1))
+		! /AS_INTEGER=TRUE
+		;
+
+			Append_Model_Template
+			/MODEL_TEMPLATE=&::model_directory&OxfordFM_gait.mdh
+			/CALIBRATION_FILE=&::working_directory&Static*.c3d
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=notolga
+		;
+
+	!remove model file for whole foot as for OFM we show 3 segments
+	Set_Segment_Properties
+	/CALIBRATION_FILE=&::working_directory&Static*.c3d
+	/SEGMENT_NAME=LFT
+	! /KINEMATIC_ONLY=
+	! /MASS=
+	! /CG_FROM_PROX_AXIAL=
+	! /CG_FROM_PROX_ML=
+	! /CG_FROM_PROX_AP=
+	! /INERTIA_XX=
+	! /INERTIA_YY=
+	! /INERTIA_ZZ=
+	! /AP_DIRECTION=
+	! /AXIAL_DIRECTION=
+	/MODEL_FILE=dummy
+	! /MATERIAL_FILE=
+	;
+
+	Set_Segment_Properties
+	/CALIBRATION_FILE=&::working_directory&Static*.c3d
+	/SEGMENT_NAME=RFT
+	! /KINEMATIC_ONLY=
+	! /MASS=
+	! /CG_FROM_PROX_AXIAL=
+	! /CG_FROM_PROX_ML=
+	! /CG_FROM_PROX_AP=
+	! /INERTIA_XX=
+	! /INERTIA_YY=
+	! /INERTIA_ZZ=
+	! /AP_DIRECTION=
+	! /AXIAL_DIRECTION=
+	/MODEL_FILE=dummy
+	! /MATERIAL_FILE=
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::includes_RFM&" = "TRUE")
+! /AS_INTEGER=TRUE
+;
+
+	Append_Model_Template
+	/MODEL_TEMPLATE=&::model_directory&RizzoliFM_gait.mdh
+	/CALIBRATION_FILE=&::working_directory&Static*.c3d
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::model_used&" = "CGM")
+! /AS_INTEGER=TRUE
+;
+
+	Modify_Landmark
+	/LANDMARK_NAME=LHEE_LTOE
+	/CALIBRATION_FILE=&::working_directory&Static*.c3d
+	! /USER_GENERATED=
+	! /USE_PERCENTAGE=
+	! /CALIBRATION_ONLY=
+	! /USE_TARGETS=
+	! /SEGMENT_NAME=
+	! /TARGET_TYPES=
+	! /TARGET_NAMES=
+	! /MCS_ML=
+	! /MCS_AP=
+	/MCS_AXIAL=::left_foot_normalization
+	! /LANDMARK_LOCATION=
+	! /REFERENCE_LOCATION_TYPE=
+	! /REFERENCE_LOCATION_NAME=
+	! /USE_REFERENCE_LOCATION=
+	;
+
+	Modify_Landmark
+	/LANDMARK_NAME=RHEE_RTOE
+	/CALIBRATION_FILE=&::working_directory&Static*.c3d
+	! /USER_GENERATED=
+	! /USE_PERCENTAGE=
+	! /CALIBRATION_ONLY=
+	! /USE_TARGETS=
+	! /SEGMENT_NAME=
+	! /TARGET_TYPES=
+	! /TARGET_NAMES=
+	! /MCS_ML=
+	! /MCS_AP=
+	/MCS_AXIAL=::right_foot_normalization
+	! /LANDMARK_LOCATION=
+	! /REFERENCE_LOCATION_TYPE=
+	! /REFERENCE_LOCATION_NAME=
+	! /USE_REFERENCE_LOCATION=
+	;
+
+	Build_Model
+	/CALIBRATION_FILE=&::working_directory&Static*.c3d
+	! /REBUILD_ALL_MODELS=FALSE
+	! /DISPLAY_RESULTS=TRUE
+	;
+
+	Set_Model_Metric
+	/CALIBRATION_FILE=&::working_directory&Static*.c3d
+	/METRIC_NAME=L_ankle_Width
+	/METRIC_VALUE=::ankle_width_left
+	;
+
+	Set_Model_Metric
+	/CALIBRATION_FILE=&::working_directory&Static*.c3d
+	/METRIC_NAME=L_knee_Width
+	/METRIC_VALUE=::knee_width_left
+	;
+
+	Set_Model_Metric
+	/CALIBRATION_FILE=&::working_directory&Static*.c3d
+	/METRIC_NAME=R_ankle_Width
+	/METRIC_VALUE=::ankle_width_right
+	;
+
+	Set_Model_Metric
+	/CALIBRATION_FILE=&::working_directory&Static*.c3d
+	/METRIC_NAME=R_knee_Width
+	/METRIC_VALUE=::knee_width_right
+	;
+
+	Set_Pipeline_Parameter_From_Expression
+	/PARAMETER_NAME=temp
+	/EXPRESSION=GLOBAL::METRIC::SUBJECT::LegLengthLeft 
+	/AS_INTEGER=FALSE
+	;
+
+	Set_Model_Metric
+	/CALIBRATION_FILE=&::working_directory&Static*.c3d
+	/METRIC_NAME=Left_Leg_Length
+	/METRIC_VALUE=::temp
+	;
+
+	Set_Pipeline_Parameter_From_Expression
+	/PARAMETER_NAME=temp
+	/EXPRESSION=GLOBAL::METRIC::SUBJECT::LegLengthRight
+	/AS_INTEGER=FALSE
+	;
+
+	Set_Model_Metric
+	/CALIBRATION_FILE=&::working_directory&Static*.c3d
+	/METRIC_NAME=Right_Leg_Length
+	/METRIC_VALUE=::temp
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+!Use the weight and height that the user has entered in QTM
+Set_Subject_Weight
+/CALIBRATION_FILE=&::working_directory&Static*.c3d
+/WEIGHT=::weight
+;
+
+Set_Subject_Height
+/CALIBRATION_FILE=&::working_directory&Static*.c3d
+/HEIGHT=::height
+;
+
+Set_Model_Pose_Algorithm
+! /CALIBRATION_FILE=
+/ALGORITHM=::pose_algorithm
+! /OPTIMIZER=
+! /FIT_CALIBRATION_FILE=FALSE
+! /START_WITH_SIMULATED_ANNEALING=FALSE
+! /F_TOLERANCE=1e-12
+! /X_TOLERANCE=1e-12
+! /G_TOLERANCE=1e-12
+;
+
+!calculate leg length if not set as PAF field
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(&::leg_length_left& = 0)
+! /AS_INTEGER=TRUE
+;
+
+	Select_Active_File
+	/FILE_NAME=Static
+	! /QUERY=
+	;
+
+	Conditional_Statement
+	/ITERATION_PARAMETER_NAME=olga
+	/EXPRESSION=((Data_Exists(TARGET::ORIGINAL::R_SIAS) = 1) | (Data_Exists(TARGET::ORIGINAL::L_SIPS) = 1)) !Olga
+	! /AS_INTEGER=TRUE
+	;
+
+		Evaluate_Expression
+		/EXPRESSION=distance(TARGET::ORIGINAL::L_SIAS, TARGET::ORIGINAL::L_MKNEE)
+		/RESULT_NAME=LegLengthLeft
+		/RESULT_TYPE=DERIVED
+		/RESULT_FOLDER=SUBJECT
+		;
+	
+	Conditional_Statement_End
+	/ITERATION_PARAMETER_NAME=olga
+	;
+
+	Conditional_Statement
+	/ITERATION_PARAMETER_NAME=cond2
+	/EXPRESSION=((Data_Exists(TARGET::ORIGINAL::R_SIAS) <> 1) &::AMP& (Data_Exists(TARGET::ORIGINAL::L_SIPS) <> 1)) !everybody else
+	! /AS_INTEGER=TRUE
+	;
+
+		Evaluate_Expression
+		/EXPRESSION=distance(TARGET::ORIGINAL::L_IAS, TARGET::ORIGINAL::L_TAM)
+		/RESULT_NAME=LegLengthLeft
+		/RESULT_TYPE=DERIVED
+		/RESULT_FOLDER=SUBJECT
+		;
+		
+	Conditional_Statement_End
+	/ITERATION_PARAMETER_NAME=cond2
+	;
+
+
+	Metric_Mean
+	/RESULT_METRIC_FOLDER=SUBJECT
+	/RESULT_METRIC_NAME=LegLengthLeft
+	! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+	/SIGNAL_TYPES=DERIVED
+	/SIGNAL_FOLDER=SUBJECT
+	/SIGNAL_NAMES=LegLengthLeft
+	! /COMPONENT_SEQUENCE=
+	/EVENT_SEQUENCE=
+	/EXCLUDE_EVENTS=
+	! /SEQUENCE_PERCENT_START=0
+	! /SEQUENCE_PERCENT_END=100
+	! /GENERATE_MEAN_AND_STDDEV=TRUE
+	! /APPEND_TO_EXISTING_VALUES=FALSE
+	;
+
+	Select_Active_File
+	/FILE_NAME=GLOBAL
+	! /QUERY=
+	;
+
+	Rename_Signals
+	! /FILE_NAME=
+	/SIGNAL_TYPES=METRIC
+	/SIGNAL_FOLDER=SUBJECT
+	/SIGNAL_NAMES=LegLengthLeft_MEAN
+	/NEW_SIGNAL_NAME=LegLengthLeft
+	! /APPEND_TO_OLD_SIGNAL_NAME=FALSE
+	! /INCLUDE_CALFILE=FALSE
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(&::leg_length_left& > 0)
+! /AS_INTEGER=TRUE
+;
+
+	Metric_Explicit
+	/RESULT_METRIC_NAME=GLOBAL::LegLengthLeft
+	/RESULT_METRIC_FOLDER=SUBJECT
+	/METRIC_VALUE=::leg_length_left
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(&::leg_length_right& = 0)
+! /AS_INTEGER=TRUE
+;
+
+	Select_Active_File
+	/FILE_NAME=Static
+	! /QUERY=
+	;
+
+	Conditional_Statement
+	/ITERATION_PARAMETER_NAME=olga
+	/EXPRESSION=((Data_Exists(TARGET::ORIGINAL::R_SIAS) = 1) | (Data_Exists(TARGET::ORIGINAL::L_SIPS) = 1)) !Olga
+	! /AS_INTEGER=TRUE
+	;
+
+		Evaluate_Expression
+		/EXPRESSION=distance(TARGET::ORIGINAL::R_SIAS, TARGET::ORIGINAL::R_MKNEE)
+		/RESULT_NAME=LegLengthRight
+		/RESULT_TYPE=DERIVED
+		/RESULT_FOLDER=SUBJECT
+		;
+	
+	Conditional_Statement_End
+	/ITERATION_PARAMETER_NAME=olga
+	;
+
+	Conditional_Statement
+	/ITERATION_PARAMETER_NAME=cond2
+	/EXPRESSION=((Data_Exists(TARGET::ORIGINAL::R_SIAS) <> 1) &::AMP& (Data_Exists(TARGET::ORIGINAL::L_SIPS) <> 1)) !everybody else
+	! /AS_INTEGER=TRUE
+	;
+
+		Evaluate_Expression
+		/EXPRESSION=distance(TARGET::ORIGINAL::R_IAS, TARGET::ORIGINAL::R_TAM)
+		/RESULT_NAME=LegLengthRight
+		/RESULT_TYPE=DERIVED
+		/RESULT_FOLDER=SUBJECT
+		;
+		
+	Conditional_Statement_End
+	/ITERATION_PARAMETER_NAME=cond2
+	;
+
+	Metric_Mean
+	/RESULT_METRIC_FOLDER=SUBJECT
+	/RESULT_METRIC_NAME=LegLengthRight
+	! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+	/SIGNAL_TYPES=DERIVED
+	/SIGNAL_FOLDER=SUBJECT
+	/SIGNAL_NAMES=LegLengthRight
+	! /COMPONENT_SEQUENCE=
+	/EVENT_SEQUENCE=
+	/EXCLUDE_EVENTS=
+	! /SEQUENCE_PERCENT_START=0
+	! /SEQUENCE_PERCENT_END=100
+	! /GENERATE_MEAN_AND_STDDEV=TRUE
+	! /APPEND_TO_EXISTING_VALUES=FALSE
+	;
+
+	Select_Active_File
+	/FILE_NAME=GLOBAL
+	! /QUERY=
+	;
+
+	Rename_Signals
+	! /FILE_NAME=
+	/SIGNAL_TYPES=METRIC
+	/SIGNAL_FOLDER=SUBJECT
+	/SIGNAL_NAMES=LegLengthRight_MEAN
+	/NEW_SIGNAL_NAME=LegLengthRight
+	! /APPEND_TO_OLD_SIGNAL_NAME=FALSE
+	! /INCLUDE_CALFILE=FALSE
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(&::leg_length_right& > 0)
+! /AS_INTEGER=TRUE
+;
+
+	Metric_Explicit
+	/RESULT_METRIC_NAME=GLOBAL::LegLengthRight
+	/RESULT_METRIC_FOLDER=SUBJECT
+	/METRIC_VALUE=::leg_length_right
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+!=================================
+!Inclined treadmill
+!=================================
+Select_Active_File
+/FILE_NAME=ALL_FILES
+! /QUERY=
+;
+
+! Check if markers for inclined treadmill exist
+Set_Pipeline_Parameter
+/PARAMETER_NAME=use_inclined_treadmill
+/PARAMETER_VALUE=FALSE
+;
+
+Expression_Loop
+/ITERATION_PARAMETER_NAME=loop
+/EXPRESSION=(Data_Exists(TARGET::ORIGINAL::T_FL::X) &::AMP& Data_Exists(TARGET::ORIGINAL::T_FR::X) &::AMP& Data_Exists(TARGET::ORIGINAL::T_RL::X) &::AMP& Data_Exists(TARGET::ORIGINAL::T_RR::X))
+/AS_INTEGER=FALSE
+;
+
+	Set_Pipeline_Parameter
+	/PARAMETER_NAME=use_inclined_treadmill
+	/PARAMETER_VALUE=TRUE
+	;
+
+Expression_Loop_End
+/ITERATION_PARAMETER_NAME=loop
+;
+
+Expression_Loop
+/ITERATION_PARAMETER_NAME=inclined
+/EXPRESSION=(("&::use_inclined_treadmill&" = "TRUE") &::AMP& ("&::treadmill_type&" = "AMTI_tandem"))
+/AS_INTEGER= FALSE
+;
+
+	Append_Model_Template
+	/MODEL_TEMPLATE=&::model_directory&Inclined_treadmill_AMTI_tandem.mdh
+	/CALIBRATION_FILE=&::working_directory&*static*.c3d
+	;
+
+Expression_Loop_End
+/ITERATION_PARAMETER_NAME=inclined
+;
+
+Expression_Loop
+/ITERATION_PARAMETER_NAME=inclined
+/EXPRESSION=(("&::use_inclined_treadmill&" = "TRUE") &::AMP& ("&::treadmill_type&" = "Treadmetrix"))
+/AS_INTEGER= FALSE
+;
+
+	Append_Model_Template
+	/MODEL_TEMPLATE=&::model_directory&Inclined_treadmill_Treadmetrix.mdh
+	/CALIBRATION_FILE=&::working_directory&*static*.c3d
+	;
+
+Expression_Loop_End
+/ITERATION_PARAMETER_NAME=inclined
+;
+
+Select_Active_File
+/FILE_NAME=static
+! /QUERY=
+;
+
+Assign_Model_File
+/MODEL_NAME=&::working_directory&Static*.c3d
+/MOTION_FILE_NAMES=ALL_FILES
+;
+
+!===========================================
+! Define walking direction
+!===========================================
+
+Select_Active_File
+/FILE_NAME=ALL_FILES
+! /QUERY=
+;
+
+! Add TARGET Lab orientation (used to set orientation of Virtual lab)
+! ==================================
+
+! A unit vector is defined between the right and left hip landmarks, then rounded to yield 4 possible solutions ( +/- X-axis and +/- y-axis)
+! A target is created that contains that unit_vector at every frame of data.
+! The virtual_lab will be tracked by the new TARGET.
+
+ ! Create a unit vector between left and right hips 
+Evaluate_Expression
+/EXPRESSION=UNIT_VECTOR(
+	(LANDMARK::ORIGINAL::RIGHT_HIP::X-LANDMARK::ORIGINAL::LEFT_HIP::X), 
+	(LANDMARK::ORIGINAL::RIGHT_HIP::Y-LANDMARK::ORIGINAL::LEFT_HIP::Y), 
+	(LANDMARK::ORIGINAL::RIGHT_HIP::Z-LANDMARK::ORIGINAL::LEFT_HIP::Z)) 
+! /SIGNAL_TYPES= 
+! /SIGNAL_FOLDER=ORIGINAL 
+! /SIGNAL_NAMES= 
+! /RESULT_TYPES=DERIVED 
+/RESULT_FOLDERS=VIRTUAL_LAB 
+/RESULT_NAME=HIP_VECTOR 
+! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE 
+; 
+
+! compute the median value of the unit vector 
+Metric_Median 
+/RESULT_METRIC_FOLDER=VIRTUAL_LAB 
+/RESULT_METRIC_NAME=_MED 
+/APPLY_AS_SUFFIX_TO_SIGNAL_NAME=TRUE 
+/SIGNAL_TYPES=DERIVED 
+/SIGNAL_FOLDER=VIRTUAL_LAB 
+/SIGNAL_NAMES=HIP_VECTOR 
+/COMPONENT_SEQUENCE=ALL 
+/EVENT_SEQUENCE= 
+/EXCLUDE_EVENTS= 
+/SEQUENCE_PERCENT_START= 
+/SEQUENCE_PERCENT_END= 
+/GENERATE_MEAN_AND_STDDEV=FALSE 
+! /APPEND_TO_EXISTING_VALUES=FALSE 
+; 
+
+! round the floats to an integer 
+Evaluate_Expression 
+/EXPRESSION=ROUND(METRIC::VIRTUAL_LAB::HIP_VECTOR_MED) 
+! /SIGNAL_TYPES= 
+! /SIGNAL_FOLDER=ORIGINAL 
+! /SIGNAL_NAMES= 
+/RESULT_TYPES=METRIC 
+/RESULT_FOLDERS=VIRTUAL_LAB 
+/RESULT_NAME=LAB_LATERAL 
+! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE 
+; 
+
+! create a new TARGET that has the rounded unit vector at every frame. 
+Create_Target 
+/SIGNAL_NAMES=Lab orientation
+! /SIGNAL_DESCRIPTION= 
+/EXPRESSION=METRIC::VIRTUAL_LAB::LAB_LATERAL 
+; 
+
+! Modify LANDMARK Lab orientation (used if TARGET Lab orientation does not exists)
+! ==================================
+! Note: Lower_body.mdh will not work properly if used outside PAF on c3d files without TARGET::ORIGINAL::Lab orientation and when walking direction in +-Y direction
+
+Set_Pipeline_Parameter_To_List_Of_Tagged_Files
+/PARAMETER_NAME=filenames
+/TAG_NAME=Dynamic
+! /GET_CURRENT_SELECTED_FILES=false
+! /USE_SHORT_FILENAMES=false
+;
+
+For_Each
+/ITERATION_PARAMETER_NAME=file
+/ITEMS=::filenames
+;
+
+	Select_Active_File
+	/FILE_NAME=::file
+	;
+
+	Set_Pipeline_Parameter_To_Data_Value
+	/SIGNAL_TYPES=METRIC
+	/SIGNAL_FOLDER=VIRTUAL_LAB
+	/SIGNAL_NAMES=LAB_LATERAL
+	/SIGNAL_COMPONENTS=X
+	/PARAMETER_NAME=offset_x
+	;
+
+	Set_Pipeline_Parameter_To_Data_Value
+	/SIGNAL_TYPES=METRIC
+	/SIGNAL_FOLDER=VIRTUAL_LAB
+	/SIGNAL_NAMES=LAB_LATERAL
+	/SIGNAL_COMPONENTS=Y
+	/PARAMETER_NAME=offset_y
+	;
+
+	! Create vector to define walking direction and store it at GLOBAL::TREADMILL folder (will be used for Temporal_Distance calculations)
+	Evaluate_Expression
+	/EXPRESSION=vector(-&::offset_y&,&::offset_x&,0)
+	/RESULT_NAME=WALKING_DIRECTION
+	/RESULT_TYPE=METRIC
+	/RESULT_FOLDER=TREADMILL
+	;
+
+	! make copy of WALKING_DIRECTION to GLOBAL and back to All_files
+	Evaluate_Expression
+	/EXPRESSION=METRIC::TREADMILL::WALKING_DIRECTION
+	/RESULT_NAME=GLOBAL::WALKING_DIRECTION
+	/RESULT_TYPE=METRIC
+	/RESULT_FOLDER=TREADMILL
+	;
+
+End_For_Each
+/ITERATION_PARAMETER_NAME=file
+;
+
+! Modify position of Lab orientation landmark to rotate Virtual Lab according to walking direction (only X and Y is considered)
+! walking at x direction -> offset_x = 0, offset_y =-1, walking at y direction -> offset_x = 1, offset_y = 0
+Modify_Landmark
+/LANDMARK_NAME=Lab orientation
+/CALIBRATION_FILE=&::working_directory&Static*.c3d
+! /USER_GENERATED=TRUE
+! /USE_PERCENTAGE=FALSE
+! /CALIBRATION_ONLY=FALSE
+! /USE_TARGETS=FALSE
+/SEGMENT_NAME=LAB
+! /TARGET_TYPES=
+! /TARGET_NAMES=
+/MCSX=&::offset_x
+/MCSY=&::offset_y
+! /MCSZ=0.0
+! /LANDMARK_LOCATION=
+! /REFERENCE_LOCATION_NAME=
+! /REFERENCE_LOCATION_TYPE=
+! /USE_REFERENCE_LOCATION=FALSE
+;
+
+Build_Model
+/CALIBRATION_FILE=&::working_directory&Static*.c3d
+! /REBUILD_ALL_MODELS=FALSE
+/DISPLAY_RESULTS=FALSE
+;
+
+!------------------------------------------
+! Rizzoli specific calculations
+!------------------------------------------
+Select_Active_File
+/FILE_NAME=ALL_FILES
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::includes_RFM&" = "TRUE")
+! /AS_INTEGER=TRUE
+;
+
+	Compute_Planar_Angle
+	/SIGNAL_TYPES=TARGET+TARGET+LANDMARK+LANDMARK
+	/SIGNAL_NAMES=R_P1MT+R_FM1+R_FM1_proj+R_P1MT_proj
+	/RESULT_FOLDER=RIZZOLI
+	/RESULT_NAME=Right F2G
+	/COMPUTE_3PT_ANGLE=FALSE
+	/PROJECTION_PLANE=3D
+	;
+
+	Compute_Planar_Angle
+	/SIGNAL_TYPES=LANDMARK+TARGET+TARGET
+	/SIGNAL_NAMES=RF2P_Offset+R_FM1+R_PM6
+	/RESULT_FOLDER=RIZZOLI
+	/RESULT_NAME=Right F2Ps
+	/PROJECTION_PLANE=YZ
+	/REFERENCE_SEGMENT=Right Forefoot
+	/USE_0_TO_360_DEGREES=FALSE
+	;
+
+	Compute_Planar_Angle
+	/SIGNAL_TYPES=LANDMARK+TARGET+TARGET
+	/SIGNAL_NAMES=RF2P_Offset+R_FM1+R_PM6
+	/RESULT_FOLDER=RIZZOLI
+	/RESULT_NAME=Right F2Pt
+	/PROJECTION_PLANE=XY
+	/REFERENCE_SEGMENT=Right Forefoot
+	/USE_RIGHT_HAND_RULE=FALSE
+	/USE_0_TO_360_DEGREES=FALSE
+	;
+
+	Compute_Planar_Angle
+	/SIGNAL_TYPES=LANDMARK+TARGET+TARGET
+	/SIGNAL_NAMES=R_FCC2_MLA_Origin+R_FST+R_FM1
+	/RESULT_FOLDER=RIZZOLI
+	/RESULT_NAME=Right MLA
+	/REFERENCE_SEGMENT=RFT_IOR
+	/PROJECTION_PLANE=YZ
+	/USE_RIGHT_HAND_RULE=TRUE
+	/USE_0_TO_360_DEGREES=FALSE
+	;
+
+	Compute_Planar_Angle
+	/SIGNAL_TYPES=TARGET
+	/SIGNAL_NAMES=R_FM2+R_P2MT+R_P1MT+R_FM1
+	/RESULT_FOLDER=RIZZOLI
+	/RESULT_NAME=Right S2F
+	/COMPUTE_3PT_ANGLE=FALSE
+	/REFERENCE_SEGMENT=Right Forefoot
+	/PROJECTION_PLANE=XY
+	/USE_0_TO_360_DEGREES=FALSE
+	;
+
+	Compute_Planar_Angle
+	/SIGNAL_TYPES=TARGET+TARGET+LANDMARK+LANDMARK
+	/SIGNAL_NAMES=R_P2MT+R_FM2+R_FM2_proj+R_P2MT_proj
+	/RESULT_FOLDER=RIZZOLI
+	/RESULT_NAME=Right S2G
+	/COMPUTE_3PT_ANGLE=FALSE
+	/PROJECTION_PLANE=3D
+	;
+
+	Compute_Planar_Angle
+	/SIGNAL_TYPES=TARGET
+	/SIGNAL_NAMES=R_FM2+R_P2MT+R_FMT+R_FM5
+	/RESULT_FOLDER=RIZZOLI
+	/RESULT_NAME=Right S2V
+	/COMPUTE_3PT_ANGLE=FALSE
+	/REFERENCE_SEGMENT=Right Forefoot
+	/PROJECTION_PLANE=XY
+	/USE_RIGHT_HAND_RULE=FALSE
+	/USE_0_TO_360_DEGREES=FALSE
+	;
+
+	Compute_Planar_Angle
+	/SIGNAL_TYPES=TARGET+TARGET+LANDMARK+LANDMARK
+	/SIGNAL_NAMES=R_FMT+R_FM5+R_FM5_proj+R_FMT_proj
+	/RESULT_FOLDER=RIZZOLI
+	/RESULT_NAME=Right V2G
+	/COMPUTE_3PT_ANGLE=FALSE
+	/PROJECTION_PLANE=3D
+	;
+
+	Compute_Planar_Angle
+	/SIGNAL_TYPES=TARGET+TARGET+LANDMARK+LANDMARK
+	/SIGNAL_NAMES=L_P1MT+L_FM1+L_FM1_proj+L_P1MT_proj
+	/RESULT_FOLDER=RIZZOLI
+	/RESULT_NAME=Left F2G
+	/COMPUTE_3PT_ANGLE=FALSE
+	/PROJECTION_PLANE=3D
+	;
+
+	Compute_Planar_Angle
+	/SIGNAL_TYPES=LANDMARK+TARGET+TARGET
+	/SIGNAL_NAMES=LF2P_Offset+L_FM1+L_PM6
+	/RESULT_FOLDER=RIZZOLI
+	/RESULT_NAME=Left F2Ps
+	/PROJECTION_PLANE=YZ
+	/REFERENCE_SEGMENT=Left Forefoot
+	/USE_0_TO_360_DEGREES=FALSE
+	;
+
+	Compute_Planar_Angle
+	/SIGNAL_TYPES=LANDMARK+TARGET+TARGET
+	/SIGNAL_NAMES=LF2P_Offset+L_FM1+L_PM6
+	/RESULT_FOLDER=RIZZOLI
+	/RESULT_NAME=Left F2Pt
+	/REFERENCE_SEGMENT=Left Forefoot
+	/PROJECTION_PLANE=XY
+	/USE_0_TO_360_DEGREES=FALSE
+	;
+
+	Compute_Planar_Angle
+	/SIGNAL_TYPES=LANDMARK+TARGET+TARGET
+	/SIGNAL_NAMES=L_FCC2_MLA_Origin+L_FST+L_FM1
+	/RESULT_FOLDER=RIZZOLI
+	/RESULT_NAME=Left MLA
+	/REFERENCE_SEGMENT=LFT_IOR
+	/PROJECTION_PLANE=YZ
+	/USE_RIGHT_HAND_RULE=TRUE
+	/USE_0_TO_360_DEGREES=FALSE
+	;
+
+	Compute_Planar_Angle
+	/SIGNAL_TYPES=TARGET
+	/SIGNAL_NAMES=L_FM2+L_P2MT+L_P1MT+L_FM1
+	/RESULT_FOLDER=RIZZOLI
+	/RESULT_NAME=Left S2F
+	/COMPUTE_3PT_ANGLE=FALSE
+	/REFERENCE_SEGMENT=Left Forefoot
+	/PROJECTION_PLANE=XY
+	/USE_RIGHT_HAND_RULE=FALSE
+	/USE_0_TO_360_DEGREES=FALSE
+	;
+
+	Compute_Planar_Angle
+	/SIGNAL_TYPES=TARGET+TARGET+LANDMARK+LANDMARK
+	/SIGNAL_NAMES=L_P2MT+L_FM2+L_FM2_proj+L_P2MT_proj
+	/RESULT_FOLDER=RIZZOLI
+	/RESULT_NAME=Left S2G
+	/COMPUTE_3PT_ANGLE=FALSE
+	/PROJECTION_PLANE=3D
+	;
+
+	Compute_Planar_Angle
+	/SIGNAL_TYPES=TARGET
+	/SIGNAL_NAMES=L_FM2+L_P2MT+L_FMT+L_FM5
+	/RESULT_FOLDER=RIZZOLI
+	/RESULT_NAME=Left S2V
+	/COMPUTE_3PT_ANGLE=FALSE
+	/REFERENCE_SEGMENT=Left Forefoot
+	/PROJECTION_PLANE=XY
+	/USE_0_TO_360_DEGREES=FALSE
+	;
+
+	Compute_Planar_Angle
+	/SIGNAL_TYPES=TARGET+TARGET+LANDMARK+LANDMARK
+	/SIGNAL_NAMES=L_FMT+L_FM5+L_FM5_proj+L_FMT_proj
+	/RESULT_FOLDER=RIZZOLI
+	/RESULT_NAME=Left V2G
+	/COMPUTE_3PT_ANGLE=FALSE
+	/PROJECTION_PLANE=3D
+	;
+
+	Select_Active_File
+	/FILE_NAME=STATIC
+	! /QUERY=
+	;
+
+	Compute_Planar_Angle
+	/SIGNAL_TYPES=LANDMARK
+	! /SIGNAL_FOLDER=ORIGINAL
+	/SIGNAL_NAMES=RSK_prox_center_ref+R_IM+RSK_FCC_front_proj+RSK_FCC2_front_proj
+	/RESULT_FOLDER=RIZZOLI
+	/RESULT_NAME=Right ShaCal_Static
+	/COMPUTE_3PT_ANGLE=FALSE
+	! /NORMALX=
+	! /NORMALY=
+	! /NORMALZ=
+	! /REFERENCE_SEGMENT=LAB
+	/PROJECTION_PLANE=3D
+	! /USE_RIGHT_HAND_RULE=TRUE
+	! /USE_0_TO_360_DEGREES=TRUE
+	;
+
+	Metric_Mean
+	/RESULT_METRIC_FOLDER=RIZZOLI
+	/RESULT_METRIC_NAME=_Offset
+	/APPLY_AS_SUFFIX_TO_SIGNAL_NAME=TRUE
+	/SIGNAL_TYPES=DERIVED
+	/SIGNAL_FOLDER=RIZZOLI
+	/SIGNAL_NAMES=Right ShaCal_Static
+	/COMPONENT_SEQUENCE=X
+	/EVENT_SEQUENCE=
+	/EXCLUDE_EVENTS=
+	/SEQUENCE_PERCENT_START=
+	/SEQUENCE_PERCENT_END=
+	! /GENERATE_MEAN_AND_STDDEV=TRUE
+	! /APPEND_TO_EXISTING_VALUES=FALSE
+	;
+	Compute_Planar_Angle
+	/SIGNAL_TYPES=LANDMARK
+	! /SIGNAL_FOLDER=ORIGINAL
+	/SIGNAL_NAMES=LSK_prox_center_ref+L_IM+LSK_FCC_front_proj+LSK_FCC2_front_proj
+	/RESULT_FOLDER=RIZZOLI
+	/RESULT_NAME=Left ShaCal_Static
+	/COMPUTE_3PT_ANGLE=FALSE
+	! /NORMALX=
+	! /NORMALY=
+	! /NORMALZ=
+	! /REFERENCE_SEGMENT=LAB
+	/PROJECTION_PLANE=3D
+	! /USE_RIGHT_HAND_RULE=TRUE
+	! /USE_0_TO_360_DEGREES=TRUE
+	;
+
+	Metric_Mean
+	/RESULT_METRIC_FOLDER=RIZZOLI
+	/RESULT_METRIC_NAME=_Offset
+	/APPLY_AS_SUFFIX_TO_SIGNAL_NAME=TRUE
+	/SIGNAL_TYPES=DERIVED
+	/SIGNAL_FOLDER=RIZZOLI
+	/SIGNAL_NAMES=Left ShaCal_Static
+	/COMPONENT_SEQUENCE=X
+	/EVENT_SEQUENCE=
+	/EXCLUDE_EVENTS=
+	/SEQUENCE_PERCENT_START=
+	/SEQUENCE_PERCENT_END=
+	! /GENERATE_MEAN_AND_STDDEV=TRUE
+	! /APPEND_TO_EXISTING_VALUES=FALSE
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+!For inclined treadmill modify landmarks used to locate FPs 
+Expression_Loop
+/ITERATION_PARAMETER_NAME=inclined
+/EXPRESSION=("&::use_inclined_treadmill&" = "TRUE")
+/AS_INTEGER= FALSE
+;
+
+	Conditional_Statement
+	/ITERATION_PARAMETER_NAME=inclined2
+	/EXPRESSION=("&::treadmill_type&" = "AMTI_tandem")
+	/AS_INTEGER= FALSE
+	;
+
+		Set_Pipeline_Parameter
+		/PARAMETER_NAME=ld_names
+		/PARAMETER_VALUE=T_F1+T_F2+T_F3+T_F4+T_R1+T_R2+T_R3+T_R4
+		;
+
+		Set_Pipeline_Parameter
+		/PARAMETER_NAME=corner1
+		/PARAMETER_VALUE=1000 * LANDMARK::ORIGINAL::T_F1::X + 1000 * LANDMARK::ORIGINAL::T_F1::Y + 1000 * LANDMARK::ORIGINAL::T_F1::Z + 1000 * LANDMARK::ORIGINAL::T_R1::X + 1000 * LANDMARK::ORIGINAL::T_R1::Y + 1000 * LANDMARK::ORIGINAL::T_R1::Z
+		;
+
+		Set_Pipeline_Parameter
+		/PARAMETER_NAME=corner2
+		/PARAMETER_VALUE=1000 * LANDMARK::ORIGINAL::T_F2::X + 1000 * LANDMARK::ORIGINAL::T_F2::Y + 1000 * LANDMARK::ORIGINAL::T_F2::Z + 1000 * LANDMARK::ORIGINAL::T_R2::X + 1000 * LANDMARK::ORIGINAL::T_R2::Y + 1000 * LANDMARK::ORIGINAL::T_R2::Z
+		;
+
+		Set_Pipeline_Parameter
+		/PARAMETER_NAME=corner3
+		/PARAMETER_VALUE=1000 * LANDMARK::ORIGINAL::T_F3::X + 1000 * LANDMARK::ORIGINAL::T_F3::Y + 1000 * LANDMARK::ORIGINAL::T_F3::Z + 1000 * LANDMARK::ORIGINAL::T_R3::X + 1000 * LANDMARK::ORIGINAL::T_R3::Y + 1000 * LANDMARK::ORIGINAL::T_R3::Z
+		;
+
+		Set_Pipeline_Parameter
+		/PARAMETER_NAME=corner4
+		/PARAMETER_VALUE=1000 * LANDMARK::ORIGINAL::T_F4::X + 1000 * LANDMARK::ORIGINAL::T_F4::Y + 1000 * LANDMARK::ORIGINAL::T_F4::Z + 1000 * LANDMARK::ORIGINAL::T_R4::X + 1000 * LANDMARK::ORIGINAL::T_R4::Y + 1000 * LANDMARK::ORIGINAL::T_R4::Z
+		;
+
+	Conditional_Statement_End
+	/ITERATION_PARAMETER_NAME=inclined2
+	;
+
+	Conditional_Statement
+	/ITERATION_PARAMETER_NAME=inclined2
+	/EXPRESSION=("&::treadmill_type&" = "Treadmetrix")
+	/AS_INTEGER= FALSE
+	;
+
+		Set_Pipeline_Parameter
+		/PARAMETER_NAME=ld_names
+		/PARAMETER_VALUE=T_F1+T_F2+T_R3+T_R4
+		;
+
+		Set_Pipeline_Parameter
+		/PARAMETER_NAME=corner1
+		/PARAMETER_VALUE=1000 * LANDMARK::ORIGINAL::T_F1::X + 1000 * LANDMARK::ORIGINAL::T_F1::Y + 1000 * LANDMARK::ORIGINAL::T_F1::Z
+		;
+
+		Set_Pipeline_Parameter
+		/PARAMETER_NAME=corner2
+		/PARAMETER_VALUE=1000 * LANDMARK::ORIGINAL::T_F2::X + 1000 * LANDMARK::ORIGINAL::T_F2::Y + 1000 * LANDMARK::ORIGINAL::T_F2::Z
+		;
+
+		Set_Pipeline_Parameter
+		/PARAMETER_NAME=corner3
+		/PARAMETER_VALUE=1000 * LANDMARK::ORIGINAL::T_R3::X + 1000 * LANDMARK::ORIGINAL::T_R3::Y + 1000 * LANDMARK::ORIGINAL::T_R3::Z
+		;
+
+		Set_Pipeline_Parameter
+		/PARAMETER_NAME=corner4
+		/PARAMETER_VALUE=1000 * LANDMARK::ORIGINAL::T_R4::X + 1000 * LANDMARK::ORIGINAL::T_R4::Y + 1000 * LANDMARK::ORIGINAL::T_R4::Z
+		;
+
+	Conditional_Statement_End
+	/ITERATION_PARAMETER_NAME=inclined2
+	;
+
+	!set vertical offset of FP surface to marker center
+	For_Each
+	/ITERATION_PARAMETER_NAME=ld_name
+	! /ITERATION_PARAMETER_COUNT_NAME=
+	/ITEMS=::ld_names
+	;
+
+		Modify_Landmark
+		/LANDMARK_NAME=::ld_name
+		/CALIBRATION_FILE=&::working_directory&Static*.c3d
+		! /USER_GENERATED=
+		! /USE_PERCENTAGE=
+		! /CALIBRATION_ONLY=
+		! /USE_TARGETS=
+		! /SEGMENT_NAME=
+		! /TARGET_TYPES=
+		! /TARGET_NAMES=
+		! /MCS_ML=
+		/MCS_AP=-0.010
+		! /MCS_AXIAL=
+		! /LANDMARK_LOCATION=
+		! /REFERENCE_LOCATION_TYPE=
+		! /REFERENCE_LOCATION_NAME=
+		! /USE_REFERENCE_LOCATION=
+		;
+
+	End_For_Each
+	/ITERATION_PARAMETER_NAME=ld_name
+	;
+	
+	Build_Model
+	/CALIBRATION_FILE=&::working_directory&Static*.c3d
+	! /REBUILD_ALL_MODELS=FALSE
+	/DISPLAY_RESULTS=FALSE
+	;
+
+	Select_Active_File
+	/FILE_NAME=ALL_FILES
+	;
+
+	Modify_Force_Platform_Parameters
+	! /FP_USED=
+	! /FP_TYPE=
+	! /FP_CHANNEL=
+	! /FP_ORIGIN=
+	! /FP_CALMATRIX=
+	! /STORE_CALMATRIX=BYROW
+	! /FP_ZERO=
+	! /FP_ZEROS=
+	/FP_CORNER1=::corner1
+	/FP_CORNER2=::corner2
+	/FP_CORNER3=::corner3
+	/FP_CORNER4=::corner4
+	! /FP_COP_POLYNOMIAL=
+	! /FP_COP_TRANSLATION=
+	! /FP_COP_ROTATION=
+	! /UPDATE_C3D_FILE=FALSE
+	! /MODIFY_CAL_FILE=FALSE
+	;
+
+	Recalc
+	;
+	
+Expression_Loop_End
+/ITERATION_PARAMETER_NAME=inclined
+;
+
+! ==================================
+! Generate events
+! ==================================
+
+! ==================================
+!Add events to static files so that they can be used in the plots.
+Select_Active_File
+/FILE_NAME=Static
+;
+
+Event_Explicit
+/EVENT_NAME=LHS
+! /FRAME=
+/TIME=0
+;
+Event_Explicit
+/EVENT_NAME=RHS
+! /FRAME=
+/TIME=0
+;
+Event_Explicit
+/EVENT_NAME=LHS
+! /FRAME=
+/TIME=eof
+;
+Event_Explicit
+/EVENT_NAME=RHS
+! /FRAME=
+/TIME=eof
+;
+
+!Calculate the size of the window that will be used for the event detection. This changes depending on the frame rate.
+!=========================================
+Select_Active_File
+/FILE_NAME=ALL_FILES
+! /QUERY=
+;
+
+Evaluate_Expression
+/EXPRESSION=PARAMETERS::POINT::RATE/&::window_size_divisor
+/RESULT_NAME=WINDOW
+/RESULT_TYPE=METRIC
+! /RESULT_FOLDER=PROCESSED
+;
+
+!Events detection
+!=========================================
+Select_Active_File
+/FILE_NAME=ALL_FILES
+! /QUERY=
+;

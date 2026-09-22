@@ -1,0 +1,18 @@
+trial_id,load_kg,jump_type,arm,valid_mocap,oop_flag,thoracolumbar_rise_m,arm_amp_m,notes
+4,0,CMJ,FREE_ARM?,True,Moderate,0.4299,0.4903, arm_amp near threshold (~0.5m)
+5,0,CMJ,FREE_ARM,True,OK,0.7480,0.3890,
+6,0,CMJ,FREE_ARM,True,Moderate,1.8226,0.3991, large thoracolumbar rise (L_TH4 marker)
+7,0,CMJ,FREE_ARM,True,Significant,0.5842,0.5389, OOP large - exclude from main 2D analysis
+9,0,CMJ,UNKNOWN,False,NA,NA,NA, markers missing
+11,0,CMJ,FREE_ARM?,True,Significant,0.5140,0.5143, arm_amp 0.51m - may be restricted free-arm
+12,0,CMJ,FREE_ARM,True,Moderate,0.5647,0.4092,
+13,0,CMJ,FREE_ARM?,True,Moderate,0.5409,0.5160, arm_amp 0.52m
+15,0,CMJ,UNKNOWN,False,NA,NA,NA, markers missing
+16,0,CMJ,FREE_ARM,True,Significant,0.6429,0.6888, largest arm_amp in 0kg
+17,0,CMJ,FREE_ARM,True,Moderate,0.9656,0.7021,
+18,20,CMJ?,UNKNOWN,False,NA,NA,NA, markers missing
+19,20,CMJ?,NO_ARM?,True,Significant,0.3615,0.3967, loaded jump - arms more constrained
+20,20,CMJ?,UNKNOWN,False,NA,NA,NA, markers missing
+22,40,CMJ?,NO_ARM?,True,Significant,0.3109,0.4706, loaded jump + large OOP
+23,40,CMJ?,NO_ARM?,True,Significant,0.3005,0.4278, loaded jump - arms constrained
+24,40,CMJ?,UNKNOWN,False,NA,NA,NA, markers missing

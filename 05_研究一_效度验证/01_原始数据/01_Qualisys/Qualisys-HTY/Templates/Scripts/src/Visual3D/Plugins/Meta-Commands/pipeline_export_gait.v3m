@@ -1,0 +1,4828 @@
+! BEGIN_META
+! META_CMD_NAME	= Pipeline_Export_Gait
+! META_PARAM	= working_directory  :   string ::yes
+! META_PARAM	= openfile  :   string ::yes
+! META_PARAM	= analysis_name  :   string ::yes
+! META_PARAM	= event_mode  :   string ::yes
+! META_PARAM	= auto_range_str  :   string ::yes
+! META_PARAM	= normative_data  :   string ::yes
+! META_PARAM	= normative_file_exists  :   string ::yes
+! META_PARAM	= normative_directory  :   string ::yes
+! META_PARAM	= normative_file  :   string ::yes
+! META_PARAM	= select_tags_list  :   string ::yes
+! META_PARAM	= select_tags_arr_list  :   string ::yes
+! META_PARAM	= link_signal_names  :   string ::yes
+! META_PARAM	= event_seq  :   string ::yes
+! META_PARAM	= includes_OFM  :   string ::yes
+! META_PARAM	= includes_RFM  :   string ::yes
+! META_PARAM	= noraxon_exists  :   string ::yes
+! META_PARAM	= mega_me6000_exists  :   string ::yes
+! META_PARAM	= delsys_trigno_exists  :   string ::yes
+! META_PARAM	= myon_exists  :   string ::yes
+! META_PARAM	= analog_EMG_exists  :   string ::yes
+! META_PARAM	= EMG_signal_names  :   string ::yes
+! META_PARAM	= EMG_type  :   string ::yes
+! META_PARAM	= EMG_folder  :   string ::yes
+! META_PARAM	= EMG_exclude_seq  :   string ::yes
+! META_PARAM	= EMG_event_seq  :   string ::yes
+! META_PARAM	= EMG_points  :   string ::yes
+! META_PARAM	= EMG_names_norm  :   string ::yes
+! META_PARAM	= EMG_type_norm  :   string ::yes
+! META_PARAM	= EMG_folder_norm  :   string ::yes
+! META_PARAM	= EMG_points_norm  :   string ::yes
+! META_PARAM	= normative_non_noraxon_file_exists  :   string ::yes
+! META_PARAM	= EMG_graph_signals_name_left  :   string ::yes
+! META_PARAM	= EMG_graph_signals_name_right  :   string ::yes
+! META_PARAM	= includes_thorax  :   string ::yes
+! META_PARAM	= includes_arms  :   string ::yes
+! META_PARAM	= event_sq  :   string ::yes
+! META_PARAM	= sig_types  :   string ::yes
+! META_PARAM	= sig_names  :   string ::yes
+! META_PARAM	= sig_folder  :   string ::yes
+! META_PARAM	= sig_types_web  :   string ::yes
+! META_PARAM	= sig_names_web  :   string ::yes
+! META_PARAM	= sig_folder_web  :   string ::yes
+! META_PARAM	= ev_segence  :   string ::yes
+! META_PARAM	= ev_exclude  :   string ::yes
+! META_PARAM	= norm_points  :   string ::yes
+! META_PARAM	= EMG_units_pct_str  :   string ::yes
+! META_PARAM	= sig_type_n  :   string ::yes
+! META_PARAM	= sig_names_n  :   string ::yes
+! META_PARAM	= sig_folder_n  :   string ::yes
+! META_PARAM	= norm_points_n  :   string ::yes
+! META_PARAM	= sig_type_3dv  :   string ::yes
+! META_PARAM	= sig_folder_3dv  :   string ::yes
+! META_PARAM	= marker_list_3dv  :   string ::yes
+! META_PARAM	= norm_points_3dv  :   string ::yes
+! META_PARAM	= cmo_file  :   string ::yes
+! END_META
+
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!  Copyright notice
+!  This PAF and its content is copyright of Qualisys AB © 2012-2018. All rights reserved. 
+!  The PAF script is only to be used in conjunction with a Qualisys Motion Capture System. 
+!  Only legal PAF owners are entitled to use the script and only in relation with related PAF.
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Set_View_Processing_Results
+! /ACCUMULATE_PIPELINE_RESULTS=ALL
+! /ACCUMULATE_BUILDMODEL_RESULTS=ALL
+! /RESET_PIPELINE_RESULTS=FALSE
+! /RESET_BUILDMODEL_RESULTS=FALSE
+! /VIEW_PIPELINE_RESULTS=1
+! /VIEW_BUILDMODEL_RESULTS=2
+! /VIEW_RECALC_PIPELINE_WARNINGS=2
+;
+
+File_Open
+/FILE_NAME=::openfile
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(("&::analysis_name&" = "Internal Export Word") &::AMP& ("&::auto_range_str&" = "TRUE") &::AMP& ("&::event_mode&" = "Multiple forceplates"))
+! /AS_INTEGER=TRUE
+;
+
+	Event_Delete
+	/EVENT_NAME=LHS
+	/EVENT_SEQUENCE=START+RANGESTART
+	! /EXCLUDE_EVENTS=
+	! /TIME=
+	;
+
+	Event_Delete
+	/EVENT_NAME=RHS
+	/EVENT_SEQUENCE=START+RANGESTART
+	! /EXCLUDE_EVENTS=
+	! /TIME=
+	;
+
+	Event_Delete
+	/EVENT_NAME=LTO
+	/EVENT_SEQUENCE=START+RANGESTART
+	! /EXCLUDE_EVENTS=
+	! /TIME=
+	;
+
+	Event_Delete
+	/EVENT_NAME=RTO
+	/EVENT_SEQUENCE=START+RANGESTART
+	! /EXCLUDE_EVENTS=
+	! /TIME=
+	;
+
+	Event_Delete
+	/EVENT_NAME=LHS
+	/EVENT_SEQUENCE=RANGEEND+END
+	! /EXCLUDE_EVENTS=
+	! /TIME=
+	;
+
+	Event_Delete
+	/EVENT_NAME=RHS
+	/EVENT_SEQUENCE=RANGEEND+END
+	! /EXCLUDE_EVENTS=
+	! /TIME=
+	;
+
+	Event_Delete
+	/EVENT_NAME=LTO
+	/EVENT_SEQUENCE=RANGEEND+END
+	! /EXCLUDE_EVENTS=
+	! /TIME=
+	;
+
+	Event_Delete
+	/EVENT_NAME=RTO
+	/EVENT_SEQUENCE=RANGEEND+END
+	! /EXCLUDE_EVENTS=
+	! /TIME=
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Select_Active_File 
+/FILE_NAME=GLOBAL 
+!/QUERY=
+;
+
+! ==================================
+! ! Load normative data for kinematic data
+! ==================================
+!open normative file for kinematic data
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::normative_data&" = "Custom")
+! /AS_INTEGER=TRUE
+;
+
+	File_Open
+	! /FILE_NAME=
+	! /SUFFIX=
+	/SET_PROMPT=Select normative data (.vnd) file!
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(("&::normative_data&" <> "Custom") &::AMP& ("&::normative_file_exists&" = "TRUE"))
+! /AS_INTEGER=TRUE
+;
+
+	File_Open
+	/FILE_NAME=&::normative_file
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+File_Open
+/FILE_NAME=&::normative_directory&TSP_normatives.vnd
+;
+
+Select_Active_File
+/FILE_NAME=Static
+! /QUERY=
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=GLOBAL::Height
+/RESULT_METRIC_FOLDER=SUBJECT
+/METRIC_VALUE=MODEL::METRIC::HEIGHT
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=GLOBAL::Weight
+/RESULT_METRIC_FOLDER=SUBJECT
+/METRIC_VALUE=MODEL::METRIC::MASS
+;
+
+Select_Active_File 
+/FILE_NAME=Dynamic
+;
+
+Evaluate_Expression
+/EXPRESSION=GLOBAL::METRIC::SUBJECT::LegLengthLeft
+/RESULT_NAME=LegLengthLeft
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=SUBJECT
+;
+
+Evaluate_Expression
+/EXPRESSION=GLOBAL::METRIC::SUBJECT::LegLengthRight
+/RESULT_NAME=LegLengthRight
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=SUBJECT
+;
+
+!=================================================
+!Compute temporal and distance data for report
+! for both conditions
+!=================================================
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(STRING_FIND("&::event_mode&","Instrumented treadmill",0) <> -1)
+! /AS_INTEGER=TRUE
+;
+
+	Metric_Compute_Temporal_Distance
+	/GLOBAL_RESULT_METRIC_FOLDER=TMPD
+	/CALCULATE_PER_FILE=TRUE
+	/CREATE_ALL_INSTANCES=TRUE
+	/RHS_EVENT=RHS
+	/LHS_EVENT=LHS
+	/RTO_EVENT=RTO
+	/LTO_EVENT=LTO
+	/STRICT_EVENT_SEQUENCE_VALIDATION=TRUE
+	! /COMPUTE_SPEED=TRUE
+	! /COMPUTE_STATURES_PER_SECOND=TRUE
+	! /COMPUTE_STRIDE_WIDTH=TRUE
+	! /COMPUTE_STRIDE_LENGTH=TRUE
+	! /COMPUTE_CYCLE_TIME=TRUE
+	! /COMPUTE_STEP_LENGTH=TRUE
+	! /COMPUTE_STEP_TIME=TRUE
+	! /COMPUTE_STANCE_TIME=TRUE
+	! /COMPUTE_SWING_TIME=TRUE
+	! /COMPUTE_STEPS_PER_MINUTE=TRUE
+	! /COMPUTE_STRIDES_PER_MINUTE=TRUE
+	! /COMPUTE_DOUBLE_LIMB_SUPPORT_TIME=TRUE
+	! /COMPUTE_RIGHT_INITIAL_DOUBLE_LIMB_SUPPORT_TIME=TRUE
+	! /COMPUTE_RIGHT_TERMINAL_DOUBLE_LIMB_SUPPORT_TIME=TRUE
+	/TREADMILL_SPEED=METRIC::TREADMILL::SPEED
+	/TREADMILL_DIRECTION=METRIC::TREADMILL::WALKING_DIRECTION
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(STRING_FIND("&::event_mode&","Instrumented treadmill",0) = -1)
+! /AS_INTEGER=TRUE
+;
+
+	Metric_Compute_Temporal_Distance
+	/GLOBAL_RESULT_METRIC_FOLDER=TMPD
+	/CALCULATE_PER_FILE=TRUE
+	/CREATE_ALL_INSTANCES=TRUE
+	/RHS_EVENT=RHS
+	/LHS_EVENT=LHS
+	/RTO_EVENT=RTO
+	/LTO_EVENT=LTO
+	/STRICT_EVENT_SEQUENCE_VALIDATION=TRUE
+	! /COMPUTE_SPEED=TRUE
+	! /COMPUTE_STATURES_PER_SECOND=TRUE
+	! /COMPUTE_STRIDE_WIDTH=TRUE
+	! /COMPUTE_STRIDE_LENGTH=TRUE
+	! /COMPUTE_CYCLE_TIME=TRUE
+	! /COMPUTE_STEP_LENGTH=TRUE
+	! /COMPUTE_STEP_TIME=TRUE
+	! /COMPUTE_STANCE_TIME=TRUE
+	! /COMPUTE_SWING_TIME=TRUE
+	! /COMPUTE_STEPS_PER_MINUTE=TRUE
+	! /COMPUTE_STRIDES_PER_MINUTE=TRUE
+	! /COMPUTE_DOUBLE_LIMB_SUPPORT_TIME=TRUE
+	! /COMPUTE_RIGHT_INITIAL_DOUBLE_LIMB_SUPPORT_TIME=TRUE
+	! /COMPUTE_RIGHT_TERMINAL_DOUBLE_LIMB_SUPPORT_TIME=TRUE
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+!Preparing signal for web report to keep naming convention
+Metric_Explicit
+/RESULT_METRIC_NAME=Left_Stance_Time_Pct_Count
+/RESULT_METRIC_FOLDER=TMPD
+/METRIC_VALUE=METRIC::TMPD::Left_Stance_Time_Count
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=Right_Stance_Time_Pct_Count
+/RESULT_METRIC_FOLDER=TMPD
+/METRIC_VALUE=METRIC::TMPD::Right_Stance_Time_Count
+;
+
+!Left_initial... created for web report 
+Metric_Explicit
+/RESULT_METRIC_NAME=Left_Initial_Double_Limb_Support_Time
+/RESULT_METRIC_FOLDER=TMPD
+/METRIC_VALUE=METRIC::TMPD::Right_Terminal_Double_Limb_Support_Time
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=Left_Initial_Double_Limb_Support_Time_Count
+/RESULT_METRIC_FOLDER=TMPD
+/METRIC_VALUE=METRIC::TMPD::Right_Terminal_Double_Limb_Support_Time_Count
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=Left_Initial_Double_Limb_Support_Time_Mean
+/RESULT_METRIC_FOLDER=TMPD
+/METRIC_VALUE=METRIC::TMPD::Right_Terminal_Double_Limb_Support_Time_Mean
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=Left_Initial_Double_Limb_Support_Time_StdDev
+/RESULT_METRIC_FOLDER=TMPD
+/METRIC_VALUE=METRIC::TMPD::Right_Terminal_Double_Limb_Support_Time_StdDev
+;
+
+! Speed - calculate global SD
+Generate_Metric
+/SIGNAL_TYPES=METRIC
+/SIGNAL_FOLDER=TMPD
+/SIGNAL_NAMES=Speed
+/RESULT_METRIC_FOLDER=TMPD
+/RESULT_METRIC_NAME=_STDDEV
+/APPLY_AS_SUFFIX_TO_SIGNAL_NAME=TRUE
+/METRIC_PROCESS=STANDARD_DEVIATION
+! /RANGE_START=
+! /RANGE_END=
+;
+
+!Strides per minute (mean of L+R sides)
+Evaluate_Expression
+/EXPRESSION=(METRIC::TMPD::Left_Strides_Per_Minute_Mean + METRIC::TMPD::Right_Strides_Per_Minute_Mean) / 2
+/RESULT_NAME=Strides_per_Minute_Mean
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=TMPD
+;
+
+!Stride time in sec
+Evaluate_Expression
+/EXPRESSION=1 / METRIC::TMPD::Strides_per_Minute_Mean * 60
+/RESULT_NAME=Stride_Time_Mean
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=TMPD
+;
+
+!Stance time as %gait cycle use by web
+Evaluate_Expression
+/EXPRESSION=METRIC::TMPD::Right_Stance_Time / METRIC::TMPD::Right_Cycle_Time * 100
+/RESULT_NAME=Right_Stance_Time_Pct
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=TMPD
+;
+
+Evaluate_Expression
+/EXPRESSION=METRIC::TMPD::Left_Stance_Time / METRIC::TMPD::Left_Cycle_Time * 100
+/RESULT_NAME=Left_Stance_Time_Pct
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=TMPD
+;
+
+!Cadence calculated from Step Time
+Evaluate_Expression
+/EXPRESSION=60 / (Append_As_Frames(METRIC::TMPD::Right_Step_Time,METRIC::TMPD::Left_Step_Time))
+/RESULT_NAME=Cadence
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=TMPD
+;
+
+Evaluate_Expression
+/EXPRESSION=Metric_Mean(METRIC::TMPD::Cadence)
+/RESULT_NAME=Cadence_Mean
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=TMPD
+;
+
+Evaluate_Expression
+/EXPRESSION=Metric_StdDev(60 / list(METRIC::TMPD::Left_Step_Time, METRIC::TMPD::Right_Step_Time))
+/RESULT_NAME=Cadence_StdDev
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=TMPD
+;
+
+Evaluate_Expression
+/EXPRESSION=METRIC::TMPD::Left_Step_Time_Count + METRIC::TMPD::Right_Step_Time_Count
+/RESULT_NAME=Cadence_Count
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=TMPD
+;
+
+Evaluate_Expression
+/EXPRESSION=GLOBAL::METRIC::TMPD::Left_Step_Time_Count + GLOBAL::METRIC::TMPD::Right_Step_Time_Count
+/RESULT_NAME=GLOBAL::Cadence_Count
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=TMPD
+;
+
+!Calculation of Stance time % and Cadence require special way to calculate SD for Word same way as other parameters (mean of all cycles, not sd of mean all trials)
+Set_Pipeline_Parameter_To_List_Of_Tagged_Files
+/PARAMETER_NAME=files
+/TAG_NAME=Dynamic
+! /GET_CURRENT_SELECTED_FILES=false
+! /USE_SHORT_FILENAMES=false
+;
+
+For_Each
+/ITERATION_PARAMETER_NAME=filename
+/ITERATION_PARAMETER_COUNT_NAME=inc
+/ITEMS=::files
+;
+
+	Select_Active_File
+	/FILE_NAME=::filename
+	! /QUERY=
+	;
+
+	Evaluate_Expression
+	/EXPRESSION=METRIC::TMPD::Left_Stance_Time_Pct
+	/RESULT_NAME=GLOBAL::Left_Stance_Time_Pct_&::inc
+	/RESULT_TYPE=METRIC
+	/RESULT_FOLDER=TEMP
+	;
+
+	! add to string only if exists as Merge_Data later would fail on merging nonexistant data
+	Conditional_Statement
+	/ITERATION_PARAMETER_NAME=cond
+	/EXPRESSION=Data_Exists(GLOBAL::METRIC::TEMP::Left_Stance_Time_Pct_&::inc&)
+	! /AS_INTEGER=TRUE
+	;
+
+		Set_Pipeline_Parameter
+		/PARAMETER_NAME=pp_left
+		/PARAMETER_VALUE=&::pp_left&Left_Stance_Time_Pct_&::inc&+
+		;
+
+	Conditional_Statement_End
+	/ITERATION_PARAMETER_NAME=cond
+	;
+
+	Evaluate_Expression
+	/EXPRESSION=METRIC::TMPD::Right_Stance_Time_Pct
+	/RESULT_NAME=GLOBAL::Right_Stance_Time_Pct_&::inc
+	/RESULT_TYPE=METRIC
+	/RESULT_FOLDER=TEMP
+	;
+
+	Conditional_Statement
+	/ITERATION_PARAMETER_NAME=cond
+	/EXPRESSION=Data_Exists(GLOBAL::METRIC::TEMP::Right_Stance_Time_Pct_&::inc&)
+	! /AS_INTEGER=TRUE
+	;
+
+		Set_Pipeline_Parameter
+		/PARAMETER_NAME=pp_right
+		/PARAMETER_VALUE=&::pp_right&Right_Stance_Time_Pct_&::inc&+
+		;
+
+	Conditional_Statement_End
+	/ITERATION_PARAMETER_NAME=cond
+	;
+
+	Evaluate_Expression
+	/EXPRESSION=METRIC::TMPD::Cadence
+	/RESULT_NAME=GLOBAL::Cadence_&::inc
+	/RESULT_TYPE=METRIC
+	/RESULT_FOLDER=TEMP
+	;
+
+	Conditional_Statement
+	/ITERATION_PARAMETER_NAME=cond
+	/EXPRESSION=Data_Exists(GLOBAL::METRIC::TEMP::Cadence_&::inc&)
+	! /AS_INTEGER=TRUE
+	;
+
+		Set_Pipeline_Parameter
+		/PARAMETER_NAME=pp_cadence
+		/PARAMETER_VALUE=&::pp_cadence&Cadence_&::inc&+
+		;
+
+	Conditional_Statement_End
+	/ITERATION_PARAMETER_NAME=cond
+	;
+
+End_For_Each
+/ITERATION_PARAMETER_NAME=filename
+;
+
+Set_Pipeline_Parameter_From_Expression
+/PARAMETER_NAME=pp_left_con
+/EXPRESSION=STRING_LENGTH("&::pp_left&") - 1
+! /AS_INTEGER=TRUE
+;
+
+Set_Pipeline_Parameter_From_Expression
+/PARAMETER_NAME=pp_left
+/EXPRESSION=STRING_LEFT("&::pp_left&", &::pp_left_con&)
+! /AS_INTEGER=TRUE
+;
+
+Set_Pipeline_Parameter_From_Expression
+/PARAMETER_NAME=pp_right_con
+/EXPRESSION=STRING_LENGTH("&::pp_right&") - 1
+! /AS_INTEGER=TRUE
+;
+
+Set_Pipeline_Parameter_From_Expression
+/PARAMETER_NAME=pp_right
+/EXPRESSION=STRING_LEFT("&::pp_right&", &::pp_right_con&)
+! /AS_INTEGER=TRUE
+;
+
+Set_Pipeline_Parameter_From_Expression
+/PARAMETER_NAME=pp_cadence_con
+/EXPRESSION=STRING_LENGTH("&::pp_cadence&") - 1
+! /AS_INTEGER=TRUE
+;
+
+Set_Pipeline_Parameter_From_Expression
+/PARAMETER_NAME=pp_cadence
+/EXPRESSION=STRING_LEFT("&::pp_cadence&", &::pp_cadence_con&)
+! /AS_INTEGER=TRUE
+;
+
+Select_Active_File
+/FILE_NAME=GLOBAL
+! /QUERY=
+;
+
+Merge_Data
+/SIGNAL_TYPES=METRIC
+/SIGNAL_FOLDER=TEMP
+/SIGNAL_NAMES=&::pp_left&
+/SIGNAL_COMPONENTS=
+! /COMPONENT_SEQUENCE=
+/RESULT_TYPES=METRIC
+/RESULT_FOLDERS=TMPD
+/RESULT_NAME=GLOBAL::Left_Stance_Time_Pct
+! /MERGE_TYPE=APPEND_TO_END
+;
+
+Merge_Data
+/SIGNAL_TYPES=METRIC
+/SIGNAL_FOLDER=TEMP
+/SIGNAL_NAMES=&::pp_right&
+/SIGNAL_COMPONENTS=
+! /COMPONENT_SEQUENCE=
+/RESULT_TYPES=METRIC
+/RESULT_FOLDERS=TMPD
+/RESULT_NAME=GLOBAL::Right_Stance_Time_Pct
+! /MERGE_TYPE=APPEND_TO_END
+;
+
+Merge_Data
+/SIGNAL_TYPES=METRIC
+/SIGNAL_FOLDER=TEMP
+/SIGNAL_NAMES=&::pp_cadence&
+/SIGNAL_COMPONENTS=
+! /COMPONENT_SEQUENCE=
+/RESULT_TYPES=METRIC
+/RESULT_FOLDERS=TMPD
+/RESULT_NAME=GLOBAL::Cadence
+! /MERGE_TYPE=APPEND_TO_END
+;
+
+Metric_Mean
+/RESULT_METRIC_FOLDER=TMPD
+/RESULT_METRIC_NAME=Left_Stance_Time_Pct_Mean+Right_Stance_Time_Pct_Mean+Cadence_Mean
+/APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+/SIGNAL_TYPES=METRIC
+/SIGNAL_FOLDER=TMPD
+/SIGNAL_NAMES=Left_Stance_Time_Pct+Right_Stance_Time_Pct+Cadence
+! /COMPONENT_SEQUENCE=
+/EVENT_SEQUENCE=
+/EXCLUDE_EVENTS=
+! /GENERATE_MEAN_AND_STDDEV=TRUE
+! /APPEND_TO_EXISTING_VALUES=FALSE
+;
+
+Metric_StdDev
+/RESULT_METRIC_FOLDER=TMPD
+/RESULT_METRIC_NAME=Left_Stance_Time_Pct_StdDev+Right_Stance_Time_Pct_StdDev+Cadence_StdDev
+/APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+/SIGNAL_TYPES=METRIC
+/SIGNAL_FOLDER=TMPD
+/SIGNAL_NAMES=Left_Stance_Time_Pct+Right_Stance_Time_Pct+Cadence
+! /COMPONENT_SEQUENCE=
+/EVENT_SEQUENCE=
+/EXCLUDE_EVENTS=
+! /GENERATE_MEAN_AND_STDDEV=TRUE
+! /APPEND_TO_EXISTING_VALUES=FALSE
+;
+
+Select_Active_File
+/FILE_NAME=Dynamic
+! /QUERY=
+;
+
+!Normalise temporal/spatial data based on leg length following U of Salford method
+Select_Active_File 
+/FILE_NAME=GLOBAL
+;
+
+Evaluate_Expression
+/EXPRESSION=(METRIC::SUBJECT::LegLengthLeft + METRIC::SUBJECT::LegLengthRight) / 2
+/RESULT_NAME=LegLengthAvg
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=SUBJECT
+;
+
+!Speed / sqrt(9.81*leg length)
+Evaluate_Expression
+/EXPRESSION=METRIC::TMPD::Speed/sqrt(9.81*METRIC::SUBJECT::LegLengthAvg)
+/RESULT_NAME=SpeedNorm
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=TMPD
+;
+
+!(Cadence/60)/SQRT(9.81/leg length in mm)
+Evaluate_Expression
+/EXPRESSION=((METRIC::TMPD::Left_Strides_Per_Minute_Mean+METRIC::TMPD::Right_Strides_Per_Minute_Mean)/60)/sqrt(9.81/METRIC::SUBJECT::LegLengthAvg)
+/RESULT_NAME=CadenceNorm
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=TMPD
+;
+
+!Stride length/leg length
+Evaluate_Expression
+/EXPRESSION=METRIC::TMPD::Stride_Length_Mean/METRIC::SUBJECT::LegLengthAvg
+/RESULT_NAME=Stride_LengthNorm
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=TMPD
+;
+
+!Left Step Length/leg length
+Evaluate_Expression
+/EXPRESSION=METRIC::TMPD::Left_Step_Length_Mean/METRIC::SUBJECT::LegLengthAvg
+/RESULT_NAME=Left_Step_LengthNorm
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=TMPD
+;
+
+!Right Step Length/leg length
+Evaluate_Expression
+/EXPRESSION=METRIC::TMPD::Right_Step_Length_Mean/METRIC::SUBJECT::LegLengthAvg
+/RESULT_NAME=Right_Step_LengthNorm
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=TMPD
+;
+
+!Express normalised metrics as %normal (after adjusting for leg length)
+For_Each
+/ITERATION_PARAMETER_NAME=SIG_NAME
+/ITEMS=SpeedNorm+CadenceNorm+Stride_LengthNorm+Left_Step_LengthNorm+Right_Step_LengthNorm
+;
+
+	Evaluate_Expression
+	/EXPRESSION=METRIC::TMPD::&::SIG_NAME&/P2D::TSP_Normatives::&::SIG_NAME&:&:2*100
+	/RESULT_NAME=&::SIG_NAME&PctDiff
+	/RESULT_TYPE=METRIC
+	/RESULT_FOLDER=TMPD
+	;
+
+End_For_Each
+/ITERATION_PARAMETER_NAME=SIG_NAME
+;
+
+!================================
+!Rename/Copy Metrics as names are too long to be used in Word
+!================================
+Select_Active_File 
+/FILE_NAME=GLOBAL 
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=StrideLenCount
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Stride_Length_Count
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=StrideLenSD
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Stride_Length_Stddev
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=StrideLenMean
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Stride_Length_Mean
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=StrideWidCount
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Stride_Width_Count
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=StrideWidSD
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Stride_Width_StdDev
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=StrideWidMean
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Stride_Width_Mean
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=RStepLenCount
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Right_Step_Length_Count
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=LStepLenCount
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Left_Step_Length_Count
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=RStepLenMean
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Right_Step_Length_Mean
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=LStepLenMean
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Left_Step_Length_Mean
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=RStepLenSD
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Right_Step_Length_StdDev
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=LStepLenSD
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Left_Step_Length_StdDev
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=RStepTimeCount
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Right_Step_Time_Count
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=LStepTimeCount
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Left_Step_Time_Count
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=RStepTimeMean
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Right_Step_Time_Mean
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=LStepTimeMean
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Left_Step_Time_Mean
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=RStepTimeSD
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Right_Step_Time_StdDev
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=LStepTimeSD
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Left_Step_Time_StdDev
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=RStepPerMinCount
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Right_Steps_Per_Minute_Count
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=LStepPerMinCount
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Left_Steps_Per_Minute_Count
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=RStepPerMinMean
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Right_Steps_Per_Minute_Mean
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=LStepPerMinMean
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Left_Steps_Per_Minute_Mean
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=RStepPerMinSD
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Right_Steps_Per_Minute_StdDev
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=LStepPerMinSD
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Left_Steps_Per_Minute_StdDev
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=RStanTimeCount
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Right_Stance_Time_Count
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=LStanTimeCount
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Left_Stance_Time_Count
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=RStanTimeMean
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Right_Stance_Time_Mean
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=LStanTimeMean
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Left_Stance_Time_Mean
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=RStanTimeSD
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Right_Stance_Time_StdDev
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=LStanTimeSD
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Left_Stance_Time_StdDev
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=RSwingTimeMean
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Right_Swing_Time_Mean
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=LSwingTimeMean
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Left_Swing_Time_Mean
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=RSwingTimeSD
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Right_Swing_Time_StdDev
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=LSwingTimeSD
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Left_Swing_Time_StdDev
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=RDblSuppCount
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Right_Initial_Double_Limb_Support_Time_Count
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=RDblSuppMean
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Right_Initial_Double_Limb_Support_Time_Mean
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=RDblSuppSD
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Right_Initial_Double_Limb_Support_Time_StdDev
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=LDblSuppCount
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Right_Terminal_Double_Limb_Support_Time_Count
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=LDblSuppMean
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Right_Terminal_Double_Limb_Support_Time_Mean
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=LDblSuppSD
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Right_Terminal_Double_Limb_Support_Time_StdDev
+;
+
+!Non-standard temporal metrics
+
+!Speed in meters per min
+Multiply_Signals_By_Constant
+/SIGNAL_TYPES=METRIC
+/SIGNAL_NAMES=Speed
+/SIGNAL_FOLDER=TMPD
+! /RESULT_TYPES=
+/RESULT_FOLDER=SHORT
+/RESULT_NAME=_m_per_minMean
+/APPLY_AS_SUFFIX_TO_SIGNAL_NAME=TRUE
+! /SIGNAL_COMPONENTS=
+/CONSTANT=60
+;
+
+!Strides per minute (mean of L+R sides)
+Evaluate_Expression
+/EXPRESSION=(GLOBAL::METRIC::TMPD::Left_Strides_Per_Minute_Mean+GLOBAL::METRIC::TMPD::Right_Strides_Per_Minute_Mean)/2
+/RESULT_NAME=StrideMinMean
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=SHORT
+;
+
+Evaluate_Expression
+/EXPRESSION=(GLOBAL::METRIC::TMPD::Left_Strides_Per_Minute_StdDev+GLOBAL::METRIC::TMPD::Right_Strides_Per_Minute_StdDev)/2
+/RESULT_NAME=StrideMinSD
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=SHORT
+;
+
+Evaluate_Expression
+/EXPRESSION=GLOBAL::METRIC::TMPD::Left_Strides_Per_Minute_Count+GLOBAL::METRIC::TMPD::Right_Strides_Per_Minute_Count
+/RESULT_NAME=StrideMinCount
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=SHORT
+;
+
+!Stride time in sec
+Evaluate_Expression
+/EXPRESSION=1/GLOBAL::METRIC::SHORT::StrideMinMean * 60
+/RESULT_NAME=StriTimeMean
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=SHORT
+;
+
+!Stance time as %gait cycle
+Evaluate_Expression
+/EXPRESSION=GLOBAL::METRIC::TMPD::Right_Stance_Time_Pct_Mean
+/RESULT_NAME=RStanPctMean
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=SHORT
+;
+
+Evaluate_Expression
+/EXPRESSION=GLOBAL::METRIC::TMPD::Right_Stance_Time_Pct_StdDev
+/RESULT_NAME=RStanPctSD
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=SHORT
+;
+
+Evaluate_Expression
+/EXPRESSION=GLOBAL::METRIC::TMPD::Left_Stance_Time_Pct_Mean
+/RESULT_NAME=LStanPctMean
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=SHORT
+;
+
+Evaluate_Expression
+/EXPRESSION=GLOBAL::METRIC::TMPD::Left_Stance_Time_Pct_StdDev
+/RESULT_NAME=LStanPctSD
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=SHORT
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=RStanPctCount
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Right_Stance_Time_Count
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=LStanPctCount
+/RESULT_METRIC_FOLDER=SHORT
+/METRIC_VALUE=METRIC::TMPD::Left_Stance_Time_Count
+;
+
+!Swing time as %gait cycle
+Evaluate_Expression
+/EXPRESSION=GLOBAL::METRIC::SHORT::RSwingTimeMean/GLOBAL::METRIC::TMPD::Right_Cycle_Time_Mean*100
+/RESULT_NAME=RSwingPctMean
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=SHORT
+;
+
+Evaluate_Expression
+/EXPRESSION=GLOBAL::METRIC::SHORT::RSwingTimeSD/GLOBAL::METRIC::TMPD::Right_Cycle_Time_Mean*100
+/RESULT_NAME=RSwingPctSD
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=SHORT
+;
+
+Evaluate_Expression
+/EXPRESSION=GLOBAL::METRIC::SHORT::LSwingTimeMean/GLOBAL::METRIC::TMPD::Left_Cycle_Time_Mean*100
+/RESULT_NAME=LSwingPctMean
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=SHORT
+;
+
+Evaluate_Expression
+/EXPRESSION=GLOBAL::METRIC::SHORT::LSwingTimeSD/GLOBAL::METRIC::TMPD::Left_Cycle_Time_Mean*100
+/RESULT_NAME=LSwingPctSD
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=SHORT
+;
+
+!Double Support as %gait cycle
+Evaluate_Expression
+/EXPRESSION=GLOBAL::METRIC::SHORT::RDblSuppMean/GLOBAL::METRIC::TMPD::Right_Cycle_Time_Mean*100
+/RESULT_NAME=RDblSuppPctMean
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=SHORT
+;
+
+Evaluate_Expression
+/EXPRESSION=GLOBAL::METRIC::SHORT::RDblSuppSD/GLOBAL::METRIC::TMPD::Right_Cycle_Time_Mean*100
+/RESULT_NAME=RDblSuppPctSD
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=SHORT
+;
+
+Evaluate_Expression
+/EXPRESSION=GLOBAL::METRIC::SHORT::LDblSuppMean/GLOBAL::METRIC::TMPD::Left_Cycle_Time_Mean*100
+/RESULT_NAME=LDblSuppPctMean
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=SHORT
+;
+
+Evaluate_Expression
+/EXPRESSION=GLOBAL::METRIC::SHORT::LDblSuppSD/GLOBAL::METRIC::TMPD::Left_Cycle_Time_Mean*100
+/RESULT_NAME=LDblSuppPctSD
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=SHORT
+;
+
+!Cadence as sum of right steps per minute + left steps per minute
+Evaluate_Expression
+/EXPRESSION=GLOBAL::METRIC::TMPD::Cadence_Count
+/RESULT_NAME=CadenceCount
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=SHORT
+;
+
+Evaluate_Expression
+/EXPRESSION=GLOBAL::METRIC::TMPD::Cadence_Mean
+/RESULT_NAME=CadenceMean
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=SHORT
+;
+
+Evaluate_Expression
+/EXPRESSION=GLOBAL::METRIC::TMPD::Cadence_StdDev
+/RESULT_NAME=CadenceSD
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=SHORT
+;
+
+! For_Each
+! /ITERATION_PARAMETER_NAME=tag_name
+! /ITERATION_PARAMETER_COUNT_NAME=inc
+! /ITEMS=::select_tags_arr_list
+! ;
+
+	! Get_Pipeline_Parameter_Index_Value
+	! /PARAMETER_NAME=file
+	! /PARAMETER_VALUE=::select_tags_list
+	! /INDEX=::inc
+	! ;
+	
+	Select_Active_File
+	/FILE_NAME=Dynamic
+	!/FILE_NAME=::file
+	! /QUERY=
+	;
+
+	! Set_Pipeline_Parameter_From_Expression
+	! /PARAMETER_NAME=str
+	! /EXPRESSION=STRING_LENGTH("&::link_signal_names&") -19
+	! ! /AS_INTEGER=TRUE
+	! ;
+
+	! Set_Pipeline_Parameter_From_Expression
+	! /PARAMETER_NAME=str
+	! /EXPRESSION=STRING_LENGTH("&::event_seq&") -19
+	! ! /AS_INTEGER=TRUE
+	! ;
+
+	! Conditional_Statement
+	! /ITERATION_PARAMETER_NAME=cond
+	! /EXPRESSION=("&::tag_name&" = "Left")
+	! ! /AS_INTEGER=TRUE
+	! ;
+
+		! Set_Pipeline_Parameter_From_Expression
+		! /PARAMETER_NAME=link_signal_names_wo_grf
+		! /EXPRESSION=STRING_RIGHT("&::link_signal_names&", &::str&)
+		! ! /AS_INTEGER=TRUE
+		! ;
+
+		! Set_Pipeline_Parameter_From_Expression
+		! /PARAMETER_NAME=link_signal_names_wo_grf
+		! /EXPRESSION=STRING_RIGHT("&::link_signal_names&", &::str&)
+		! ! /AS_INTEGER=TRUE
+		! ;
+
+	! Conditional_Statement_End
+	! /ITERATION_PARAMETER_NAME=cond
+	! ;
+	
+	! Conditional_Statement
+	! /ITERATION_PARAMETER_NAME=cond
+	! /EXPRESSION=("&::tag_name&" = "Right")
+	! ! /AS_INTEGER=TRUE
+	! ;
+
+		! Set_Pipeline_Parameter
+		! /PARAMETER_NAME=link_signal_names_wo_grf
+		! /PARAMETER_VALUE=::link_signal_names
+		! /PARAMETER_VALUE_SEARCH_FOR=Left GRF+Right GRF
+		! /PARAMETER_VALUE_REPLACE_WITH=Right GRF
+		! ! /PARAMETER_VALUE_PREFIX=
+		! ! /PARAMETER_VALUE_APPEND=
+		! ! /MULTI_PASS=FALSE
+		! ;
+
+	! Conditional_Statement_End
+	! /ITERATION_PARAMETER_NAME=cond
+	! ;
+
+	! Set_Pipeline_Parameter
+	! /PARAMETER_NAME=link_signal_names_wo_grf
+	! /PARAMETER_VALUE=::link_signal_names_wo_grf
+	! /PARAMETER_VALUE_SEARCH_FOR=++
+	! /PARAMETER_VALUE_REPLACE_WITH=+
+	! ! /PARAMETER_VALUE_PREFIX=
+	! ! /PARAMETER_VALUE_APPEND=
+	! ! /MULTI_PASS=FALSE
+	! ;
+
+	!Maximum and minimum for link model based data. Needed for adjustment of y range of Word plots.
+	For_Each
+	/ITERATION_PARAMETER_NAME=component
+	! /ITERATION_PARAMETER_COUNT_NAME=
+	/ITEMS=X+Y+Z
+	;
+		Metric_Maximum
+		/RESULT_METRIC_NAME=_max_&::component
+		/APPLY_AS_SUFFIX_TO_SIGNAL_NAME=TRUE
+		/RESULT_METRIC_FOLDER=MIN_MAX
+		/SIGNAL_TYPES=LINK_MODEL_BASED
+		/SIGNAL_NAMES=::link_signal_names
+		! /SIGNAL_FOLDER=ORIGINAL
+		/SIGNAL_COMPONENTS=
+		/COMPONENT_SEQUENCE=&::component
+		/EVENT_SEQUENCE=::event_seq
+		/EXCLUDE_EVENTS=
+		/GENERATE_MEAN_AND_STDDEV=FALSE
+		! /APPEND_TO_EXISTING_VALUES=FALSE
+		/CREATE_GLOBAL_MAXIMUM=TRUE
+		;
+	
+		Metric_Minimum
+		/RESULT_METRIC_NAME=_min_&::component
+		/APPLY_AS_SUFFIX_TO_SIGNAL_NAME=TRUE
+		/RESULT_METRIC_FOLDER=MIN_MAX
+		/SIGNAL_TYPES=LINK_MODEL_BASED
+		/SIGNAL_NAMES=::link_signal_names
+		! /SIGNAL_FOLDER=ORIGINAL
+		/SIGNAL_COMPONENTS=
+		/COMPONENT_SEQUENCE=&::component
+		/EVENT_SEQUENCE=::event_seq
+		/EXCLUDE_EVENTS=
+		/GENERATE_MEAN_AND_STDDEV=FALSE
+		! /APPEND_TO_EXISTING_VALUES=FALSE
+		/CREATE_GLOBAL_MINIMUM=TRUE
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond
+		/EXPRESSION=("&::includes_OFM&" = "TRUE")
+		! /AS_INTEGER=TRUE
+		;
+
+			Metric_Maximum
+			/RESULT_METRIC_NAME=_max_X
+			/APPLY_AS_SUFFIX_TO_SIGNAL_NAME=TRUE
+			/RESULT_METRIC_FOLDER=MIN_MAX
+			/SIGNAL_TYPES=DERIVED+DERIVED
+			/SIGNAL_NAMES=Left Arch Height+Right Arch Height
+			/SIGNAL_FOLDER=ARCH_HEIGHT+ARCH_HEIGHT
+			/SIGNAL_COMPONENTS=
+			/COMPONENT_SEQUENCE=X
+			/EVENT_SEQUENCE=LHS+LHS,RHS+RHS
+			/EXCLUDE_EVENTS=
+			/GENERATE_MEAN_AND_STDDEV=FALSE
+			! /APPEND_TO_EXISTING_VALUES=FALSE
+			/CREATE_GLOBAL_MAXIMUM=TRUE
+			;
+
+			Metric_Minimum
+			/RESULT_METRIC_NAME=_min_X
+			/APPLY_AS_SUFFIX_TO_SIGNAL_NAME=TRUE
+			/RESULT_METRIC_FOLDER=MIN_MAX
+			/SIGNAL_TYPES=DERIVED+DERIVED
+			/SIGNAL_NAMES=Left Arch Height+Right Arch Height
+			/SIGNAL_FOLDER=ARCH_HEIGHT+ARCH_HEIGHT
+			/SIGNAL_COMPONENTS=
+			/COMPONENT_SEQUENCE=X
+			/EVENT_SEQUENCE=LHS+LHS,RHS+RHS
+			/EXCLUDE_EVENTS=
+			/GENERATE_MEAN_AND_STDDEV=FALSE
+			! /APPEND_TO_EXISTING_VALUES=FALSE
+			/CREATE_GLOBAL_MINIMUM=TRUE
+			;
+			
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond
+		;
+
+	End_For_Each
+	/ITERATION_PARAMETER_NAME=component
+	;
+	
+! End_For_Each
+! /ITERATION_PARAMETER_NAME=tag_name
+! ;
+
+!========================================
+!Determine number of dynamic files
+!========================================
+
+Set_Pipeline_Parameter_To_List_Of_Files
+/PARAMETER_NAME=FILE_LIST
+/FOLDER=::working_directory
+! /SEARCH_SUBFOLDERS=FALSE
+/FILE_MASK=Gait*.c3d
+;
+
+Select_Active_File 
+/FILE_NAME=GLOBAL 
+;
+
+Metric_Explicit
+/RESULT_METRIC_NAME=NUM_FILES
+/RESULT_METRIC_FOLDER=TMPD
+/METRIC_VALUE=0
+;
+
+For_Each
+/ITERATION_PARAMETER_NAME=FILE_NAME
+/ITEMS=::FILE_LIST
+;
+
+	Add_Constant_To_Signals
+	/SIGNAL_TYPES=METRIC
+	/SIGNAL_NAMES=NUM_FILES
+	/SIGNAL_FOLDER=TMPD
+	/RESULT_NAMES=GLOBAL::NUM_FILES
+	/RESULT_TYPES=METRIC
+	/RESULT_FOLDER=TMPD
+	! /RESULT_SUFFIX=
+	/SIGNAL_COMPONENTS=0
+	/CONSTANT=1
+	;
+
+End_For_Each
+/ITERATION_PARAMETER_NAME=FILE_NAME
+;
+
+!====================================
+!Calculate event times as % so that intermediate events can be included in the plots:
+!       Left:  Right:
+!   0%  LHS    RHS
+!       RTO    LTO
+!       RHS    LHS
+!       LTO    RTO
+! 100%  LHS    RHS
+!====================================
+
+Select_Active_File 
+/FILE_NAME=Dynamic 
+;
+
+!Left Side
+Metric_Time_Between_Events
+/RESULT_METRIC_NAME=LHS_to_LHS
+/RESULT_METRIC_FOLDER=EVENTS_NORMALISED
+/EVENT_SEQUENCE=LHS+LHS
+/EXCLUDE_EVENTS=
+/GENERATE_MEAN_AND_STDDEV=TRUE
+! /APPEND_TO_EXISTING_VALUES=FALSE
+;
+
+Metric_Time_Between_Events
+/RESULT_METRIC_NAME=LHS_to_RTO
+/RESULT_METRIC_FOLDER=EVENTS_NORMALISED
+/EVENT_SEQUENCE=LHS+RTO
+/EXCLUDE_EVENTS=
+/GENERATE_MEAN_AND_STDDEV=FALSE
+! /APPEND_TO_EXISTING_VALUES=FALSE
+;
+
+Metric_Time_Between_Events
+/RESULT_METRIC_NAME=LHS_to_RHS
+/RESULT_METRIC_FOLDER=EVENTS_NORMALISED
+/EVENT_SEQUENCE=LHS+RHS
+/EXCLUDE_EVENTS=
+/GENERATE_MEAN_AND_STDDEV=FALSE
+! /APPEND_TO_EXISTING_VALUES=FALSE
+;
+
+Metric_Time_Between_Events
+/RESULT_METRIC_NAME=LHS_to_LTO
+/RESULT_METRIC_FOLDER=EVENTS_NORMALISED
+/EVENT_SEQUENCE=LHS+LTO
+/EXCLUDE_EVENTS=
+/GENERATE_MEAN_AND_STDDEV=FALSE
+! /APPEND_TO_EXISTING_VALUES=FALSE
+;
+
+!Express time between events as % Gait Cycle
+Divide_Signal_By_Constant
+/SIGNAL_TYPES=METRIC+METRIC+METRIC
+/SIGNAL_NAMES=LHS_to_LTO+LHS_to_RHS+LHS_to_RTO
+/SIGNAL_FOLDER=EVENTS_NORMALISED+EVENTS_NORMALISED+EVENTS_NORMALISED
+! /RESULT_TYPES=
+/RESULT_FOLDER=EVENTS_NORMALISED
+/RESULT_NAME=_pct
+/APPLY_AS_SUFFIX_TO_SIGNAL_NAME=TRUE
+! /SIGNAL_COMPONENTS=
+/CONSTANT=METRIC::EVENTS_NORMALISED::LHS_to_LHS_MEAN
+;
+
+!Normalise LHS_to_RTO separately 
+!Subtract 1 in case the result would otherwise be > 1
+Evaluate_Expression
+/EXPRESSION=(METRIC::EVENTS_NORMALISED::LHS_to_RTO/METRIC::EVENTS_NORMALISED::LHS_to_LHS_MEAN)-( 1 < (METRIC::EVENTS_NORMALISED::LHS_to_RTO/METRIC::EVENTS_NORMALISED::LHS_to_LHS_MEAN))
+/RESULT_NAME=LHS_to_RTO_pct
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=EVENTS_NORMALISED
+;
+
+Metric_Time_Between_Events
+/RESULT_METRIC_NAME=RHS_to_RHS
+/RESULT_METRIC_FOLDER=EVENTS_NORMALISED
+/EVENT_SEQUENCE=RHS+RHS
+/EXCLUDE_EVENTS=
+/GENERATE_MEAN_AND_STDDEV=TRUE
+! /APPEND_TO_EXISTING_VALUES=FALSE
+;
+
+Metric_Time_Between_Events
+/RESULT_METRIC_NAME=RHS_to_LTO
+/RESULT_METRIC_FOLDER=EVENTS_NORMALISED
+/EVENT_SEQUENCE=RHS+LTO
+/EXCLUDE_EVENTS=
+/GENERATE_MEAN_AND_STDDEV=FALSE
+! /APPEND_TO_EXISTING_VALUES=FALSE
+;
+
+Metric_Time_Between_Events
+/RESULT_METRIC_NAME=RHS_to_LHS
+/RESULT_METRIC_FOLDER=EVENTS_NORMALISED
+/EVENT_SEQUENCE=RHS+LHS
+/EXCLUDE_EVENTS=
+/GENERATE_MEAN_AND_STDDEV=FALSE
+! /APPEND_TO_EXISTING_VALUES=FALSE
+;
+
+Metric_Time_Between_Events
+/RESULT_METRIC_NAME=RHS_to_RTO
+/RESULT_METRIC_FOLDER=EVENTS_NORMALISED
+/EVENT_SEQUENCE=RHS+RTO
+/EXCLUDE_EVENTS=
+/GENERATE_MEAN_AND_STDDEV=FALSE
+! /APPEND_TO_EXISTING_VALUES=FALSE
+;
+
+!Express time between events as % Gait Cycle
+Divide_Signal_By_Constant
+/SIGNAL_TYPES=METRIC+METRIC+METRIC
+/SIGNAL_NAMES=RHS_to_RTO+RHS_to_LHS+RHS_to_LTO
+/SIGNAL_FOLDER=EVENTS_NORMALISED+EVENTS_NORMALISED+EVENTS_NORMALISED
+! /RESULT_TYPES=
+/RESULT_FOLDER=EVENTS_NORMALISED
+/RESULT_NAME=_pct
+/APPLY_AS_SUFFIX_TO_SIGNAL_NAME=TRUE
+! /SIGNAL_COMPONENTS=
+/CONSTANT=METRIC::EVENTS_NORMALISED::RHS_to_RHS_MEAN
+;
+
+!Normalise RHS_to_LTO separately 
+!Subtract 1 in case the result would otherwise be > 1
+Evaluate_Expression
+/EXPRESSION=(METRIC::EVENTS_NORMALISED::RHS_to_LTO/METRIC::EVENTS_NORMALISED::RHS_to_RHS_MEAN)-( 1 < (METRIC::EVENTS_NORMALISED::RHS_to_LTO/METRIC::EVENTS_NORMALISED::RHS_to_RHS_MEAN))
+/RESULT_NAME=RHS_to_LTO_pct
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=EVENTS_NORMALISED
+;
+
+! compute mean values
+Select_Active_File
+/FILE_NAME=Dynamic
+! /QUERY=
+;
+
+!Calculate mean events (pct)
+For_Each
+/ITERATION_PARAMETER_NAME=SIG_NAME
+/ITEMS=
+RHS_to_LTO_pct+RHS_to_LHS_pct+RHS_to_RTO_pct+
+LHS_to_RTO_pct+LHS_to_RHS_pct+LHS_to_LTO_pct
+;
+
+	!Within-trial mean
+	Metric_Mean
+	/RESULT_METRIC_FOLDER=EVENTS_NORMALISED
+	/RESULT_METRIC_NAME=_MEAN
+	/APPLY_AS_SUFFIX_TO_SIGNAL_NAME=TRUE
+	/SIGNAL_TYPES=METRIC
+	/SIGNAL_FOLDER=EVENTS_NORMALISED
+	/SIGNAL_NAMES=::SIG_NAME
+	/COMPONENT_SEQUENCE=ALL
+	/EVENT_SEQUENCE=
+	/EXCLUDE_EVENTS=
+	/SEQUENCE_PERCENT_START=
+	/SEQUENCE_PERCENT_END=
+	/GENERATE_MEAN_AND_STDDEV=FALSE
+	! /APPEND_TO_EXISTING_VALUES=FALSE
+	;
+
+
+	!Global means (across all trials)
+	Metric_Mean
+	/RESULT_METRIC_NAME=GLOBAL::&::SIG_NAME
+	! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+	/RESULT_METRIC_FOLDER=EVENTS_NORMALISED
+	/SIGNAL_TYPES=METRIC
+	/SIGNAL_NAMES=::SIG_NAME
+	/SIGNAL_FOLDER=EVENTS_NORMALISED
+	! /SIGNAL_COMPONENTS=ALL_COMPONENTS
+	/EVENT_SEQUENCE=
+	/EXCLUDE_EVENTS=
+	/GENERATE_MEAN_AND_STDDEV=TRUE
+	/APPEND_TO_EXISTING_VALUES=TRUE
+	;
+
+
+End_For_Each
+/ITERATION_PARAMETER_NAME=SIG_NAME
+;
+
+Select_Active_File
+/FILE_NAME=GLOBAL
+! /QUERY=
+;
+
+
+!====================================
+!Prepare global means of all signals
+!====================================
+
+Select_Active_File 
+/FILE_NAME=Dynamic
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::includes_OFM&" = "TRUE")
+! /AS_INTEGER=TRUE
+;
+
+	Set_Pipeline_Parameter
+	/PARAMETER_NAME=link_signal_names
+	/PARAMETER_VALUE=&::link_signal_names&+Left Arch Height+Right Arch Height
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::includes_RFM&" = "TRUE")
+! /AS_INTEGER=TRUE
+;
+
+	Set_Pipeline_Parameter
+	/PARAMETER_NAME=link_signal_names
+	/PARAMETER_VALUE=&::link_signal_names&+Left F2G+Left F2Ps+Left F2Pt+Left MLA+Left S2F+Left S2G+Left S2V+Left ShaCal_Static+Left V2G+Right F2G+Right F2Ps+Right F2Pt+Right MLA+Right S2F+Right S2G+Right S2V+Right ShaCal_Static+Right V2G
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+For_Each
+/ITERATION_PARAMETER_NAME=signal
+/ITEMS=::link_signal_names
+;
+
+	Conditional_Statement
+	/ITERATION_PARAMETER_NAME=cond
+	/EXPRESSION=(((STRING_FIND("&::signal&","Moment",0) <> -1) | (STRING_FIND("&::signal&","Power",0) <> -1)) &::AMP& ("&::event_mode&" = "Instrumented treadmill (single belt)"))
+	! /AS_INTEGER=TRUE
+	;
+
+		Set_Data_To_New_Values
+		/SIGNAL_TYPES=LINK_MODEL_BASED
+		/SIGNAL_FOLDER=ORIGINAL
+		/SIGNAL_NAMES=::signal
+		! /SIGNAL_COMPONENTS=ALL_COMPONENTS
+		! /RESULT_TYPES=
+		! /RESULT_FOLDERS=PROCESSED
+		! /RESULT_SUFFIX=
+		/EVENT_SEQUENCE=LHS+RTO
+		! /EXCLUDE_EVENTS=
+		! /START_FRAME=
+		! /END_FRAME=
+		! /USE_POINT_RATE=TRUE
+		! /REPLACEMENT_VALUES=NO_DATA
+		! /THRESHOLD_HIGH=NO_DATA
+		! /THRESHOLD_LOW=NO_DATA
+		! /SET_DATA_AT_SINGLE_EVENT=FALSE
+		;
+		
+		Set_Data_To_New_Values
+		/SIGNAL_TYPES=LINK_MODEL_BASED
+		/SIGNAL_FOLDER=PROCESSED
+		/SIGNAL_NAMES=::signal
+		! /SIGNAL_COMPONENTS=ALL_COMPONENTS
+		! /RESULT_TYPES=
+		! /RESULT_FOLDERS=PROCESSED
+		! /RESULT_SUFFIX=
+		/EVENT_SEQUENCE=RHS+LTO
+		! /EXCLUDE_EVENTS=
+		! /START_FRAME=
+		! /END_FRAME=
+		! /USE_POINT_RATE=TRUE
+		! /REPLACEMENT_VALUES=NO_DATA
+		! /THRESHOLD_HIGH=NO_DATA
+		! /THRESHOLD_LOW=NO_DATA
+		! /SET_DATA_AT_SINGLE_EVENT=FALSE
+		;
+
+	Conditional_Statement_End
+	/ITERATION_PARAMETER_NAME=cond
+	;
+
+	!define folder and type
+	Conditional_Statement
+	/ITERATION_PARAMETER_NAME=cond
+	/EXPRESSION=(STRING_FIND("&::signal&","Arch Height",0) <> -1)
+	! /AS_INTEGER=TRUE
+	;
+	
+		Set_Pipeline_Parameter
+		/PARAMETER_NAME=signal_type
+		/PARAMETER_VALUE=DERIVED
+		;
+		
+		Set_Pipeline_Parameter
+		/PARAMETER_NAME=signal_folder
+		/PARAMETER_VALUE=ARCH_HEIGHT
+		;
+		
+	Conditional_Statement_End
+	/ITERATION_PARAMETER_NAME=cond
+	;
+
+	Conditional_Statement
+	/ITERATION_PARAMETER_NAME=cond
+	/EXPRESSION=(STRING_FIND("&::signal&","GRF",0) <> -1)
+	! /AS_INTEGER=TRUE
+	;
+	
+		Set_Pipeline_Parameter
+		/PARAMETER_NAME=signal_type
+		/PARAMETER_VALUE=DERIVED
+		;
+		
+		Set_Pipeline_Parameter
+		/PARAMETER_NAME=signal_folder
+		/PARAMETER_VALUE=FORCE_GRAPH
+		;
+		
+	Conditional_Statement_End
+	/ITERATION_PARAMETER_NAME=cond
+	;
+
+	Conditional_Statement
+	/ITERATION_PARAMETER_NAME=cond
+	/EXPRESSION=((STRING_FIND("&::signal&","F2",0) <> -1) | (STRING_FIND("&::signal&","MLA",0) <> -1) | (STRING_FIND("&::signal&","S2",0) <> -1) |  (STRING_FIND("&::signal&","ShaCal",0) <> -1) |  (STRING_FIND("&::signal&","V2G",0) <> -1))
+	! /AS_INTEGER=TRUE
+	;
+	
+		Set_Pipeline_Parameter
+		/PARAMETER_NAME=signal_type
+		/PARAMETER_VALUE=DERIVED
+		;
+		
+		Set_Pipeline_Parameter
+		/PARAMETER_NAME=signal_folder
+		/PARAMETER_VALUE=RIZZOLI
+		;
+		
+	Conditional_Statement_End
+	/ITERATION_PARAMETER_NAME=cond
+	;
+
+	Conditional_Statement
+	/ITERATION_PARAMETER_NAME=cond
+	/EXPRESSION=((STRING_FIND("&::signal&","Arch Height",0) = -1) &::AMP& (STRING_FIND("&::signal&","GRF",0) = -1) &::AMP& (STRING_FIND("&::signal&","F2",0) = -1) &::AMP&  (STRING_FIND("&::signal&","MLA",0) = -1) &::AMP&  (STRING_FIND("&::signal&","S2",0) = -1) &::AMP& (STRING_FIND("&::signal&","ShaCal",0) = -1) &::AMP&  (STRING_FIND("&::signal&","V2G",0) = -1))
+	! /AS_INTEGER=TRUE
+	;
+	
+		Set_Pipeline_Parameter
+		/PARAMETER_NAME=signal_type
+		/PARAMETER_VALUE=LINK_MODEL_BASED
+		;
+		
+		Set_Pipeline_Parameter
+		/PARAMETER_NAME=signal_folder
+		/PARAMETER_VALUE=ORIGINAL
+		;
+		
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=(((STRING_FIND("&::signal&","Moment",0) <> -1) | (STRING_FIND("&::signal&","Power",0) <> -1)) &::AMP& ("&::event_mode&" = "Instrumented treadmill (single belt)"))
+		! /AS_INTEGER=TRUE
+		;
+
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=signal_folder
+			/PARAMETER_VALUE=PROCESSED
+			;
+			
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+	Conditional_Statement_End
+	/ITERATION_PARAMETER_NAME=cond
+	;
+
+	!define event sequence - left
+	Conditional_Statement
+	/ITERATION_PARAMETER_NAME=cond
+	/EXPRESSION=(STRING_FIND("&::signal&","Left",0) <> -1)
+	! /AS_INTEGER=TRUE
+	;
+	
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=((STRING_FIND("&::signal&","Angle",0) <> -1) | (STRING_FIND("&::signal&","Progression",0) <> -1) | (STRING_FIND("&::signal&","Arch",0) <> -1) | (STRING_FIND("&::signal&","F2",0) <> -1) | (STRING_FIND("&::signal&","MLA",0) <> -1) | (STRING_FIND("&::signal&","S2",0) <> -1) | (STRING_FIND("&::signal&","ShaCal",0) <> -1) | (STRING_FIND("&::signal&","V2G",0) <> -1))
+		! /AS_INTEGER=TRUE
+		;
+		
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=ev_seg
+			/PARAMETER_VALUE=LHS+LHS
+			;
+			
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=(STRING_FIND("&::signal&","GRF",0) <> -1)
+		! /AS_INTEGER=TRUE
+		;
+		
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=ev_seg
+			/PARAMETER_VALUE=LON+LOFF
+			;
+			
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=((STRING_FIND("&::signal&","Moment",0) <> -1) | (STRING_FIND("&::signal&","Power",0) <> -1))
+		! /AS_INTEGER=TRUE
+		;
+		
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=ev_seg
+			/PARAMETER_VALUE=LON+LHS
+			;
+			
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=((STRING_FIND("&::signal&","Angle",0) = -1) &::AMP& (STRING_FIND("&::signal&","Progression",0) = -1) &::AMP& (STRING_FIND("&::signal&","Arch",0) = -1) &::AMP& (STRING_FIND("&::signal&","GRF",0) = -1) &::AMP& (STRING_FIND("&::signal&","Moment",0) = -1) &::AMP& (STRING_FIND("&::signal&","Power",0) = -1) &::AMP& (STRING_FIND("&::signal&","F2",0) = -1) &::AMP&  (STRING_FIND("&::signal&","MLA",0) = -1) &::AMP&  (STRING_FIND("&::signal&","S2",0) = -1) &::AMP& (STRING_FIND("&::signal&","ShaCal",0) = -1) &::AMP&  (STRING_FIND("&::signal&","V2G",0) = -1))
+		! /AS_INTEGER=TRUE
+		;
+		
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=ev_seg
+			/PARAMETER_VALUE=LON+LHS
+			;
+			
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+	Conditional_Statement_End
+	/ITERATION_PARAMETER_NAME=cond
+	;
+
+	!define event sequence - right
+	Conditional_Statement
+	/ITERATION_PARAMETER_NAME=cond
+	/EXPRESSION=(STRING_FIND("&::signal&","Right",0) <> -1)
+	! /AS_INTEGER=TRUE
+	;
+	
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=((STRING_FIND("&::signal&","Angle",0) <> -1) | (STRING_FIND("&::signal&","Progression",0) <> -1) | (STRING_FIND("&::signal&","Arch",0) <> -1) | (STRING_FIND("&::signal&","F2",0) <> -1) | (STRING_FIND("&::signal&","MLA",0) <> -1) | (STRING_FIND("&::signal&","S2",0) <> -1) | (STRING_FIND("&::signal&","ShaCal",0) <> -1) | (STRING_FIND("&::signal&","V2G",0) <> -1))
+		! /AS_INTEGER=TRUE
+		;
+		
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=ev_seg
+			/PARAMETER_VALUE=RHS+RHS
+			;
+			
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=(STRING_FIND("&::signal&","GRF",0) <> -1)
+		! /AS_INTEGER=TRUE
+		;
+		
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=ev_seg
+			/PARAMETER_VALUE=RON+ROFF
+			;
+			
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=((STRING_FIND("&::signal&","Moment",0) <> -1) | (STRING_FIND("&::signal&","Power",0) <> -1))
+		! /AS_INTEGER=TRUE
+		;
+		
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=ev_seg
+			/PARAMETER_VALUE=RON+RHS
+			;
+			
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=((STRING_FIND("&::signal&","Angle",0) = -1) &::AMP& (STRING_FIND("&::signal&","Progression",0) = -1) &::AMP& (STRING_FIND("&::signal&","Progression",0) = -1) &::AMP& (STRING_FIND("&::signal&","Arch",0) = -1) &::AMP& (STRING_FIND("&::signal&","GRF",0) = -1) &::AMP& (STRING_FIND("&::signal&","Moment",0) = -1) &::AMP& (STRING_FIND("&::signal&","Power",0) = -1) &::AMP& (STRING_FIND("&::signal&","F2",0) = -1) &::AMP&  (STRING_FIND("&::signal&","MLA",0) = -1) &::AMP&  (STRING_FIND("&::signal&","S2",0) = -1) &::AMP& (STRING_FIND("&::signal&","ShaCal",0) = -1) &::AMP&  (STRING_FIND("&::signal&","V2G",0) = -1))
+		! /AS_INTEGER=TRUE
+		;
+		
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=ev_seg
+			/PARAMETER_VALUE=RON+RHS
+			;
+			
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+	Conditional_Statement_End
+	/ITERATION_PARAMETER_NAME=cond
+	;
+
+	For_Each
+	/ITERATION_PARAMETER_NAME=component
+	! /ITERATION_PARAMETER_COUNT_NAME=
+	/ITEMS=X+Y+Z
+	;
+
+		Global_Normalized_Signal_Mean
+		/SIGNAL_TYPES=::signal_type
+		/SIGNAL_FOLDER=::signal_folder
+		/SIGNAL_NAMES=::signal
+		/SIGNAL_COMPONENTS=::component
+		! /START_LABEL=
+		! /END_LABEL=
+		/EVENT_SEQUENCE=::ev_seg
+		! /EXCLUDE_EVENTS=
+		/RESULT_NAME=&::signal&_&::component
+		/RESULT_FOLDER=TEMP
+		! /NORMALIZE_POINTS=101
+		/CREATE_STANDARD_DEVIATION=TRUE
+		! /CALCULATE_PER_FILE=FALSE
+		;
+		
+	End_For_Each
+	/ITERATION_PARAMETER_NAME=component
+	;
+
+End_For_Each
+/ITERATION_PARAMETER_NAME=signal
+;
+
+!Combine the three signal components into one signal
+Select_Active_File 
+/FILE_NAME=GLOBAL 
+;
+
+For_Each
+/ITERATION_PARAMETER_NAME=signal
+/ITEMS=::link_signal_names
+;
+
+	Evaluate_Expression
+	/EXPRESSION=vector(P2D::TEMP::&::signal&_X::Y, P2D::TEMP::&::signal&_Y::Y, P2D::TEMP::&::signal&_Z::Y)
+	/RESULT_NAME=&::signal&_MEAN
+	/RESULT_TYPE=P2D
+	/RESULT_FOLDER=TIMESERIES
+	;
+
+End_For_Each
+/ITERATION_PARAMETER_NAME=signal
+;
+
+!delete temporary folder
+Delete_Folder
+/SIGNAL_TYPE=P2D
+/FOLDER=TEMP
+;
+
+!====================================
+!Export events
+!====================================
+Select_Active_File 
+/FILE_NAME=Dynamic
+;
+
+!make copy of LHS an RHS events to make them available for web report
+Evaluate_Expression
+/EXPRESSION=EVENT_LABEL::ORIGINAL::LHS
+! /SIGNAL_TYPES=
+! /SIGNAL_FOLDER=ORIGINAL
+! /SIGNAL_NAMES=
+/RESULT_TYPES=METRIC
+/RESULT_FOLDERS=EVENTS_TIMES
+/RESULT_NAME=LHS
+! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+;
+
+Evaluate_Expression
+/EXPRESSION=EVENT_LABEL::ORIGINAL::RHS
+! /SIGNAL_TYPES=
+! /SIGNAL_FOLDER=ORIGINAL
+! /SIGNAL_NAMES=
+/RESULT_TYPES=METRIC
+/RESULT_FOLDERS=EVENTS_TIMES
+/RESULT_NAME=RHS
+! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+;
+
+Export_Data_To_Ascii_File
+/SIGNAL_TYPES=METRIC
+/SIGNAL_FOLDER=EVENTS_NORMALISED+EVENTS_TIMES
+/FILE_NAME=&::working_directory&events.xml
+! /SIGNAL_COMPONENTS=
+/COMPONENT_SEQUENCE=ALL
+! /SIGNAL_PRECISION=
+! /START_LABEL=
+! /END_LABEL=
+! /EVENT_SEQUENCE=
+! /EXCLUDE_EVENTS=
+! /USE_POINT_RATE=FALSE
+! /NORMALIZE_DATA=FALSE
+! /NORMALIZE_POINTS=101
+! /EXPORT_MEAN_AND_STD_DEV=FALSE
+! /USE_P2D_FORMAT=FALSE
+/USE_XML_FORMAT=TRUE
+/USE_SHORT_FILENAME=TRUE
+! /EXPORT_EMPTY_SIGNALS=FALSE
+! /EXPORT_WITHOUT_HEADER=FALSE
+! /EXPORT_NAN=FALSE
+;
+
+Select_Active_File 
+/FILE_NAME=GLOBAL 
+;
+
+Export_Data_To_Ascii_File
+/SIGNAL_TYPES=METRIC
+/SIGNAL_FOLDER=EVENTS_NORMALISED
+/FILE_NAME=&::working_directory&events_global.xml
+! /SIGNAL_COMPONENTS=
+/COMPONENT_SEQUENCE=ALL
+! /SIGNAL_PRECISION=
+! /START_LABEL=
+! /END_LABEL=
+! /EVENT_SEQUENCE=
+! /EXCLUDE_EVENTS=
+! /USE_POINT_RATE=FALSE
+! /NORMALIZE_DATA=FALSE
+! /NORMALIZE_POINTS=101
+! /EXPORT_MEAN_AND_STD_DEV=FALSE
+! /USE_P2D_FORMAT=FALSE
+/USE_XML_FORMAT=TRUE
+/USE_SHORT_FILENAME=TRUE
+! /EXPORT_EMPTY_SIGNALS=FALSE
+! /EXPORT_WITHOUT_HEADER=FALSE
+! /EXPORT_NAN=FALSE
+;
+
+!====================================
+!Export Metrics to xml file
+!====================================
+Select_Active_File
+/FILE_NAME=Dynamic
+! /QUERY=
+;
+
+Export_Data_To_Ascii_File
+/SIGNAL_TYPES=METRIC+METRIC+METRIC
+/SIGNAL_FOLDER=TMPD+MAP+SUBJECT
+! /SIGNAL_NAMES=
+/FILE_NAME=&::working_directory&metrics_per_trial.xml
+! /SIGNAL_COMPONENTS=
+! /COMPONENT_SEQUENCE=
+! /SIGNAL_PRECISION=
+! /START_LABEL=
+! /END_LABEL=
+! /EVENT_SEQUENCE=
+! /EXCLUDE_EVENTS=
+! /USE_POINT_RATE=FALSE
+! /NORMALIZE_DATA=FALSE
+! /NORMALIZE_POINTS=101
+! /EXPORT_MEAN_AND_STD_DEV=FALSE
+! /USE_P2D_FORMAT=FALSE
+/USE_XML_FORMAT=TRUE
+/USE_SHORT_FILENAME=TRUE
+! /EXPORT_EMPTY_SIGNALS=FALSE
+! /EXPORT_WITHOUT_HEADER=FALSE
+! /EXPORT_NAN=FALSE
+;
+
+Select_Active_File
+/FILE_NAME=GLOBAL
+! /QUERY=
+;
+
+Export_Data_To_Ascii_File
+/FILE_NAME=&::working_directory&metrics.xml
+/SIGNAL_TYPES=METRIC
+/SIGNAL_NAMES=	AGE+Height+Weight+
+
+				CadenceCount+CadenceMean+CadenceSD+LDblSuppCount+LDblSuppMean+LDblSuppPctMean+LDblSuppPctSD+LDblSuppSD+LStanPctMean+LStanPctSD+
+				LStanPctCount+LStanTimeMean+LStanTimeSD+LStepLenCount+LStepLenMean+LStepLenSD+LStepPerMinCount+LStepPerMinMean+LStepPerMinSD+LStepTimeCount+
+				LStepTimeMean+LStepTimeSD+LSwingPctMean+LSwingPctSD+LSwingTimeMean+LSwingTimeSD+RDblSuppCount+RDblSuppMean+RDblSuppPctMean+RDblSuppPctSD+
+				RDblSuppSD+RStanPctMean+RStanPctSD+RStanPctCount+RStanTimeMean+RStanTimeSD+RStepLenCount+RStepLenMean+RStepLenSD+RStepPerMinCount+
+				RStepPerMinMean+RStepPerMinSD+RStepTimeCount+RStepTimeMean+RStepTimeSD+RSwingPctMean+RSwingPctSD+RSwingTimeMean+RSwingTimeSD+Speed_m_per_minMean+
+				StrideLenCount+StrideLenMean+StrideLenSD+StrideMinCount+StrideMinMean+StrideMinSD+StrideWidCount+StrideWidMean+StrideWidSD+StriTimeMean+
+
+				Cycle_Time_Count+Cycle_Time_Mean+Cycle_Time_StdDev+Double_Limb_Support_Time_Ave+Double_Limb_Support_Time_Count+Double_Limb_Support_Time_StdDev+Left_Cycle_Time_Count+Left_Cycle_Time_Mean+Left_Cycle_Time_StdDev+Left_Stance_Time_Count+
+				Left_Stance_Time_Mean+Left_Stance_Time_StdDev+Left_Steps_Per_Minute_Count+Left_Steps_Per_Minute_Mean+Left_Steps_Per_Minute_StdDev+Left_Step_Length_Count+Left_Step_Length_Mean+Left_Step_Length_StdDev+Left_Step_Time_Count+Left_Step_Time_Mean+
+				Left_Step_Time_StdDev+Left_Strides_Per_Minute_Count+Left_Strides_Per_Minute_Mean+Left_Strides_Per_Minute_StdDev+Left_Stride_Length_Count+Left_Stride_Length_Mean+Left_Stride_Length_StdDev+Left_Swing_Time_Count+Left_Swing_Time_Mean+Left_Swing_Time_StdDev+
+				NUM_FILES+Right_Cycle_Time_Count+Right_Cycle_Time_Mean+Right_Cycle_Time_StdDev+Right_Initial_Double_Limb_Support_Time_Count+Right_Initial_Double_Limb_Support_Time_Mean+Right_Initial_Double_Limb_Support_Time_StdDev+Right_Stance_Time_Count+Right_Stance_Time_Mean+Right_Stance_Time_StdDev+
+				Right_Steps_Per_Minute_Count+Right_Steps_Per_Minute_Mean+Right_Steps_Per_Minute_StdDev+Right_Step_Length_Count+Right_Step_Length_Mean+Right_Step_Length_StdDev+Right_Step_Time_Count+Right_Step_Time_Mean+Right_Step_Time_StdDev+Right_Strides_Per_Minute_Count+
+				Right_Strides_Per_Minute_Mean+Right_Strides_Per_Minute_StdDev+Right_Stride_Length_Count+Right_Stride_Length_Mean+Right_Stride_Length_StdDev+Right_Swing_Time_Count+Right_Swing_Time_Mean+Right_Swing_Time_StdDev+Right_Terminal_Double_Limb_Support_Time_Count+Right_Terminal_Double_Limb_Support_Time_Mean+
+				Right_Terminal_Double_Limb_Support_Time_StdDev+Speed+Speed_STDDEV+Statures_Per_Second+Stride_Length_Count+Stride_Length_Mean+Stride_Length_StdDev+Stride_Width_Count+Stride_Width_Mean+Stride_Width_StdDev+Left_GPS_IQR+
+				SpeedNormPctDiff+CadenceNormPctDiff+Stride_LengthNormPctDiff+Left_Step_LengthNormPctDiff+Right_Step_LengthNormPctDiff+
+				
+				Left_GPS_ln_mean_MEAN+Left_GPS_ln_mean_STDDEV+Left_GPS_mean_MEAN+Left_GPS_mean_STDDEV+Left_GPS_MEDIAN+Overall_GPS_IQR+Overall_GPS_ln_mean_MEAN+Overall_GPS_ln_mean_STDDEV+Overall_GPS_mean_MEAN+Overall_GPS_mean_STDDEV+
+				Overall_GPS_MEDIAN+Right_GPS_IQR+Right_GPS_ln_mean_MEAN+Right_GPS_ln_mean_STDDEV+Right_GPS_mean_MEAN+Right_GPS_mean_STDDEV+Right_GPS_MEDIAN+Left Ankle Angles_X_gvs_ln_mean_MEAN+Left Ankle Angles_X_gvs_ln_mean_STDDEV+Left Ankle Angles_X_gvs_MEDIAN+
+				Left Ankle Angles_X_IQR+Left Foot Progression_Z_gvs_ln_mean_MEAN+Left Foot Progression_Z_gvs_ln_mean_STDDEV+Left Foot Progression_Z_gvs_MEDIAN+Left Foot Progression_Z_IQR+Left Foot Prog_Z_gvs_MEDIAN+Left Hip Angles_X_gvs_ln_mean_MEAN+Left Hip Angles_X_gvs_ln_mean_STDDEV+Left Hip Angles_X_gvs_MEDIAN+Left Hip Angles_X_IQR+
+				Left Hip Angles_Y_gvs_ln_mean_MEAN+Left Hip Angles_Y_gvs_ln_mean_STDDEV+Left Hip Angles_Y_gvs_MEDIAN+Left Hip Angles_Y_IQR+Left Hip Angles_Z_gvs_ln_mean_MEAN+Left Hip Angles_Z_gvs_ln_mean_STDDEV+Left Hip Angles_Z_gvs_MEDIAN+Left Hip Angles_Z_IQR+Left Knee Angles_X_gvs_ln_mean_MEAN+Left Knee Angles_X_gvs_ln_mean_STDDEV+
+				Left Knee Angles_X_gvs_MEDIAN+Left Knee Angles_X_IQR+Left Pelvic Angles_X_gvs_ln_mean_MEAN+Left Pelvic Angles_X_gvs_ln_mean_STDDEV+Left Pelvic Angles_X_gvs_MEDIAN+Left Pelvic Angles_X_IQR+Left Pelvic Angles_Y_gvs_ln_mean_MEAN+Left Pelvic Angles_Y_gvs_ln_mean_STDDEV+Left Pelvic Angles_Y_gvs_MEDIAN+Left Pelvic Angles_Y_IQR+
+				Left Pelvic Angles_Z_gvs_ln_mean_MEAN+Left Pelvic Angles_Z_gvs_ln_mean_STDDEV+Left Pelvic Angles_Z_gvs_MEDIAN+Left Pelvic Angles_Z_IQR+Right Ankle Angles_X_gvs_ln_mean_MEAN+Right Ankle Angles_X_gvs_ln_mean_STDDEV+Right Ankle Angles_X_gvs_MEDIAN+Right Ankle Angles_X_IQR+Right Foot Progression_Z_gvs_ln_mean_MEAN+Right Foot Progression_Z_gvs_ln_mean_STDDEV+
+				Right Foot Progression_Z_gvs_MEDIAN+Right Foot Progression_Z_IQR+Right Foot Prog_Z_gvs_MEDIAN+Right Hip Angles_X_gvs_ln_mean_MEAN+Right Hip Angles_X_gvs_ln_mean_STDDEV+Right Hip Angles_X_gvs_MEDIAN+Right Hip Angles_X_IQR+Right Hip Angles_Y_gvs_ln_mean_MEAN+Right Hip Angles_Y_gvs_ln_mean_STDDEV+Right Hip Angles_Y_gvs_MEDIAN+
+				Right Hip Angles_Y_IQR+Right Hip Angles_Z_gvs_ln_mean_MEAN+Right Hip Angles_Z_gvs_ln_mean_STDDEV+Right Hip Angles_Z_gvs_MEDIAN+Right Hip Angles_Z_IQR+Right Knee Angles_X_gvs_ln_mean_MEAN+Right Knee Angles_X_gvs_ln_mean_STDDEV+Right Knee Angles_X_gvs_MEDIAN+Right Knee Angles_X_IQR+Right Pelvic Angles_X_gvs_ln_mean_MEAN+
+				Right Pelvic Angles_X_gvs_ln_mean_STDDEV+Right Pelvic Angles_X_gvs_MEDIAN+Right Pelvic Angles_X_IQR+Right Pelvic Angles_Y_gvs_ln_mean_MEAN+Right Pelvic Angles_Y_gvs_ln_mean_STDDEV+Right Pelvic Angles_Y_gvs_MEDIAN+Right Pelvic Angles_Y_IQR+Right Pelvic Angles_Z_gvs_ln_mean_MEAN+Right Pelvic Angles_Z_gvs_ln_mean_STDDEV+Right Pelvic Angles_Z_gvs_MEDIAN+
+				Right Pelvic Angles_Z_IQR+Left Plv Ang_X_gvs_MEDIAN+Left Plv Ang_Y_gvs_MEDIAN+Left Plv Ang_Z_gvs_MEDIAN+Right Ank Ang_X_gvs_MEDIAN+
+
+/SIGNAL_FOLDER=	SUBJECT+SUBJECT+SUBJECT+
+
+				SHORT+SHORT+SHORT+SHORT+SHORT+SHORT+SHORT+SHORT+SHORT+SHORT+
+				SHORT+SHORT+SHORT+SHORT+SHORT+SHORT+SHORT+SHORT+SHORT+SHORT+
+				SHORT+SHORT+SHORT+SHORT+SHORT+SHORT+SHORT+SHORT+SHORT+SHORT+
+				SHORT+SHORT+SHORT+SHORT+SHORT+SHORT+SHORT+SHORT+SHORT+SHORT+
+				SHORT+SHORT+SHORT+SHORT+SHORT+SHORT+SHORT+SHORT+SHORT+SHORT+
+				SHORT+SHORT+SHORT+SHORT+SHORT+SHORT+SHORT+SHORT+SHORT+SHORT+
+
+				TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+
+				TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+
+				TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+
+				TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+
+				TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+
+				TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+
+				TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+TMPD+MAP+
+				TMPD+TMPD+TMPD+TMPD+TMPD+
+				
+				MAP+MAP+MAP+MAP+MAP+MAP+MAP+MAP+MAP+MAP+
+				MAP+MAP+MAP+MAP+MAP+MAP+MAP+MAP+MAP+MAP+
+				MAP+MAP+MAP+MAP+MAP+MAP+MAP+MAP+MAP+MAP+
+				MAP+MAP+MAP+MAP+MAP+MAP+MAP+MAP+MAP+MAP+
+				MAP+MAP+MAP+MAP+MAP+MAP+MAP+MAP+MAP+MAP+
+				MAP+MAP+MAP+MAP+MAP+MAP+MAP+MAP+MAP+MAP+
+				MAP+MAP+MAP+MAP+MAP+MAP+MAP+MAP+MAP+MAP+
+				MAP+MAP+MAP+MAP+MAP+MAP+MAP+MAP+MAP+MAP+
+				MAP+MAP+MAP+MAP+MAP+MAP+MAP+MAP+MAP+MAP+
+				MAP+MAP+MAP+MAP+MAP+
+
+! /SIGNAL_COMPONENTS=
+!/COMPONENT_SEQUENCE=ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, ALL, 
+/SIGNAL_PRECISION=	1+2+1+
+
+					0+0+2+0+2+2+2+2+2+2+
+					0+2+2+0+2+2+0+2+2+0+
+					2+2+2+2+2+2+0+2+2+2+
+					2+2+2+0+2+2+0+2+2+0+
+					2+2+0+2+2+2+2+2+2+2+
+					0+2+2+0+2+2+0+2+2+2+
+					
+					2+2+2+2+2+2+2+2+2+2+
+					2+2+2+2+2+2+2+2+2+2+
+					2+2+2+2+2+2+2+2+2+2+
+					2+2+2+2+2+2+2+2+2+2+
+					2+2+2+2+2+2+2+2+2+2+
+					2+2+2+2+2+2+2+2+2+2+
+					2+2+2+2+2+2+2+2+2+2+2+
+					0+0+0+0+0+
+					
+					1+1+1+2+1+2+1+2+1+2+
+					1+2+1+2+1+2+1+1+2+1+
+					1+1+2+1+2+1+1+2+1+2+
+					1+2+1+2+1+2+1+2+1+2+
+					1+2+1+2+1+2+1+2+1+2+
+					1+2+1+2+1+2+1+2+1+2+
+					1+2+1+1+2+1+2+1+2+1+
+					2+1+2+1+2+1+2+1+2+1+
+					2+1+2+1+2+1+2+1+2+1+
+					2+1+1+1+1
+! /START_LABEL=
+! /END_LABEL=
+!/EVENT_SEQUENCE=
+! /EXCLUDE_EVENTS=
+! /USE_POINT_RATE=FALSE
+! /NORMALIZE_DATA=FALSE
+! /NORMALIZE_POINTS=101
+! /EXPORT_MEAN_AND_STD_DEV=FALSE
+! /USE_P2D_FORMAT=FALSE
+! /USE_XML_FORMAT=FALSE
+/USE_XML_FORMAT=TRUE
+! /USE_SHORT_FILENAME=FALSE
+! /EXPORT_EMPTY_SIGNALS=FALSE
+! /EXPORT_WITHOUT_HEADER=FALSE
+;
+
+!export min and max values to xml and use them to set Word report y axis
+Export_Data_To_Ascii_File
+/FILE_NAME=&::working_directory&min_max.xml
+/SIGNAL_TYPES=METRIC
+/SIGNAL_NAMES=
+/SIGNAL_FOLDER=MIN_MAX
+! /SIGNAL_COMPONENTS=
+/COMPONENT_SEQUENCE=ALL
+! /SIGNAL_PRECISION=
+! /START_LABEL=
+! /END_LABEL=
+! /EVENT_SEQUENCE=
+! /EXCLUDE_EVENTS=
+! /USE_POINT_RATE=FALSE
+! /NORMALIZE_DATA=FALSE
+! /NORMALIZE_POINTS=101
+! /EXPORT_MEAN_AND_STD_DEV=FALSE
+! /USE_P2D_FORMAT=FALSE
+/USE_XML_FORMAT=TRUE
+! /USE_SHORT_FILENAME=FALSE
+! /EXPORT_EMPTY_SIGNALS=FALSE
+! /EXPORT_WITHOUT_HEADER=FALSE
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(("&::noraxon_exists&" = "TRUE") | ("&::delsys_trigno_exists&" = "TRUE") | ("&::mega_me6000_exists&" = "TRUE") | ("&::myon_exists&" = "TRUE") | ("&::analog_EMG_exists&" = "TRUE"))
+! /AS_INTEGER=TRUE
+;
+	
+	! Export EMG maxima to xml file (to be used to set maximum of y-axis scale for Word report)
+	Export_Data_To_Ascii_File
+	/FILE_NAME=&::working_directory&metrics_EMG.xml
+	/SIGNAL_TYPES=METRIC
+	! /SIGNAL_NAMES=
+	/SIGNAL_FOLDER=EMG
+	! /SIGNAL_COMPONENTS=
+	/COMPONENT_SEQUENCE=ALL
+	! /SIGNAL_PRECISION=
+	! /START_LABEL=
+	! /END_LABEL=
+	/EVENT_SEQUENCE=BOF+EOF
+	! /EXCLUDE_EVENTS=
+	! /USE_POINT_RATE=FALSE
+	! /NORMALIZE_DATA=FALSE
+	! /NORMALIZE_POINTS=101
+	! /EXPORT_MEAN_AND_STD_DEV=FALSE
+	! /USE_P2D_FORMAT=FALSE
+	/USE_XML_FORMAT=TRUE
+	! /USE_SHORT_FILENAME=FALSE
+	! /EXPORT_EMPTY_SIGNALS=FALSE
+	! /EXPORT_WITHOUT_HEADER=FALSE
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+!====================================
+! Export timeseries to xml file
+!====================================
+
+! =============================================	
+! Calculate per-cycle within-trial mean values for Word and instrumented treadmill
+! =============================================	
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(("&::analysis_name&" = "Internal Export Word") &::AMP& ((STRING_FIND("&::event_mode&","Instrumented treadmill",0) <> -1) | ("&::auto_range_str&" = "FALSE")))
+! /AS_INTEGER=TRUE
+;
+
+	! make a backup of LINK_MODEL_BASED::ORIGINAL folder. Backup will be used to restore data for V3D report after export to Word
+	Select_Active_File
+	/FILE_NAME=ALL_FILES
+	! /QUERY=
+	;
+	
+	Copy_Folder
+	/SIGNAL_TYPE=LINK_MODEL_BASED
+	/EXISTING_FOLDER=ORIGINAL
+	/NEW_FOLDER_NAME=BACKUP
+	/OVERWRITE_EXISTING_SIGNALS=TRUE
+	;
+
+	Conditional_Statement
+	/ITERATION_PARAMETER_NAME=cond1
+	/EXPRESSION=(("&::noraxon_exists&" = "TRUE") | ("&::normative_non_noraxon_file_exists&" = "TRUE"))
+	! /AS_INTEGER=TRUE
+	;
+
+		Copy_Folder
+		/SIGNAL_TYPE=ANALOG
+		/EXISTING_FOLDER=EMG_PROCESSED
+		/NEW_FOLDER_NAME=EMG_PROCESSED_BACKUP
+		/OVERWRITE_EXISTING_SIGNALS=TRUE
+		;
+
+	Conditional_Statement_End
+	/ITERATION_PARAMETER_NAME=cond1
+	;
+
+	Set_Pipeline_Parameter_To_List_Of_Tagged_Files
+	/PARAMETER_NAME=files
+	! /TAG_NAME=
+	/GET_CURRENT_SELECTED_FILES=TRUE
+	/USE_SHORT_FILENAMES=FALSE
+	;
+
+	For_Each
+	/ITERATION_PARAMETER_NAME=file
+	/ITERATION_PARAMETER_COUNT_NAME=inc
+	/ITEMS=::files
+	;
+
+		Select_Active_File
+		/FILE_NAME=::file 
+		! /QUERY=
+		;
+
+		Event_Explicit
+		/EVENT_NAME=start
+		/FRAME=1
+		! /TIME=
+		;
+
+		Event_Explicit
+		/EVENT_NAME=end
+		/FRAME=eof
+		! /TIME=
+		;
+
+		Evaluate_Expression
+		/EXPRESSION=PARAMETERS::POINT::FRAMES 
+		/RESULT_NAME=LAST_FRAME
+		! /RESULT_TYPE=DERIVED
+		! /RESULT_FOLDER=PROCESSED
+		;
+
+		Set_Pipeline_Parameter_To_Data_Value
+		/PARAMETER_NAME=LAST_FRAME
+		/SIGNAL_TYPES=DERIVED
+		/SIGNAL_NAMES=LAST_FRAME
+		/SIGNAL_FOLDER=PROCESSED
+		! /SIGNAL_COMPONENTS=ALL_COMPONENTS
+		;
+
+		!create sepatare p2d signal for each component 
+		For_Each
+		/ITERATION_PARAMETER_NAME=AXIS
+		/ITEMS=X+Y+Z
+		;
+			Global_Normalized_Signal_Mean
+			/SIGNAL_TYPES=DERIVED
+			/SIGNAL_NAMES=LEFT GRF
+			/SIGNAL_FOLDER=FORCE_GRAPH
+			/SIGNAL_COMPONENTS=::AXIS
+			! /START_LABEL=
+			! /END_LABEL=
+			/EVENT_SEQUENCE=LON+LOFF
+			! /EXCLUDE_EVENTS=
+			/RESULT_NAME=LEFT GRF_&::AXIS
+			/RESULT_FOLDER=WITHIN_TRIAL_NO_&::inc&
+			/NORMALIZE_POINTS=::LAST_FRAME
+			! /CREATE_STANDARD_DEVIATION=FALSE
+			! /CALCULATE_PER_FILE=FALSE
+			;
+
+			Global_Normalized_Signal_Mean
+			/SIGNAL_TYPES=DERIVED
+			/SIGNAL_NAMES=RIGHT GRF
+			/SIGNAL_FOLDER=FORCE_GRAPH
+			/SIGNAL_COMPONENTS=::AXIS
+			! /START_LABEL=
+			! /END_LABEL=
+			/EVENT_SEQUENCE=RON+ROFF
+			! /EXCLUDE_EVENTS=
+			/RESULT_NAME=RIGHT GRF_&::AXIS
+			/RESULT_FOLDER=WITHIN_TRIAL_NO_&::inc&
+			/NORMALIZE_POINTS=::LAST_FRAME
+			! /CREATE_STANDARD_DEVIATION=FALSE
+			! /CALCULATE_PER_FILE=FALSE
+			;
+
+		End_For_Each
+		/ITERATION_PARAMETER_NAME=AXIS
+		;
+
+		Evaluate_Expression
+		/EXPRESSION=vector(GLOBAL::P2D::WITHIN_TRIAL_NO_&::inc&:&:&LEFT GRF_X::Y, GLOBAL::P2D::WITHIN_TRIAL_NO_&::inc&:&:&LEFT GRF_Y::Y, GLOBAL::P2D::WITHIN_TRIAL_NO_&::inc&:&:&LEFT GRF_Z::Y)
+		/RESULT_NAME=LEFT GRF
+		/RESULT_TYPE=LINK_MODEL_BASED
+		/RESULT_FOLDER=PROCESSED
+		;
+
+		Evaluate_Expression
+		/EXPRESSION=vector(GLOBAL::P2D::WITHIN_TRIAL_NO_&::inc&:&:&RIGHT GRF_X::Y, GLOBAL::P2D::WITHIN_TRIAL_NO_&::inc&:&:&RIGHT GRF_Y::Y, GLOBAL::P2D::WITHIN_TRIAL_NO_&::inc&:&:&RIGHT GRF_Z::Y)
+		/RESULT_NAME=RIGHT GRF
+		/RESULT_TYPE=LINK_MODEL_BASED
+		/RESULT_FOLDER=PROCESSED
+		;
+
+		Set_Pipeline_Parameter
+		/PARAMETER_NAME=SIGNALS_LEFT
+		/PARAMETER_VALUE=Left Foot Progression+Left Ankle Angles+Left Foot Pitch Angles+Left Hip Angles+Left Knee Angles+Left Pelvic Angles
+		;
+		
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=("&::includes_thorax&" = "TRUE")
+		! /AS_INTEGER=TRUE
+		;
+
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=SIGNALS_LEFT
+			/PARAMETER_VALUE=&::SIGNALS_LEFT&+Left Thorax Angles+Left Thorax_Lab Angles
+			;
+		
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=("&::includes_arms&" = "TRUE")
+		! /AS_INTEGER=TRUE
+		;
+
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=SIGNALS_LEFT
+			/PARAMETER_VALUE=&::SIGNALS_LEFT&+Left Shoulder Angles+Left Elbow Angles
+			;
+		
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=("&::includes_OFM&" = "TRUE")
+		! /AS_INTEGER=TRUE
+		;
+
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=SIGNALS_LEFT
+			/PARAMETER_VALUE=&::SIGNALS_LEFT&+Left Forefoot Hindfoot Angle+Left Forefoot Tibia Angle+Left Hallux Forefoot Angle+Left Hindfoot Tibia Angle+Left Arch Height
+			;
+		
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=("&::includes_RFM&" = "TRUE")
+		! /AS_INTEGER=TRUE
+		;
+
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=SIGNALS_LEFT
+			/PARAMETER_VALUE=&::SIGNALS_LEFT&+Left Forefoot Hindfoot Angle+Left Forefoot Midfoot Angle+Left Hallux Forefoot Angle+Left Hindfoot Midfoot Angle+Left Hindfoot Tibia Angle+Left Shank IORFoot Angle+Left F2G+Left F2Ps+Left F2Pt+Left MLA+Left S2F+Left S2G+Left S2V+Left ShaCal_Static+Left V2G
+			;
+		
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+		For_Each
+		/ITERATION_PARAMETER_NAME=SIGNAL_LIST_LEFT
+		/ITEMS=::SIGNALS_LEFT
+		;
+
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=signal_type
+			/PARAMETER_VALUE=LINK_MODEL_BASED
+			;
+			
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=signal_folder
+			/PARAMETER_VALUE=ORIGINAL
+			;
+			
+			Conditional_Statement
+			/ITERATION_PARAMETER_NAME=cond2
+			/EXPRESSION=((STRING_FIND("&::SIGNAL_LIST_LEFT&","F2",0) <> -1) | (STRING_FIND("&::SIGNAL_LIST_LEFT&","MLA",0) <> -1) | (STRING_FIND("&::SIGNAL_LIST_LEFT&","S2",0) <> -1) | (STRING_FIND("&::SIGNAL_LIST_LEFT&","ShaCal",0) <> -1) | (STRING_FIND("&::SIGNAL_LIST_LEFT&","V2G",0) <> -1))
+			! /AS_INTEGER=TRUE
+			;
+			
+				Set_Pipeline_Parameter
+				/PARAMETER_NAME=signal_type
+				/PARAMETER_VALUE=DERIVED
+				;
+				
+				Set_Pipeline_Parameter
+				/PARAMETER_NAME=signal_folder
+				/PARAMETER_VALUE=RIZZOLI
+				;
+				
+			Conditional_Statement_End
+			/ITERATION_PARAMETER_NAME=cond2
+			;
+
+			Global_Normalized_Signal_Mean
+			/SIGNAL_TYPES=::signal_type
+			/SIGNAL_NAMES=::SIGNAL_LIST_LEFT
+			/SIGNAL_FOLDER=::signal_folder
+			/SIGNAL_COMPONENTS=X
+			! /START_LABEL=
+			! /END_LABEL=
+			/EVENT_SEQUENCE=LHS+LHS
+			! /EXCLUDE_EVENTS=
+			/RESULT_NAME=::SIGNAL_LIST_LEFT&_X
+			/RESULT_FOLDER=WITHIN_TRIAL_NO_&::inc&
+			/NORMALIZE_POINTS=::LAST_FRAME
+			! /CREATE_STANDARD_DEVIATION=FALSE
+			! /CALCULATE_PER_FILE=FALSE
+			;
+
+			Global_Normalized_Signal_Mean
+			/SIGNAL_TYPES=::signal_type
+			/SIGNAL_NAMES=::SIGNAL_LIST_LEFT
+			/SIGNAL_FOLDER=::signal_folder
+			/SIGNAL_COMPONENTS=Y
+			! /START_LABEL=
+			! /END_LABEL=
+			/EVENT_SEQUENCE=LHS+LHS
+			! /EXCLUDE_EVENTS=
+			/RESULT_NAME=::SIGNAL_LIST_LEFT&_Y
+			/RESULT_FOLDER=WITHIN_TRIAL_NO_&::inc&
+			/NORMALIZE_POINTS=::LAST_FRAME
+			! /CREATE_STANDARD_DEVIATION=FALSE
+			! /CALCULATE_PER_FILE=FALSE
+			;
+
+			Global_Normalized_Signal_Mean
+			/SIGNAL_TYPES=::signal_type
+			/SIGNAL_NAMES=::SIGNAL_LIST_LEFT
+			/SIGNAL_FOLDER=::signal_folder
+			/SIGNAL_COMPONENTS=Z
+			! /START_LABEL=
+			! /END_LABEL=
+			/EVENT_SEQUENCE=LHS+LHS
+			! /EXCLUDE_EVENTS=
+			/RESULT_NAME=::SIGNAL_LIST_LEFT&_Z
+			/RESULT_FOLDER=WITHIN_TRIAL_NO_&::inc& 
+			/NORMALIZE_POINTS=::LAST_FRAME
+			! /CREATE_STANDARD_DEVIATION=FALSE
+			! /CALCULATE_PER_FILE=FALSE
+			;
+			
+			! combine 3 p2d signals into one signal and overwrite link_model_based signals with means
+			! to make them available for export (without renaming signals)
+			Evaluate_Expression
+			/EXPRESSION=vector(GLOBAL::P2D::WITHIN_TRIAL_NO_&::inc&:&:&::SIGNAL_LIST_LEFT&_X::Y, GLOBAL::P2D::WITHIN_TRIAL_NO_&::inc&:&:&::SIGNAL_LIST_LEFT&_Y::Y, GLOBAL::P2D::WITHIN_TRIAL_NO_&::inc&:&:&::SIGNAL_LIST_LEFT&_Z::Y)
+			/RESULT_NAME=::SIGNAL_LIST_LEFT
+			/RESULT_TYPE=LINK_MODEL_BASED
+			/RESULT_FOLDER=PROCESSED
+			;
+
+		End_For_Each
+		/ITERATION_PARAMETER_NAME=SIGNAL_LIST_LEFT
+		;
+
+		For_Each
+		/ITERATION_PARAMETER_NAME=SIGNAL_LIST_LEFT
+		/ITEMS=Left Ankle Moment+Left Ankle Power+Left Hip Moment+Left Hip Power+Left Knee Moment+Left Knee Power
+		;
+		
+			Conditional_Statement
+			/ITERATION_PARAMETER_NAME=cond1
+			/EXPRESSION=("&::event_mode&" = "Instrumented treadmill (single belt)")
+			! /AS_INTEGER=TRUE
+			;
+
+				Set_Data_To_New_Values
+				/SIGNAL_TYPES=LINK_MODEL_BASED
+				! /SIGNAL_FOLDER=ORIGINAL
+				/SIGNAL_NAMES=::SIGNAL_LIST_LEFT
+				! /SIGNAL_COMPONENTS=ALL_COMPONENTS
+				! /RESULT_TYPES=
+				! /RESULT_FOLDERS=PROCESSED
+				! /RESULT_SUFFIX=
+				/EVENT_SEQUENCE=LHS+RTO
+				! /EXCLUDE_EVENTS=
+				! /START_FRAME=
+				! /END_FRAME=
+				! /USE_POINT_RATE=TRUE
+				! /REPLACEMENT_VALUES=NO_DATA
+				! /THRESHOLD_HIGH=NO_DATA
+				! /THRESHOLD_LOW=NO_DATA
+				! /SET_DATA_AT_SINGLE_EVENT=FALSE
+				;
+
+				Set_Data_To_New_Values
+				/SIGNAL_TYPES=LINK_MODEL_BASED
+				/SIGNAL_FOLDER=PROCESSED
+				/SIGNAL_NAMES=::SIGNAL_LIST_LEFT
+				! /SIGNAL_COMPONENTS=ALL_COMPONENTS
+				! /RESULT_TYPES=
+				! /RESULT_FOLDERS=PROCESSED
+				! /RESULT_SUFFIX=
+				/EVENT_SEQUENCE=RHS+LTO
+				! /EXCLUDE_EVENTS=
+				! /START_FRAME=
+				! /END_FRAME=
+				! /USE_POINT_RATE=TRUE
+				! /REPLACEMENT_VALUES=NO_DATA
+				! /THRESHOLD_HIGH=NO_DATA
+				! /THRESHOLD_LOW=NO_DATA
+				! /SET_DATA_AT_SINGLE_EVENT=FALSE
+				;
+				
+				Global_Normalized_Signal_Mean
+				/SIGNAL_TYPES=LINK_MODEL_BASED
+				/SIGNAL_NAMES=::SIGNAL_LIST_LEFT
+				/SIGNAL_FOLDER=PROCESSED
+				/SIGNAL_COMPONENTS=X
+				! /START_LABEL=
+				! /END_LABEL=
+				/EVENT_SEQUENCE=LON+LHS
+				! /EXCLUDE_EVENTS=
+				/RESULT_NAME=::SIGNAL_LIST_LEFT&_X
+				/RESULT_FOLDER=WITHIN_TRIAL_NO_&::inc& 
+				/NORMALIZE_POINTS=::LAST_FRAME
+				! /CREATE_STANDARD_DEVIATION=FALSE
+				! /CALCULATE_PER_FILE=FALSE
+				;
+
+				Global_Normalized_Signal_Mean
+				/SIGNAL_TYPES=LINK_MODEL_BASED
+				/SIGNAL_NAMES=::SIGNAL_LIST_LEFT
+				/SIGNAL_FOLDER=PROCESSED
+				/SIGNAL_COMPONENTS=Y
+				! /START_LABEL=
+				! /END_LABEL=
+				/EVENT_SEQUENCE=LON+LHS
+				! /EXCLUDE_EVENTS=
+				/RESULT_NAME=::SIGNAL_LIST_LEFT&_Y
+				/RESULT_FOLDER=WITHIN_TRIAL_NO_&::inc& 
+				/NORMALIZE_POINTS=::LAST_FRAME
+				! /CREATE_STANDARD_DEVIATION=FALSE
+				! /CALCULATE_PER_FILE=FALSE
+				;
+
+				Global_Normalized_Signal_Mean
+				/SIGNAL_TYPES=LINK_MODEL_BASED
+				/SIGNAL_NAMES=::SIGNAL_LIST_LEFT
+				/SIGNAL_FOLDER=PROCESSED
+				/SIGNAL_COMPONENTS=Z
+				! /START_LABEL=
+				! /END_LABEL=
+				/EVENT_SEQUENCE=LON+LHS
+				! /EXCLUDE_EVENTS=
+				/RESULT_NAME=::SIGNAL_LIST_LEFT&_Z
+				/RESULT_FOLDER=WITHIN_TRIAL_NO_&::inc& 
+				/NORMALIZE_POINTS=::LAST_FRAME
+				! /CREATE_STANDARD_DEVIATION=FALSE
+				! /CALCULATE_PER_FILE=FALSE
+				;
+
+			Conditional_Statement_End
+			/ITERATION_PARAMETER_NAME=cond1
+			;
+
+			Conditional_Statement
+			/ITERATION_PARAMETER_NAME=cond1
+			/EXPRESSION=("&::event_mode&" <> "Instrumented treadmill (single belt)")
+			! /AS_INTEGER=TRUE
+			;
+
+				Global_Normalized_Signal_Mean
+				/SIGNAL_TYPES=LINK_MODEL_BASED
+				/SIGNAL_NAMES=::SIGNAL_LIST_LEFT
+				/SIGNAL_FOLDER=ORIGINAL
+				/SIGNAL_COMPONENTS=X
+				! /START_LABEL=
+				! /END_LABEL=
+				/EVENT_SEQUENCE=LON+LHS
+				! /EXCLUDE_EVENTS=
+				/RESULT_NAME=::SIGNAL_LIST_LEFT&_X
+				/RESULT_FOLDER=WITHIN_TRIAL_NO_&::inc& 
+				/NORMALIZE_POINTS=::LAST_FRAME
+				! /CREATE_STANDARD_DEVIATION=FALSE
+				! /CALCULATE_PER_FILE=FALSE
+				;
+
+				Global_Normalized_Signal_Mean
+				/SIGNAL_TYPES=LINK_MODEL_BASED
+				/SIGNAL_NAMES=::SIGNAL_LIST_LEFT
+				/SIGNAL_FOLDER=ORIGINAL
+				/SIGNAL_COMPONENTS=Y
+				! /START_LABEL=
+				! /END_LABEL=
+				/EVENT_SEQUENCE=LON+LHS
+				! /EXCLUDE_EVENTS=
+				/RESULT_NAME=::SIGNAL_LIST_LEFT&_Y
+				/RESULT_FOLDER=WITHIN_TRIAL_NO_&::inc& 
+				/NORMALIZE_POINTS=::LAST_FRAME
+				! /CREATE_STANDARD_DEVIATION=FALSE
+				! /CALCULATE_PER_FILE=FALSE
+				;
+
+				Global_Normalized_Signal_Mean
+				/SIGNAL_TYPES=LINK_MODEL_BASED
+				/SIGNAL_NAMES=::SIGNAL_LIST_LEFT
+				/SIGNAL_FOLDER=ORIGINAL
+				/SIGNAL_COMPONENTS=Z
+				! /START_LABEL=
+				! /END_LABEL=
+				/EVENT_SEQUENCE=LON+LHS
+				! /EXCLUDE_EVENTS=
+				/RESULT_NAME=::SIGNAL_LIST_LEFT&_Z
+				/RESULT_FOLDER=WITHIN_TRIAL_NO_&::inc& 
+				/NORMALIZE_POINTS=::LAST_FRAME
+				! /CREATE_STANDARD_DEVIATION=FALSE
+				! /CALCULATE_PER_FILE=FALSE
+				;
+			
+			Conditional_Statement_End
+			/ITERATION_PARAMETER_NAME=cond1
+			;
+
+			! combine 3 p2d signals into one signal and overwrite link_model_based signals with means
+			! to make them available for export (without renaming signals)
+			Evaluate_Expression
+			/EXPRESSION=vector(GLOBAL::P2D::WITHIN_TRIAL_NO_&::inc&:&:&::SIGNAL_LIST_LEFT&_X::Y, GLOBAL::P2D::WITHIN_TRIAL_NO_&::inc&:&:&::SIGNAL_LIST_LEFT&_Y::Y, GLOBAL::P2D::WITHIN_TRIAL_NO_&::inc&:&:&::SIGNAL_LIST_LEFT&_Z::Y)
+			/RESULT_NAME=::SIGNAL_LIST_LEFT
+			/RESULT_TYPE=LINK_MODEL_BASED
+			/RESULT_FOLDER=PROCESSED
+			;
+
+		End_For_Each
+		/ITERATION_PARAMETER_NAME=SIGNAL_LIST_LEFT
+		;
+
+		Set_Pipeline_Parameter
+		/PARAMETER_NAME=SIGNALS_RIGHT
+		/PARAMETER_VALUE=Right Ankle Angles+Right Foot Progression+Right Foot Pitch Angles+Right Hip Angles+Right Knee Angles+Right Pelvic Angles
+		;
+		
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=("&::includes_thorax&" = "TRUE")
+		! /AS_INTEGER=TRUE
+		;
+
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=SIGNALS_RIGHT
+			/PARAMETER_VALUE=&::SIGNALS_RIGHT&+Right Thorax Angles+Right Thorax_Lab Angles
+			;
+		
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=("&::includes_arms&" = "TRUE")
+		! /AS_INTEGER=TRUE
+		;
+
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=SIGNALS_RIGHT
+			/PARAMETER_VALUE=&::SIGNALS_RIGHT&+Right Shoulder Angles+Right Elbow Angles
+			;
+		
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=("&::includes_OFM&" = "TRUE")
+		! /AS_INTEGER=TRUE
+		;
+
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=SIGNALS_RIGHT
+			/PARAMETER_VALUE=&::SIGNALS_RIGHT&+Right Forefoot Hindfoot Angle+Right Forefoot Tibia Angle+Right Hallux Forefoot Angle+Right Hindfoot Tibia Angle+Right Arch Height
+			;
+		
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=("&::includes_RFM&" = "TRUE")
+		! /AS_INTEGER=TRUE
+		;
+
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=SIGNALS_RIGHT
+			/PARAMETER_VALUE=&::SIGNALS_RIGHT&+Right Forefoot Hindfoot Angle+Right Forefoot Midfoot Angle+Right Hallux Forefoot Angle+Right Hindfoot Midfoot Angle+Right Hindfoot Tibia Angle+Right Shank IORFoot Angle+Right F2G+Right F2Ps+Right F2Pt+Right MLA+Right S2F+Right S2G+Right S2V+Right ShaCal_Static+Right V2G
+			;
+		
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+		For_Each
+		/ITERATION_PARAMETER_NAME=SIGNAL_LIST_RIGHT
+		/ITEMS=::SIGNALS_RIGHT
+		;
+		
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=signal_type
+			/PARAMETER_VALUE=LINK_MODEL_BASED
+			;
+			
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=signal_folder
+			/PARAMETER_VALUE=ORIGINAL
+			;
+			
+			Conditional_Statement
+			/ITERATION_PARAMETER_NAME=cond2
+			/EXPRESSION=((STRING_FIND("&::SIGNAL_LIST_RIGHT&","F2",0) <> -1) | (STRING_FIND("&::SIGNAL_LIST_RIGHT&","MLA",0) <> -1) | (STRING_FIND("&::SIGNAL_LIST_RIGHT&","S2",0) <> -1) | (STRING_FIND("&::SIGNAL_LIST_RIGHT&","ShaCal",0) <> -1) | (STRING_FIND("&::SIGNAL_LIST_RIGHT&","V2G",0) <> -1))
+			! /AS_INTEGER=TRUE
+			;
+			
+				Set_Pipeline_Parameter
+				/PARAMETER_NAME=signal_type
+				/PARAMETER_VALUE=DERIVED
+				;
+				
+				Set_Pipeline_Parameter
+				/PARAMETER_NAME=signal_folder
+				/PARAMETER_VALUE=RIZZOLI
+				;
+				
+			Conditional_Statement_End
+			/ITERATION_PARAMETER_NAME=cond2
+			;
+
+			Global_Normalized_Signal_Mean
+			/SIGNAL_TYPES=::signal_type
+			/SIGNAL_NAMES=::SIGNAL_LIST_RIGHT
+			/SIGNAL_FOLDER=::signal_folder
+			/SIGNAL_COMPONENTS=X
+			! /START_LABEL=
+			! /END_LABEL=
+			/EVENT_SEQUENCE=RHS+RHS
+			! /EXCLUDE_EVENTS=
+			/RESULT_NAME=::SIGNAL_LIST_RIGHT&_X
+			/RESULT_FOLDER=WITHIN_TRIAL_NO_&::inc& 
+			/NORMALIZE_POINTS=::LAST_FRAME
+			! /CREATE_STANDARD_DEVIATION=FALSE
+			! /CALCULATE_PER_FILE=FALSE
+			;
+
+			Global_Normalized_Signal_Mean
+			/SIGNAL_TYPES=::signal_type
+			/SIGNAL_NAMES=::SIGNAL_LIST_RIGHT
+			/SIGNAL_FOLDER=::signal_folder
+			/SIGNAL_COMPONENTS=Y
+			! /START_LABEL=
+			! /END_LABEL=
+			/EVENT_SEQUENCE=RHS+RHS
+			! /EXCLUDE_EVENTS=
+			/RESULT_NAME=::SIGNAL_LIST_RIGHT&_Y
+			/RESULT_FOLDER=WITHIN_TRIAL_NO_&::inc& 
+			/NORMALIZE_POINTS=::LAST_FRAME
+			! /CREATE_STANDARD_DEVIATION=FALSE
+			! /CALCULATE_PER_FILE=FALSE
+			;
+
+			Global_Normalized_Signal_Mean
+			/SIGNAL_TYPES=::signal_type
+			/SIGNAL_NAMES=::SIGNAL_LIST_RIGHT
+			/SIGNAL_FOLDER=::signal_folder
+			/SIGNAL_COMPONENTS=Z
+			! /START_LABEL=
+			! /END_LABEL=
+			/EVENT_SEQUENCE=RHS+RHS
+			! /EXCLUDE_EVENTS=
+			/RESULT_NAME=::SIGNAL_LIST_RIGHT&_Z
+			/RESULT_FOLDER=WITHIN_TRIAL_NO_&::inc& 
+			/NORMALIZE_POINTS=::LAST_FRAME
+			! /CREATE_STANDARD_DEVIATION=FALSE
+			! /CALCULATE_PER_FILE=FALSE
+			;
+
+			Evaluate_Expression
+			/EXPRESSION=vector(GLOBAL::P2D::WITHIN_TRIAL_NO_&::inc&:&:&::SIGNAL_LIST_RIGHT&_X::Y, GLOBAL::P2D::WITHIN_TRIAL_NO_&::inc&:&:&::SIGNAL_LIST_RIGHT&_Y::Y, GLOBAL::P2D::WITHIN_TRIAL_NO_&::inc&:&:&::SIGNAL_LIST_RIGHT&_Z::Y)
+			/RESULT_NAME=::SIGNAL_LIST_RIGHT
+			/RESULT_TYPE=LINK_MODEL_BASED
+			/RESULT_FOLDER=PROCESSED
+			;
+
+		End_For_Each
+		/ITERATION_PARAMETER_NAME=SIGNAL_LIST_RIGHT
+		;
+		
+		For_Each
+		/ITERATION_PARAMETER_NAME=SIGNAL_LIST_RIGHT
+		/ITEMS=RIGHT Ankle Moment+RIGHT Ankle Power+RIGHT Hip Moment+RIGHT Hip Power+RIGHT Knee Moment+RIGHT Knee Power
+		;
+		
+			Conditional_Statement
+			/ITERATION_PARAMETER_NAME=cond1
+			/EXPRESSION=("&::event_mode&" = "Instrumented treadmill (single belt)")
+			! /AS_INTEGER=TRUE
+			;
+
+				Set_Data_To_New_Values
+				/SIGNAL_TYPES=LINK_MODEL_BASED
+				! /SIGNAL_FOLDER=ORIGINAL
+				/SIGNAL_NAMES=::SIGNAL_LIST_RIGHT
+				! /SIGNAL_COMPONENTS=ALL_COMPONENTS
+				! /RESULT_TYPES=
+				! /RESULT_FOLDERS=PROCESSED
+				! /RESULT_SUFFIX=
+				/EVENT_SEQUENCE=LHS+RTO
+				! /EXCLUDE_EVENTS=
+				! /START_FRAME=
+				! /END_FRAME=
+				! /USE_POINT_RATE=TRUE
+				! /REPLACEMENT_VALUES=NO_DATA
+				! /THRESHOLD_HIGH=NO_DATA
+				! /THRESHOLD_LOW=NO_DATA
+				! /SET_DATA_AT_SINGLE_EVENT=FALSE
+				;
+
+				Set_Data_To_New_Values
+				/SIGNAL_TYPES=LINK_MODEL_BASED
+				/SIGNAL_FOLDER=PROCESSED
+				/SIGNAL_NAMES=::SIGNAL_LIST_RIGHT
+				! /SIGNAL_COMPONENTS=ALL_COMPONENTS
+				! /RESULT_TYPES=
+				! /RESULT_FOLDERS=PROCESSED
+				! /RESULT_SUFFIX=
+				/EVENT_SEQUENCE=RHS+LTO
+				! /EXCLUDE_EVENTS=
+				! /START_FRAME=
+				! /END_FRAME=
+				! /USE_POINT_RATE=TRUE
+				! /REPLACEMENT_VALUES=NO_DATA
+				! /THRESHOLD_HIGH=NO_DATA
+				! /THRESHOLD_LOW=NO_DATA
+				! /SET_DATA_AT_SINGLE_EVENT=FALSE
+				;
+				
+				Global_Normalized_Signal_Mean
+				/SIGNAL_TYPES=LINK_MODEL_BASED
+				/SIGNAL_NAMES=::SIGNAL_LIST_RIGHT
+				/SIGNAL_FOLDER=PROCESSED
+				/SIGNAL_COMPONENTS=X
+				! /START_LABEL=
+				! /END_LABEL=
+				/EVENT_SEQUENCE=RON+RHS
+				! /EXCLUDE_EVENTS=
+				/RESULT_NAME=::SIGNAL_LIST_RIGHT&_X
+				/RESULT_FOLDER=WITHIN_TRIAL_NO_&::inc& 
+				/NORMALIZE_POINTS=::LAST_FRAME
+				! /CREATE_STANDARD_DEVIATION=FALSE
+				! /CALCULATE_PER_FILE=FALSE
+				;
+
+				Global_Normalized_Signal_Mean
+				/SIGNAL_TYPES=LINK_MODEL_BASED
+				/SIGNAL_NAMES=::SIGNAL_LIST_RIGHT
+				/SIGNAL_FOLDER=PROCESSED
+				/SIGNAL_COMPONENTS=Y
+				! /START_LABEL=
+				! /END_LABEL=
+				/EVENT_SEQUENCE=RON+RHS
+				! /EXCLUDE_EVENTS=
+				/RESULT_NAME=::SIGNAL_LIST_RIGHT&_Y
+				/RESULT_FOLDER=WITHIN_TRIAL_NO_&::inc& 
+				/NORMALIZE_POINTS=::LAST_FRAME
+				! /CREATE_STANDARD_DEVIATION=FALSE
+				! /CALCULATE_PER_FILE=FALSE
+				;
+
+				Global_Normalized_Signal_Mean
+				/SIGNAL_TYPES=LINK_MODEL_BASED
+				/SIGNAL_NAMES=::SIGNAL_LIST_RIGHT
+				/SIGNAL_FOLDER=PROCESSED
+				/SIGNAL_COMPONENTS=Z
+				! /START_LABEL=
+				! /END_LABEL=
+				/EVENT_SEQUENCE=RON+RHS
+				! /EXCLUDE_EVENTS=
+				/RESULT_NAME=::SIGNAL_LIST_RIGHT&_Z
+				/RESULT_FOLDER=WITHIN_TRIAL_NO_&::inc& 
+				/NORMALIZE_POINTS=::LAST_FRAME
+				! /CREATE_STANDARD_DEVIATION=FALSE
+				! /CALCULATE_PER_FILE=FALSE
+				;
+				
+			Conditional_Statement_End
+			/ITERATION_PARAMETER_NAME=cond1
+			;
+
+			Conditional_Statement
+			/ITERATION_PARAMETER_NAME=cond1
+			/EXPRESSION=("&::event_mode&" <> "Instrumented treadmill (single belt)")
+			! /AS_INTEGER=TRUE
+			;
+
+				Global_Normalized_Signal_Mean
+				/SIGNAL_TYPES=LINK_MODEL_BASED
+				/SIGNAL_NAMES=::SIGNAL_LIST_RIGHT
+				/SIGNAL_FOLDER=ORIGINAL
+				/SIGNAL_COMPONENTS=X
+				! /START_LABEL=
+				! /END_LABEL=
+				/EVENT_SEQUENCE=RON+RHS
+				! /EXCLUDE_EVENTS=
+				/RESULT_NAME=::SIGNAL_LIST_RIGHT&_X
+				/RESULT_FOLDER=WITHIN_TRIAL_NO_&::inc& 
+				/NORMALIZE_POINTS=::LAST_FRAME
+				! /CREATE_STANDARD_DEVIATION=FALSE
+				! /CALCULATE_PER_FILE=FALSE
+				;
+
+				Global_Normalized_Signal_Mean
+				/SIGNAL_TYPES=LINK_MODEL_BASED
+				/SIGNAL_NAMES=::SIGNAL_LIST_RIGHT
+				/SIGNAL_FOLDER=ORIGINAL
+				/SIGNAL_COMPONENTS=Y
+				! /START_LABEL=
+				! /END_LABEL=
+				/EVENT_SEQUENCE=RON+RHS
+				! /EXCLUDE_EVENTS=
+				/RESULT_NAME=::SIGNAL_LIST_RIGHT&_Y
+				/RESULT_FOLDER=WITHIN_TRIAL_NO_&::inc& 
+				/NORMALIZE_POINTS=::LAST_FRAME
+				! /CREATE_STANDARD_DEVIATION=FALSE
+				! /CALCULATE_PER_FILE=FALSE
+				;
+
+				Global_Normalized_Signal_Mean
+				/SIGNAL_TYPES=LINK_MODEL_BASED
+				/SIGNAL_NAMES=::SIGNAL_LIST_RIGHT
+				/SIGNAL_FOLDER=ORIGINAL
+				/SIGNAL_COMPONENTS=Z
+				! /START_LABEL=
+				! /END_LABEL=
+				/EVENT_SEQUENCE=RON+RHS
+				! /EXCLUDE_EVENTS=
+				/RESULT_NAME=::SIGNAL_LIST_RIGHT&_Z
+				/RESULT_FOLDER=WITHIN_TRIAL_NO_&::inc& 
+				/NORMALIZE_POINTS=::LAST_FRAME
+				! /CREATE_STANDARD_DEVIATION=FALSE
+				! /CALCULATE_PER_FILE=FALSE
+				;
+			
+			Conditional_Statement_End
+			/ITERATION_PARAMETER_NAME=cond1
+			;
+
+			! combine 3 p2d signals into one signal and overwrite link_model_based signals with means
+			! to make them available for export (without renaming signals)
+			Evaluate_Expression
+			/EXPRESSION=vector(GLOBAL::P2D::WITHIN_TRIAL_NO_&::inc&:&:&::SIGNAL_LIST_RIGHT&_X::Y, GLOBAL::P2D::WITHIN_TRIAL_NO_&::inc&:&:&::SIGNAL_LIST_RIGHT&_Y::Y, GLOBAL::P2D::WITHIN_TRIAL_NO_&::inc&:&:&::SIGNAL_LIST_RIGHT&_Z::Y)
+			/RESULT_NAME=::SIGNAL_LIST_RIGHT
+			/RESULT_TYPE=LINK_MODEL_BASED
+			/RESULT_FOLDER=PROCESSED
+			;
+
+		End_For_Each
+		/ITERATION_PARAMETER_NAME=SIGNAL_LIST_RIGHT
+		;
+		
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=(("&::noraxon_exists&" = "TRUE") | ("&::delsys_trigno_exists&" = "TRUE") | ("&::mega_me6000_exists&" = "TRUE") | ("&::myon_exists&" = "TRUE") | ("&::analog_EMG_exists&" = "TRUE"))
+		! /AS_INTEGER=TRUE
+		;
+	
+			For_Each
+			/ITERATION_PARAMETER_NAME=emg
+			/ITEMS=&::EMG_graph_signals_name_left
+			;
+			
+				Global_Normalized_Signal_Mean
+				/SIGNAL_TYPES=ANALOG
+				/SIGNAL_NAMES=::emg
+				/SIGNAL_FOLDER=EMG_PROCESSED
+				! /SIGNAL_COMPONENTS=
+				! /COMPONENT_SEQUENCE=
+				! /START_LABEL=
+				! /END_LABEL=
+				/EVENT_SEQUENCE=LHS+LHS
+				! /EXCLUDE_EVENTS=
+				/RESULT_NAME=::emg
+				/RESULT_FOLDER=WITHIN_TRIAL_NO_&::inc& 
+				/NORMALIZE_POINTS=::LAST_FRAME
+				! /CREATE_STANDARD_DEVIATION=FALSE
+				! /CALCULATE_PER_FILE=FALSE
+				;
+
+				! copy EMG signals to folder being exported to timeseries.xml
+				Evaluate_Expression
+				/EXPRESSION=(GLOBAL::P2D::WITHIN_TRIAL_NO_&::inc&:&:&::emg&:&:&Y)
+				/RESULT_NAME=::emg
+				/RESULT_TYPE=ANALOG
+				/RESULT_FOLDER=EMG_PROCESSED
+				;
+
+			End_For_Each
+			/ITERATION_PARAMETER_NAME=emg
+			;
+		
+			For_Each
+			/ITERATION_PARAMETER_NAME=emg
+			/ITEMS=&::EMG_graph_signals_name_right
+			;
+			
+				Global_Normalized_Signal_Mean
+				/SIGNAL_TYPES=ANALOG
+				/SIGNAL_NAMES=::emg
+				/SIGNAL_FOLDER=EMG_PROCESSED
+				! /SIGNAL_COMPONENTS=
+				! /COMPONENT_SEQUENCE=
+				! /START_LABEL=
+				! /END_LABEL=
+				/EVENT_SEQUENCE=RHS+RHS
+				! /EXCLUDE_EVENTS=
+				/RESULT_NAME=::emg
+				/RESULT_FOLDER=WITHIN_TRIAL_NO_&::inc& 
+				/NORMALIZE_POINTS=::LAST_FRAME
+				! /CREATE_STANDARD_DEVIATION=FALSE
+				! /CALCULATE_PER_FILE=FALSE
+				;
+
+				Evaluate_Expression
+				/EXPRESSION=(GLOBAL::P2D::WITHIN_TRIAL_NO_&::inc&:&:&::emg&:&:&Y)
+				/RESULT_NAME=::emg
+				/RESULT_TYPE=ANALOG
+				/RESULT_FOLDER=EMG_PROCESSED
+				;
+				
+			End_For_Each
+			/ITERATION_PARAMETER_NAME=emg
+			;
+		
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+	End_For_Each
+	/ITERATION_PARAMETER_NAME=file
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Select_Active_File
+/FILE_NAME=ALL_FILES
+! /QUERY=
+;
+
+Export_Data_To_Ascii_File
+/FILE_NAME=&::working_directory&timeseries.xml
+/SIGNAL_TYPES=::sig_types
+/SIGNAL_NAMES=::sig_names
+/SIGNAL_FOLDER=::sig_folder
+! /SIGNAL_COMPONENTS=
+! /SIGNAL_PRECISION=
+! /START_LABEL=
+! /END_LABEL=
+/EVENT_SEQUENCE=::ev_segence
+/EXCLUDE_EVENTS=::ev_exclude
+! /USE_POINT_RATE=FALSE
+/NORMALIZE_DATA=TRUE
+/NORMALIZE_POINTS=::norm_points
+! /EXPORT_MEAN_AND_STD_DEV=FALSE
+! /USE_P2D_FORMAT=FALSE
+/USE_XML_FORMAT=TRUE
+/USE_SHORT_FILENAME=TRUE
+/EXPORT_EMPTY_SIGNALS=TRUE
+;
+
+!copy backup folders to Processed and delete the backup folders
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(("&::analysis_name&" = "Internal Export Word") &::AMP& ((STRING_FIND("&::event_mode&","Instrumented treadmill",0) <> -1) | ("&::auto_range_str&" = "FALSE")))
+! /AS_INTEGER=TRUE
+;
+
+	Multiply_Signals_By_Constant
+	/SIGNAL_TYPES=LINK_MODEL_BASED
+	! /SIGNAL_NAMES=
+	/SIGNAL_FOLDER=BACKUP
+	! /RESULT_NAMES=
+	/RESULT_TYPES=LINK_MODEL_BASED
+	/RESULT_FOLDER=PROCESSED
+	! /SIGNAL_COMPONENTS=
+	/CONSTANT=1
+	;
+
+	Multiply_Signals_By_Constant
+	/SIGNAL_TYPES=ANALOG
+	! /SIGNAL_NAMES=
+	/SIGNAL_FOLDER=EMG_PROCESSED_BACKUP
+	! /RESULT_NAMES=
+	/RESULT_TYPES=ANALOG
+	/RESULT_FOLDER=EMG_PROCESSED
+	! /SIGNAL_COMPONENTS=
+	/CONSTANT=1
+	;
+
+	Delete_Folder
+	/SIGNAL_TYPE=LINK_MODEL_BASED
+	/FOLDER=BACKUP
+	;
+
+	Delete_Folder
+	/SIGNAL_TYPE=ANALOG
+	/FOLDER=EMG_PROCESSED_BACKUP
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+!====================================
+! Export MEAN timeseries to xml file
+!====================================
+
+Select_Active_File
+/FILE_NAME=GLOBAL
+! /QUERY=
+;
+
+Export_Data_To_Ascii_File
+/FILE_NAME=&::working_directory&timeseries_means.xml
+/SIGNAL_TYPES=P2D
+! /SIGNAL_NAMES=
+/SIGNAL_FOLDER=TIMESERIES
+! /SIGNAL_COMPONENTS=
+! /START_LABEL=
+! /END_LABEL=
+! /EVENT_SEQUENCE=
+! /EXCLUDE_EVENTS=
+! /USE_POINT_RATE=FALSE
+! /NORMALIZE_DATA=FALSE
+! /NORMALIZE_POINTS=101
+! /EXPORT_MEAN_AND_STD_DEV=FALSE
+! /USE_P2D_FORMAT=FALSE
+/USE_XML_FORMAT=TRUE
+! /USE_SHORT_FILENAME=FALSE
+;
+
+!====================================
+! Prepare and export normative data to xml file
+!====================================
+
+Select_Active_File
+/FILE_NAME=GLOBAL
+! /QUERY=
+;
+
+For_Each
+/ITERATION_PARAMETER_NAME=signal
+! /ITERATION_PARAMETER_COUNT_NAME=
+/ITEMS=::link_signal_names
+;
+
+	!define event sequence - left
+	Conditional_Statement
+	/ITERATION_PARAMETER_NAME=cond
+	/EXPRESSION=(STRING_FIND("&::signal&","Left",0) <> -1)
+	! /AS_INTEGER=TRUE
+	;
+	
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=((STRING_FIND("&::signal&","Angle",0) <> -1) | (STRING_FIND("&::signal&","Progression",0) <> -1))
+		! /AS_INTEGER=TRUE
+		;
+		
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=ev_seq
+			/PARAMETER_VALUE=LHS_LHS
+			;
+			
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=(STRING_FIND("&::signal&","GRF",0) <> -1)
+		! /AS_INTEGER=TRUE
+		;
+		
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=ev_seq
+			/PARAMETER_VALUE=LON_LOFF
+			;
+			
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=((STRING_FIND("&::signal&","Angle",0) = -1) &::AMP& (STRING_FIND("&::signal&","Progression",0) = -1) &::AMP& (STRING_FIND("&::signal&","Arch",0) = -1) &::AMP& (STRING_FIND("&::signal&","GRF",0) = -1))
+		! /AS_INTEGER=TRUE
+		;
+		
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=ev_seq
+			/PARAMETER_VALUE=LON_LHS
+			;
+			
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+	Conditional_Statement_End
+	/ITERATION_PARAMETER_NAME=cond
+	;
+
+	!define event sequence - right
+	Conditional_Statement
+	/ITERATION_PARAMETER_NAME=cond
+	/EXPRESSION=(STRING_FIND("&::signal&","Right",0) <> -1)
+	! /AS_INTEGER=TRUE
+	;
+	
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=((STRING_FIND("&::signal&","Angle",0) <> -1) | (STRING_FIND("&::signal&","Progression",0) <> -1) | (STRING_FIND("&::signal&","Arch",0) <> -1))
+		! /AS_INTEGER=TRUE
+		;
+		
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=ev_seq
+			/PARAMETER_VALUE=RHS_RHS
+			;
+			
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=(STRING_FIND("&::signal&","GRF",0) <> -1)
+		! /AS_INTEGER=TRUE
+		;
+		
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=ev_seq
+			/PARAMETER_VALUE=RON_ROFF
+			;
+			
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=((STRING_FIND("&::signal&","Angle",0) = -1) &::AMP& (STRING_FIND("&::signal&","Progression",0) = -1) &::AMP& (STRING_FIND("&::signal&","Arch",0) = -1) &::AMP& (STRING_FIND("&::signal&","GRF",0) = -1))
+		! /AS_INTEGER=TRUE
+		;
+		
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=ev_seq
+			/PARAMETER_VALUE=RON_RHS
+			;
+			
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+	Conditional_Statement_End
+	/ITERATION_PARAMETER_NAME=cond
+	;
+
+	For_Each
+	/ITERATION_PARAMETER_NAME=component
+	! /ITERATION_PARAMETER_COUNT_NAME=
+	/ITEMS=X+Y+Z
+	;
+		!these condition should be here to avoid warnings from pipeline for nonexistant signals
+		!if ((strpos($signal, "Ankle Angles") !== false && $component === "Z") || (strpos($signal, "Shoulder") !== false && $component === "Z") || (strpos($signal, "Elbow") !== false && ($component === "Y" || $component === "Z")) || (strpos($signal, "Hip Power") !==false && $component === "Z") || ((strpos($signal, "Ankle Power") !==false || strpos($signal, "Knee Power") !==false) && ($component === "Y" || $component === "Z")) || (strpos($signal, "Moment") !==false && $component === "Z") || (strpos($signal, "Progression") !==false && ($component === "X" || $component === "Y")))
+
+		Evaluate_Expression
+		/EXPRESSION=P2D::PROCESSED::&::signal&_&::component&_&::ev_seq&&::COLON&::COLON&2 - P2D::PROCESSED::&::signal&_&::component&_&::ev_seq&&::COLON&::COLON&3
+		/RESULT_NAME=&::signal&_&::component&_&::ev_seq 
+		/RESULT_TYPE=DERIVED
+		/RESULT_FOLDER=NORM_LOWER
+		;
+
+		Evaluate_Expression
+		/EXPRESSION=2*P2D::PROCESSED::&::signal&_&::component&_&::ev_seq&&::COLON&::COLON&3
+		/RESULT_NAME=&::signal&_&::component&_&::ev_seq 
+		/RESULT_TYPE=DERIVED
+		/RESULT_FOLDER=NORM_RANGE
+		;
+		
+	End_For_Each
+	/ITERATION_PARAMETER_NAME=component
+	;
+
+End_For_Each
+/ITERATION_PARAMETER_NAME=signal
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::noraxon_exists&" = "TRUE")
+! /AS_INTEGER=TRUE
+;
+	
+	! EMG normatives
+	!==========================
+	Select_Active_File
+	/FILE_NAME=ALL_FILES
+	! /QUERY=
+	;
+
+	Set_Pipeline_Parameter_To_List_Of_Signal_Names
+	/PARAMETER_NAME=EMG_NORM
+	/SIGNAL_TYPE=ANALOG
+	/SIGNAL_FOLDER=EMG_RAW
+	;
+
+	Conditional_Statement
+	/ITERATION_PARAMETER_NAME=cond1
+	/EXPRESSION=("&::EMG_units_pct_str&" = "FALSE")
+	! /AS_INTEGER=TRUE
+	;
+
+		Set_Pipeline_Parameter
+		/PARAMETER_NAME=EMG_NORM_RAW
+		/PARAMETER_VALUE=::EMG_NORM
+		! /PARAMETER_VALUE_SEARCH_FOR=
+		! /PARAMETER_VALUE_REPLACE_WITH=
+		! /PARAMETER_VALUE_PREFIX=
+		/PARAMETER_VALUE_APPEND=_raw
+		! /MULTI_PASS=FALSE
+		;
+
+		Set_Pipeline_Parameter
+		/PARAMETER_NAME=emg_items
+		/PARAMETER_VALUE=&::EMG_NORM&+&::EMG_NORM_RAW
+		;
+
+	Conditional_Statement_End
+	/ITERATION_PARAMETER_NAME=cond1
+	;
+
+	Select_Active_File
+	/FILE_NAME=GLOBAL
+	! /QUERY=
+	;
+
+	Set_Pipeline_Parameter
+	/PARAMETER_NAME=emg_items
+	/PARAMETER_VALUE=&::EMG_NORM
+	;
+
+	Conditional_Statement
+	/ITERATION_PARAMETER_NAME=cond1
+	/EXPRESSION=("&::EMG_units_pct_str&" = "TRUE")
+	! /AS_INTEGER=TRUE
+	;
+
+		Set_Pipeline_Parameter
+		/PARAMETER_NAME=emg_items
+		/PARAMETER_VALUE=&::EMG_NORM
+		;
+
+	Conditional_Statement_End
+	/ITERATION_PARAMETER_NAME=cond1
+	;
+
+	For_Each
+	/ITERATION_PARAMETER_NAME=EMG_NAME
+	/ITEMS=&::emg_items
+	;
+
+		Evaluate_Expression
+		/EXPRESSION=P2D::EMG::&::EMG_NAME&::COLON&::COLON&2 - P2D::EMG::&::EMG_NAME&::COLON&::COLON&3
+		/RESULT_NAME=&::EMG_NAME
+		/RESULT_TYPE=DERIVED
+		/RESULT_FOLDER=NORM_LOWER
+		;
+
+		Evaluate_Expression
+		/EXPRESSION=2 * P2D::EMG::&::EMG_NAME&::COLON&::COLON&3
+		/RESULT_NAME=&::EMG_NAME
+		/RESULT_TYPE=DERIVED
+		/RESULT_FOLDER=NORM_RANGE
+		;
+
+		!find max (norm_lower + norm_range)
+		Evaluate_Expression
+		/EXPRESSION=DERIVED::NORM_RANGE::&::EMG_NAME&::X + DERIVED::NORM_LOWER::&::EMG_NAME&::X + (DERIVED::NORM_RANGE::&::EMG_NAME&:&:&X / 2)
+		/RESULT_NAME=&::EMG_NAME
+		/RESULT_TYPE=DERIVED
+		/RESULT_FOLDER=NORM
+		;
+
+		Metric_Maximum
+		/RESULT_METRIC_FOLDER=EMG_NORM_MAX
+		/RESULT_METRIC_NAME=&::EMG_NAME&_norm_MAX
+		/APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+		/SIGNAL_TYPES=DERIVED
+		/SIGNAL_FOLDER=NORM
+		/SIGNAL_NAMES=&::EMG_NAME
+		! /COMPONENT_SEQUENCE=
+		/EVENT_SEQUENCE=
+		/EXCLUDE_EVENTS=
+		! /SEQUENCE_PERCENT_START=0
+		! /SEQUENCE_PERCENT_END=100
+		/GENERATE_MEAN_AND_STDDEV=FALSE
+		! /APPEND_TO_EXISTING_VALUES=FALSE
+		! /CREATE_GLOBAL_MAXIMUM=FALSE
+		;
+		
+		
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=("&::EMG_units_pct_str&" = "TRUE")
+		! /AS_INTEGER=TRUE
+		;
+
+			!rescale to 0 - 100%
+			!note: this methods do not provide exact results (2* norm_range + norm_lower should be 100% but it is 1-2% higher)
+			Evaluate_Expression
+			/EXPRESSION=((DERIVED::NORM_LOWER::&::EMG_NAME& + (DERIVED::NORM_RANGE::&::EMG_NAME& / 2)) / METRIC::EMG_NORM_MAX::&::EMG_NAME&_norm_MAX) * 100
+			/RESULT_NAME=&::EMG_NAME
+			/RESULT_TYPE=DERIVED
+			/RESULT_FOLDER=NORM_LOWER
+			;
+
+			Evaluate_Expression
+			/EXPRESSION=(DERIVED::NORM_RANGE::&::EMG_NAME& / METRIC::EMG_NORM_MAX::&::EMG_NAME&_norm_MAX) * 100
+			/RESULT_NAME=&::EMG_NAME
+			/RESULT_TYPE=DERIVED
+			/RESULT_FOLDER=NORM_RANGE
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+		! Normatives for RAW EMG are calculated separately to show green band based on mean not st. deviation
+		! EMG NORM_LOWER = mean *-1, NORM_RANGE = 2*mean
+		Evaluate_Expression
+		/EXPRESSION=-1 * (P2D::EMG::&::EMG_NAME&::COLON&::COLON&2 + P2D::EMG::&::EMG_NAME&::COLON&::COLON&3)
+		/RESULT_NAME=&::EMG_NAME&_raw
+		/RESULT_TYPE=DERIVED
+		/RESULT_FOLDER=NORM_LOWER
+		;
+
+		Evaluate_Expression
+		/EXPRESSION=2 * (P2D::EMG::&::EMG_NAME&::COLON&::COLON&2 + P2D::EMG::&::EMG_NAME&::COLON&::COLON&3)
+		/RESULT_NAME=&::EMG_NAME&_raw
+		/RESULT_TYPE=DERIVED
+		/RESULT_FOLDER=NORM_RANGE
+		;
+
+	End_For_Each
+	/ITERATION_PARAMETER_NAME=EMG_NAME
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Export_Data_To_Ascii_File
+/FILE_NAME=&::working_directory&normative.xml
+/SIGNAL_TYPES=::sig_type_n
+/SIGNAL_NAMES=::sig_names_n
+/SIGNAL_FOLDER=::sig_folder_n
+! /SIGNAL_COMPONENTS=
+! /START_LABEL=
+! /END_LABEL=
+! /EVENT_SEQUENCE=
+! /EXCLUDE_EVENTS=
+! /USE_POINT_RATE=FALSE
+/NORMALIZE_DATA=TRUE
+/NORMALIZE_POINTS=::norm_points_n
+! /EXPORT_MEAN_AND_STD_DEV=FALSE
+! /USE_P2D_FORMAT=FALSE
+/USE_XML_FORMAT=TRUE
+! /USE_SHORT_FILENAME=FALSE
+;
+
+!======================================
+!Generate screenshot of the model
+!======================================
+
+Select_Active_File
+/FILE_NAME=&::working_directory&Static.c3d
+!/QUERY=
+;
+
+Assign_Model_File
+/CALIBRATION_FILE=&::working_directory&Static*.c3d
+/MOTION_FILE_NAMES=&::working_directory&Static.c3d
+! /REMOVE_EXISTING_ASSIGNMENTS=FALSE
+;
+
+Event_Explicit
+/EVENT_NAME=start
+/FRAME=1
+! /TIME=
+;
+
+Select_Active_File
+/FILE_NAME=&::working_directory&Static.c3d
+! /QUERY=
+;
+
+Metric_Signal_Value_At_Event
+/RESULT_METRIC_NAME=Pelvis_COG
+! /RESULT_METRIC_FOLDER=PROCESSED
+/SIGNAL_TYPES=KINETIC_KINEMATIC
+/SIGNAL_NAMES=CGPos
+/SIGNAL_FOLDER=RPV
+/EVENT_NAME=start
+/GENERATE_MEAN_AND_STDDEV=FALSE
+! /APPEND_TO_EXISTING_VALUES=FALSE
+! /GENERATE_VECTOR_LENGTH_METRIC=FALSE
+! /RETAIN_NO_DATA_VALUES=FALSE
+;
+
+!Save the position of the COG of the Pelvis so that it can be used when setting the camera view centre
+Set_Pipeline_Parameter_To_Data_Value
+/PARAMETER_NAME=VIEW_CENTRE_X
+/SIGNAL_TYPES=METRIC
+/SIGNAL_NAMES=Pelvis_COG
+/SIGNAL_FOLDER=PROCESSED
+/SIGNAL_COMPONENTS=X
+;
+
+Set_Pipeline_Parameter_To_Data_Value
+/PARAMETER_NAME=VIEW_CENTRE_Y
+/SIGNAL_TYPES=METRIC
+/SIGNAL_NAMES=Pelvis_COG
+/SIGNAL_FOLDER=PROCESSED
+/SIGNAL_COMPONENTS=Y
+;
+
+Set_Pipeline_Parameter_To_Data_Value
+/PARAMETER_NAME=VIEW_CENTRE_Z
+/SIGNAL_TYPES=METRIC
+/SIGNAL_NAMES=Pelvis_COG
+/SIGNAL_FOLDER=PROCESSED
+/SIGNAL_COMPONENTS=Z
+;
+
+Set_Camera_Perspective
+/CAMERA_X_CENTER=-&::VIEW_CENTRE_X
+/CAMERA_Y_CENTER=-&::VIEW_CENTRE_Y
+/CAMERA_Z_CENTER=-&::VIEW_CENTRE_Z
+/CAMERA_ZOOM=2.5
+/CAMERA_PAN=0
+/CAMERA_TILT=0
+;
+
+Set_View_Options
+! /VIEW_GRAPH_ANIMATION_FRAME_LINE=
+/VIEW_FORCE_PLATFORMS=FALSE
+! /VIEW_GRF_BUTTERFLY=
+! /VIEW_GRF=
+! /VIEW_GRF_COFP=
+! /VIEW_CUSTOM_FORCES=
+! /VIEW_JOINTS=
+/VIEW_LAB=FALSE
+/VIEW_LAB_AXES=FALSE
+/VIEW_LANDMARKS=FALSE
+/VIEW_MODEL_COM=FALSE
+! /VIEW_MUSCLES=
+! /VIEW_MUSCLES_AS_LINES=
+! /VIEW_MUSCLES_AS_CYLINDERS=
+/VIEW_SCS_AXES=FALSE
+! /VIEW_SCS_AXES_COM=
+/VIEW_SEGMENTS=TRUE
+/VIEW_KINEMATIC_ONLY_SEGMENTS=TRUE
+! /VIEW_SEGMENT_COLORIZATION=
+/VIEW_SEGMENT_GEOMETRY=FALSE
+/VIEW_SEGMENT_LINES=FALSE
+/VIEW_TARGETS=TRUE
+! /VIEW_TARGETS_WITH_RESIDUAL_COLORMAP=
+/VIEW_COM_TRAIL=FALSE
+! /VIEW_LANDMARK_TRAIL=
+! /VIEW_SEGMENT_TRAIL=
+! /VIEW_TARGET_TRAIL=
+/VIEW_WHITE_BACKGROUND=TRUE
+;
+
+Export_3D_Animation_To_Image
+/FILE_NAME=&::working_directory&static.c3d
+/IMAGE_FILE_NAME=&::working_directory&model.png
+/FRAME=1
+/OUTPUT_WIDTH=400
+/OUTPUT_HEIGHT=800
+;
+
+!Re-set view
+Set_View_Options
+! /VIEW_GRAPH_ANIMATION_FRAME_LINE=
+/VIEW_FORCE_PLATFORMS=TRUE
+! /VIEW_GRF_BUTTERFLY=
+! /VIEW_GRF=
+! /VIEW_GRF_COFP=
+! /VIEW_CUSTOM_FORCES=
+! /VIEW_JOINTS=
+/VIEW_LAB=TRUE
+/VIEW_LAB_AXES=TRUE
+/VIEW_LANDMARKS=TRUE
+/VIEW_MODEL_COM=TRUE
+! /VIEW_MUSCLES=
+! /VIEW_MUSCLES_AS_LINES=
+! /VIEW_MUSCLES_AS_CYLINDERS=
+/VIEW_SCS_AXES=TRUE
+! /VIEW_SCS_AXES_COM=
+!/VIEW_SEGMENTS=TRUE
+!/VIEW_KINEMATIC_ONLY_SEGMENTS=TRUE
+! /VIEW_SEGMENT_COLORIZATION=
+!/VIEW_SEGMENT_GEOMETRY=FALSE
+!/VIEW_SEGMENT_LINES=FALSE
+!/VIEW_TARGETS=TRUE
+! /VIEW_TARGETS_WITH_RESIDUAL_COLORMAP=
+!/VIEW_COM_TRAIL=FALSE
+! /VIEW_LANDMARK_TRAIL=
+! /VIEW_SEGMENT_TRAIL=
+! /VIEW_TARGET_TRAIL=
+/VIEW_WHITE_BACKGROUND=FALSE
+;
+
+! !====================================
+! !Export Force Vector Screenshots to png file
+! !====================================
+
+! ! Disabled export of force vector PNGs until C-Motion have fixed problem with 3D viewer.
+
+! !use a for each loop to select a single file
+! Set_Pipeline_Parameter_To_List_Of_Files
+! /PARAMETER_NAME=files
+! /FOLDER=<?=$working_directory;?>
+! ! /SEARCH_SUBFOLDERS=FALSE
+! /FILE_MASK=*dynamic*.c3d
+! ! /files=
+! ;
+
+! For_Each
+! /ITERATION_PARAMETER_NAME=current_file
+! /ITEMS=::files
+! ;
+
+! Select_Active_File
+! /FILE_NAME=::current_file
+! ! /QUERY=
+! ;
+
+! End_For_Each
+! /ITERATION_PARAMETER_NAME=current_file
+! ;
+
+! !Left force vector
+
+! Metric_Signal_Value_At_Event
+! /RESULT_METRIC_NAME=Pelvis_COG@ROFF
+! ! /RESULT_METRIC_FOLDER=PROCESSED
+! /SIGNAL_TYPES=KINETIC_KINEMATIC
+! /SIGNAL_NAMES=CGPos
+! /SIGNAL_FOLDER=RPV
+! /EVENT_NAME=ROFF
+! /GENERATE_MEAN_AND_STDDEV=FALSE
+! ! /APPEND_TO_EXISTING_VALUES=FALSE
+! ! /GENERATE_VECTOR_LENGTH_METRIC=FALSE
+! ! /RETAIN_NO_DATA_VALUES=FALSE
+! ;
+
+! !Save the position of the COG of the Pelvis so that it can be used when setting the camera view centre
+! Set_Pipeline_Parameter_To_Data_Value
+! /PARAMETER_NAME=VIEW_CENTRE_X
+! /SIGNAL_TYPES=METRIC
+! /SIGNAL_NAMES=Pelvis_COG@ROFF
+! /SIGNAL_FOLDER=PROCESSED
+! /SIGNAL_COMPONENTS=X
+! ;
+
+! Set_Pipeline_Parameter_To_Data_Value
+! /PARAMETER_NAME=VIEW_CENTRE_Y
+! /SIGNAL_TYPES=METRIC
+! /SIGNAL_NAMES=Pelvis_COG@ROFF
+! /SIGNAL_FOLDER=PROCESSED
+! /SIGNAL_COMPONENTS=Y
+! ;
+
+! Set_Pipeline_Parameter_To_Data_Value
+! /PARAMETER_NAME=VIEW_CENTRE_Z
+! /SIGNAL_TYPES=METRIC
+! /SIGNAL_NAMES=Pelvis_COG@ROFF
+! /SIGNAL_FOLDER=PROCESSED
+! /SIGNAL_COMPONENTS=Z
+! ;
+
+! Set_Camera_Perspective
+! /CAMERA_X_CENTER=-&::VIEW_CENTRE_X
+! /CAMERA_Y_CENTER=-&::VIEW_CENTRE_Y
+! /CAMERA_Z_CENTER=-&::VIEW_CENTRE_Z
+! /CAMERA_ZOOM=2.5
+! /CAMERA_PAN=0
+! /CAMERA_TILT=0
+! ;
+
+! Set_View_Options
+! ! /VIEW_GRAPH_ANIMATION_FRAME_LINE=
+! /VIEW_FORCE_PLATFORMS=FALSE
+! ! /VIEW_GRF_BUTTERFLY=
+! ! /VIEW_GRF=
+! ! /VIEW_GRF_COFP=
+! ! /VIEW_CUSTOM_FORCES=
+! ! /VIEW_JOINTS=
+! /VIEW_LAB=FALSE
+! /VIEW_LAB_AXES=FALSE
+! /VIEW_LANDMARKS=FALSE
+! /VIEW_MODEL_COM=FALSE
+! ! /VIEW_MUSCLES=
+! ! /VIEW_MUSCLES_AS_LINES=
+! ! /VIEW_MUSCLES_AS_CYLINDERS=
+! /VIEW_SCS_AXES=FALSE
+! ! /VIEW_SCS_AXES_COM=
+! /VIEW_SEGMENTS=TRUE
+! /VIEW_KINEMATIC_ONLY_SEGMENTS=TRUE
+! ! /VIEW_SEGMENT_COLORIZATION=
+! /VIEW_SEGMENT_GEOMETRY=FALSE
+! /VIEW_SEGMENT_LINES=FALSE
+! /VIEW_TARGETS=TRUE
+! ! /VIEW_TARGETS_WITH_RESIDUAL_COLORMAP=
+! /VIEW_COM_TRAIL=FALSE
+! ! /VIEW_LANDMARK_TRAIL=
+! ! /VIEW_SEGMENT_TRAIL=
+! ! /VIEW_TARGET_TRAIL=
+! /VIEW_WHITE_BACKGROUND=TRUE
+! ;
+
+! Export_3D_Animation_To_Image
+! /FILE_NAME=::current_file
+! /IMAGE_FILE_NAME=<?=$working_directory;?>force_vector_left_frontal.png
+! /FRAME=ROFF
+! /OUTPUT_WIDTH=400
+! /OUTPUT_HEIGHT=800
+! ;
+
+! !Re-set view
+! Set_View_Options
+! ! /VIEW_GRAPH_ANIMATION_FRAME_LINE=
+! /VIEW_FORCE_PLATFORMS=TRUE
+! ! /VIEW_GRF_BUTTERFLY=
+! ! /VIEW_GRF=
+! ! /VIEW_GRF_COFP=
+! ! /VIEW_CUSTOM_FORCES=
+! ! /VIEW_JOINTS=
+! /VIEW_LAB=TRUE
+! /VIEW_LAB_AXES=TRUE
+! /VIEW_LANDMARKS=TRUE
+! /VIEW_MODEL_COM=TRUE
+! ! /VIEW_MUSCLES=
+! ! /VIEW_MUSCLES_AS_LINES=
+! ! /VIEW_MUSCLES_AS_CYLINDERS=
+! /VIEW_SCS_AXES=TRUE
+! ! /VIEW_SCS_AXES_COM=
+! !/VIEW_SEGMENTS=TRUE
+! !/VIEW_KINEMATIC_ONLY_SEGMENTS=TRUE
+! ! /VIEW_SEGMENT_COLORIZATION=
+! !/VIEW_SEGMENT_GEOMETRY=FALSE
+! !/VIEW_SEGMENT_LINES=FALSE
+! !/VIEW_TARGETS=TRUE
+! ! /VIEW_TARGETS_WITH_RESIDUAL_COLORMAP=
+! !/VIEW_COM_TRAIL=FALSE
+! ! /VIEW_LANDMARK_TRAIL=
+! ! /VIEW_SEGMENT_TRAIL=
+! ! /VIEW_TARGET_TRAIL=
+! /VIEW_WHITE_BACKGROUND=FALSE
+! ;
+
+
+
+! !Right force vector
+! Metric_Signal_Value_At_Event
+! /RESULT_METRIC_NAME=Pelvis_COG@LTO
+! ! /RESULT_METRIC_FOLDER=PROCESSED
+! /SIGNAL_TYPES=KINETIC_KINEMATIC
+! /SIGNAL_NAMES=CGPos
+! /SIGNAL_FOLDER=RPV
+! /EVENT_NAME=LTO
+! /GENERATE_MEAN_AND_STDDEV=FALSE
+! ! /APPEND_TO_EXISTING_VALUES=FALSE
+! ! /GENERATE_VECTOR_LENGTH_METRIC=FALSE
+! ! /RETAIN_NO_DATA_VALUES=FALSE
+! ;
+
+! !Save the position of the COG of the Pelvis so that it can be used when setting the camera view centre
+! Set_Pipeline_Parameter_To_Data_Value
+! /PARAMETER_NAME=VIEW_CENTRE_X
+! /SIGNAL_TYPES=METRIC
+! /SIGNAL_NAMES=Pelvis_COG@LTO
+! /SIGNAL_FOLDER=PROCESSED
+! /SIGNAL_COMPONENTS=X
+! ;
+
+! Set_Pipeline_Parameter_To_Data_Value
+! /PARAMETER_NAME=VIEW_CENTRE_Y
+! /SIGNAL_TYPES=METRIC
+! /SIGNAL_NAMES=Pelvis_COG@LTO
+! /SIGNAL_FOLDER=PROCESSED
+! /SIGNAL_COMPONENTS=Y
+! ;
+
+! Set_Pipeline_Parameter_To_Data_Value
+! /PARAMETER_NAME=VIEW_CENTRE_Z
+! /SIGNAL_TYPES=METRIC
+! /SIGNAL_NAMES=Pelvis_COG@LTO
+! /SIGNAL_FOLDER=PROCESSED
+! /SIGNAL_COMPONENTS=Z
+! ;
+
+! Set_Camera_Perspective
+! /CAMERA_X_CENTER=-&::VIEW_CENTRE_X
+! /CAMERA_Y_CENTER=-&::VIEW_CENTRE_Y
+! /CAMERA_Z_CENTER=-&::VIEW_CENTRE_Z
+! /CAMERA_ZOOM=2.5
+! /CAMERA_PAN=0
+! /CAMERA_TILT=0
+! ;
+
+! Set_View_Options
+! ! /VIEW_GRAPH_ANIMATION_FRAME_LINE=
+! /VIEW_FORCE_PLATFORMS=FALSE
+! ! /VIEW_GRF_BUTTERFLY=
+! ! /VIEW_GRF=
+! ! /VIEW_GRF_COFP=
+! ! /VIEW_CUSTOM_FORCES=
+! ! /VIEW_JOINTS=
+! /VIEW_LAB=FALSE
+! /VIEW_LAB_AXES=FALSE
+! /VIEW_LANDMARKS=FALSE
+! /VIEW_MODEL_COM=FALSE
+! ! /VIEW_MUSCLES=
+! ! /VIEW_MUSCLES_AS_LINES=
+! ! /VIEW_MUSCLES_AS_CYLINDERS=
+! /VIEW_SCS_AXES=FALSE
+! ! /VIEW_SCS_AXES_COM=
+! /VIEW_SEGMENTS=TRUE
+! /VIEW_KINEMATIC_ONLY_SEGMENTS=TRUE
+! ! /VIEW_SEGMENT_COLORIZATION=
+! /VIEW_SEGMENT_GEOMETRY=FALSE
+! /VIEW_SEGMENT_LINES=FALSE
+! /VIEW_TARGETS=TRUE
+! ! /VIEW_TARGETS_WITH_RESIDUAL_COLORMAP=
+! /VIEW_COM_TRAIL=FALSE
+! ! /VIEW_LANDMARK_TRAIL=
+! ! /VIEW_SEGMENT_TRAIL=
+! ! /VIEW_TARGET_TRAIL=
+! /VIEW_WHITE_BACKGROUND=TRUE
+! ;
+
+! Export_3D_Animation_To_Image
+! /FILE_NAME=::current_file
+! /IMAGE_FILE_NAME=<?=$working_directory;?>force_vector_right_frontal.png
+! /FRAME=LTO
+! /OUTPUT_WIDTH=400
+! /OUTPUT_HEIGHT=800
+! ;
+
+! !Re-set the view properties
+! Set_View_Options
+! ! /VIEW_GRAPH_ANIMATION_FRAME_LINE=
+! /VIEW_FORCE_PLATFORMS=TRUE
+! ! /VIEW_GRF_BUTTERFLY=
+! ! /VIEW_GRF=
+! ! /VIEW_GRF_COFP=
+! ! /VIEW_CUSTOM_FORCES=
+! ! /VIEW_JOINTS=
+! /VIEW_LAB=TRUE
+! /VIEW_LAB_AXES=TRUE
+! /VIEW_LANDMARKS=TRUE
+! /VIEW_MODEL_COM=TRUE
+! ! /VIEW_MUSCLES=
+! ! /VIEW_MUSCLES_AS_LINES=
+! ! /VIEW_MUSCLES_AS_CYLINDERS=
+! /VIEW_SCS_AXES=TRUE
+! ! /VIEW_SCS_AXES_COM=
+! !/VIEW_SEGMENTS=TRUE
+! !/VIEW_KINEMATIC_ONLY_SEGMENTS=TRUE
+! ! /VIEW_SEGMENT_COLORIZATION=
+! !/VIEW_SEGMENT_GEOMETRY=FALSE
+! !/VIEW_SEGMENT_LINES=FALSE
+! !/VIEW_TARGETS=TRUE
+! ! /VIEW_TARGETS_WITH_RESIDUAL_COLORMAP=
+! !/VIEW_COM_TRAIL=FALSE
+! ! /VIEW_LANDMARK_TRAIL=
+! ! /VIEW_SEGMENT_TRAIL=
+! ! /VIEW_TARGET_TRAIL=
+! /VIEW_WHITE_BACKGROUND=FALSE
+! ;
+
+!=========================
+! Export to 3D viewer
+!=========================
+
+Select_Active_File
+/FILE_NAME=Dynamic
+! /QUERY=
+;
+
+! Segment length in [mm]
+Evaluate_Expression
+/EXPRESSION=MODEL::SEGMENT::LAR::LENGTH * 1000
+/RESULT_NAME=LArm
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=SEG_LENGTH
+;
+
+Evaluate_Expression
+/EXPRESSION=MODEL::SEGMENT::LFA::LENGTH * 1000
+/RESULT_NAME=LForearm
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=SEG_LENGTH
+;
+
+Expression_Loop
+/ITERATION_PARAMETER_NAME=loop
+/EXPRESSION=Data_Exists(KINETIC_KINEMATIC::LHA::CGPos) ! V3D 6.00.33 or later is required
+/AS_INTEGER=TRUE
+;
+
+	Evaluate_Expression
+	/EXPRESSION=METRIC::PROCESSED::HEIGHT * 1000 * 0.106 * 0.58 ! Based on Winter 2009 (hand length) and McConville 1981 (3rd metatarsal length relative to the hand length)
+	/RESULT_NAME=LHand
+	/RESULT_TYPE=METRIC
+	/RESULT_FOLDER=SEG_LENGTH
+	;
+
+Expression_Loop_End
+/ITERATION_PARAMETER_NAME=loop
+;
+
+Evaluate_Expression
+/EXPRESSION=MODEL::SEGMENT::LFT::LENGTH * 1000 * 1.25 ! multiplied by 1.25 to better represent actual segment size
+/RESULT_NAME=LFoot
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=SEG_LENGTH
+;
+
+Evaluate_Expression
+/EXPRESSION=MODEL::SEGMENT::LSK::LENGTH * 1000
+/RESULT_NAME=LLeg
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=SEG_LENGTH
+;
+
+Evaluate_Expression
+/EXPRESSION=MODEL::SEGMENT::LTH::LENGTH * 1000
+/RESULT_NAME=LThigh
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=SEG_LENGTH
+;
+
+Evaluate_Expression
+/EXPRESSION=MODEL::SEGMENT::RAR::LENGTH * 1000
+/RESULT_NAME=RArm
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=SEG_LENGTH
+;
+
+Evaluate_Expression
+/EXPRESSION=MODEL::SEGMENT::RFA::LENGTH * 1000
+/RESULT_NAME=RForearm
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=SEG_LENGTH
+;
+
+Expression_Loop
+/ITERATION_PARAMETER_NAME=loop
+/EXPRESSION=Data_Exists(KINETIC_KINEMATIC::RHA::CGPos)
+/AS_INTEGER=TRUE
+;
+
+	Evaluate_Expression
+	/EXPRESSION=METRIC::PROCESSED::HEIGHT * 1000 * 0.106 * 0.58 ! Based on Winter 2009 (hand length) and McConville 1981 (3rd metatarsal length relative to the hand length)
+	/RESULT_NAME=RHand
+	/RESULT_TYPE=METRIC
+	/RESULT_FOLDER=SEG_LENGTH
+	;
+
+Expression_Loop_End
+/ITERATION_PARAMETER_NAME=loop
+;
+
+Evaluate_Expression
+/EXPRESSION=MODEL::SEGMENT::RFT::LENGTH * 1000 * 1.25 ! multiplied by 1.25 to better represent actual segment size
+/RESULT_NAME=RFoot
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=SEG_LENGTH
+;
+
+Evaluate_Expression
+/EXPRESSION=MODEL::SEGMENT::RSK::LENGTH * 1000
+/RESULT_NAME=RLeg
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=SEG_LENGTH
+;
+
+Evaluate_Expression
+/EXPRESSION=MODEL::SEGMENT::RTH::LENGTH * 1000
+/RESULT_NAME=RThigh
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=SEG_LENGTH
+;
+
+Evaluate_Expression
+/EXPRESSION=MODEL::METRIC::ASIS_Distance * 1000
+/RESULT_NAME=Pelvis
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=SEG_LENGTH
+;
+
+Evaluate_Expression
+/EXPRESSION=MODEL::METRIC::RTA_Distal_Radius * 2 * 1000
+/RESULT_NAME=Thorax
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=SEG_LENGTH
+;
+
+Evaluate_Expression
+/EXPRESSION=MODEL::SEGMENT::RHE::LENGTH * 1000 * 1.8 !multiplied by 1.8 to to better represent actual segment size
+/RESULT_NAME=Head
+/RESULT_TYPE=METRIC
+/RESULT_FOLDER=SEG_LENGTH
+;
+
+! segment position in [mm]
+Evaluate_Expression
+/EXPRESSION=LINK_MODEL_BASED::ORIGINAL::PelvisPos * 1000
+/RESULT_TYPES=DERIVED
+/RESULT_FOLDERS=SEG_POS
+/RESULT_NAME=Pelvis
+! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+;
+
+Evaluate_Expression
+/EXPRESSION=LANDMARK::ORIGINAL::L_HIP * 1000
+/RESULT_TYPES=DERIVED
+/RESULT_FOLDERS=SEG_POS
+/RESULT_NAME=LHip
+! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+;
+
+Evaluate_Expression
+/EXPRESSION=LANDMARK::ORIGINAL::R_HIP * 1000
+/RESULT_TYPES=DERIVED
+/RESULT_FOLDERS=SEG_POS
+/RESULT_NAME=RHip
+! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+;
+
+Evaluate_Expression
+/EXPRESSION=LANDMARK::ORIGINAL::Left_knee * 1000
+/RESULT_TYPES=DERIVED
+/RESULT_FOLDERS=SEG_POS
+/RESULT_NAME=LKnee
+! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+;
+
+Evaluate_Expression
+/EXPRESSION=LANDMARK::ORIGINAL::Right_knee * 1000
+/RESULT_TYPES=DERIVED
+/RESULT_FOLDERS=SEG_POS
+/RESULT_NAME=RKnee
+! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+;
+
+Evaluate_Expression
+/EXPRESSION=LANDMARK::ORIGINAL::LEFT_ANKLE * 1000
+/RESULT_TYPES=DERIVED
+/RESULT_FOLDERS=SEG_POS
+/RESULT_NAME=LAnkle
+! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+;
+
+Evaluate_Expression
+/EXPRESSION=LANDMARK::ORIGINAL::RIGHT_ANKLE * 1000
+/RESULT_TYPES=DERIVED
+/RESULT_FOLDERS=SEG_POS
+/RESULT_NAME=RAnkle
+! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+;
+
+Evaluate_Expression
+/EXPRESSION=LANDMARK::ORIGINAL::Distal Thorax * 1000
+/RESULT_TYPES=DERIVED
+/RESULT_FOLDERS=SEG_POS
+/RESULT_NAME=Thorax
+! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+;
+
+Evaluate_Expression
+/EXPRESSION=LANDMARK::ORIGINAL::L_Shoulder * 1000
+/RESULT_TYPES=DERIVED
+/RESULT_FOLDERS=SEG_POS
+/RESULT_NAME=LShoulder
+! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+;
+
+Evaluate_Expression
+/EXPRESSION=LANDMARK::ORIGINAL::R_Shoulder * 1000
+/RESULT_TYPES=DERIVED
+/RESULT_FOLDERS=SEG_POS
+/RESULT_NAME=RShoulder
+! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+;
+
+Evaluate_Expression
+/EXPRESSION=LANDMARK::ORIGINAL::L_Elbow * 1000
+/RESULT_TYPES=DERIVED
+/RESULT_FOLDERS=SEG_POS
+/RESULT_NAME=LElbow
+! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+;
+
+Evaluate_Expression
+/EXPRESSION=LANDMARK::ORIGINAL::R_Elbow * 1000
+/RESULT_TYPES=DERIVED
+/RESULT_FOLDERS=SEG_POS
+/RESULT_NAME=RElbow
+! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=loop
+/EXPRESSION=Data_Exists(TARGET::ORIGINAL::L_HM2)
+/AS_INTEGER=TRUE
+;
+
+	Evaluate_Expression
+	/EXPRESSION=LANDMARK::ORIGINAL::L_WRIST * 1000
+	/RESULT_TYPES=DERIVED
+	/RESULT_FOLDERS=SEG_POS
+	/RESULT_NAME=LWrist
+	! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=loop
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=loop
+/EXPRESSION=Data_Exists(TARGET::ORIGINAL::R_HM2)
+/AS_INTEGER=TRUE
+;
+
+	Evaluate_Expression
+	/EXPRESSION=LANDMARK::ORIGINAL::R_WRIST * 1000
+	/RESULT_TYPES=DERIVED
+	/RESULT_FOLDERS=SEG_POS
+	/RESULT_NAME=RWrist
+	! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=loop
+;
+
+Evaluate_Expression
+/EXPRESSION=LANDMARK::ORIGINAL::Head_mid * 1000
+/RESULT_TYPES=DERIVED
+/RESULT_FOLDERS=SEG_POS
+/RESULT_NAME=Head
+! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+;
+
+! Segment Rotations
+For_Each
+/ITERATION_PARAMETER_NAME=signal
+! /ITERATION_PARAMETER_COUNT_NAME=
+/ITEMS=Pelvis_wrt_Lab+RThigh_wrt_Lab+RLeg_wrt_Lab+RFoot_wrt_Lab+LThigh_wrt_Lab+LLeg_wrt_Lab+LFoot_wrt_Lab+Thorax_wrt_Lab+RArm_wrt_Lab+LArm_wrt_Lab+Head_wrt_Lab+LForearm_wrt_Lab+LHand_wrt_Lab+RForearm_wrt_Lab+RHand_wrt_Lab
+;
+
+	Evaluate_Expression
+	/EXPRESSION=LINK_MODEL_BASED::ORIGINAL::&::signal
+	/RESULT_TYPES=DERIVED
+	/RESULT_FOLDERS=SEG_ROT
+	/RESULT_NAME=&::signal
+	! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+	;
+
+End_For_Each
+/ITERATION_PARAMETER_NAME=signal
+;
+
+! !Forearms and hands have exception in rotation rule
+! Evaluate_Expression
+! /EXPRESSION=LINK_MODEL_BASED::ORIGINAL::LForearm_wrt_Lab::Z - 90
+! /RESULT_TYPES=DERIVED
+! /RESULT_FOLDERS=SEG_ROT
+! /RESULT_NAME=LForearm_wrt_Lab_Z
+! ! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+! ;
+
+! Evaluate_Expression
+! /EXPRESSION=LINK_MODEL_BASED::ORIGINAL::LHand_wrt_Lab::Z - 90
+! /RESULT_TYPES=DERIVED
+! /RESULT_FOLDERS=SEG_ROT
+! /RESULT_NAME=LHand_wrt_Lab_Z
+! ! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+! ;
+
+! Evaluate_Expression
+! /EXPRESSION=LINK_MODEL_BASED::ORIGINAL::RForearm_wrt_Lab::Z + 90
+! /RESULT_TYPES=DERIVED
+! /RESULT_FOLDERS=SEG_ROT
+! /RESULT_NAME=RForearm_wrt_Lab_Z
+! ! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+! ;
+
+! Evaluate_Expression
+! /EXPRESSION=LINK_MODEL_BASED::ORIGINAL::RHand_wrt_Lab::Z + 90
+! /RESULT_TYPES=DERIVED
+! /RESULT_FOLDERS=SEG_ROT
+! /RESULT_NAME=RHand_wrt_Lab_Z
+! ! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+! ;
+
+! Evaluate_Expression
+! /EXPRESSION=vector(LINK_MODEL_BASED::ORIGINAL::LForearm_wrt_Lab::X,LINK_MODEL_BASED::ORIGINAL::LForearm_wrt_Lab::Y,DERIVED::SEG_ROT::LForearm_wrt_Lab_Z::X)
+! /RESULT_TYPES=DERIVED
+! /RESULT_FOLDERS=SEG_ROT
+! /RESULT_NAME=LForearm_wrt_Lab
+! ! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+! ;
+
+! Evaluate_Expression
+! /EXPRESSION=vector(LINK_MODEL_BASED::ORIGINAL::LHand_wrt_Lab::X,LINK_MODEL_BASED::ORIGINAL::LHand_wrt_Lab::Y,DERIVED::SEG_ROT::LHand_wrt_Lab_Z::X)
+! /RESULT_TYPES=DERIVED
+! /RESULT_FOLDERS=SEG_ROT
+! /RESULT_NAME=LHand_wrt_Lab
+! ! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+! ;
+
+! Evaluate_Expression
+! /EXPRESSION=vector(LINK_MODEL_BASED::ORIGINAL::RForearm_wrt_Lab::X,LINK_MODEL_BASED::ORIGINAL::RForearm_wrt_Lab::Y,DERIVED::SEG_ROT::RForearm_wrt_Lab_Z::X)
+! /RESULT_TYPES=DERIVED
+! /RESULT_FOLDERS=SEG_ROT
+! /RESULT_NAME=RForearm_wrt_Lab
+! ! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+! ;
+
+! Evaluate_Expression
+! /EXPRESSION=vector(LINK_MODEL_BASED::ORIGINAL::RHand_wrt_Lab::X,LINK_MODEL_BASED::ORIGINAL::RHand_wrt_Lab::Y,DERIVED::SEG_ROT::RHand_wrt_Lab_Z::X)
+! /RESULT_TYPES=DERIVED
+! /RESULT_FOLDERS=SEG_ROT
+! /RESULT_NAME=RHand_wrt_Lab
+! ! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+! ;
+
+! Targets
+! WebGL 3d viewer requires data in [mm]
+Multiply_Signals_By_Constant
+/SIGNAL_TYPES=TARGET
+/SIGNAL_FOLDER=PROCESSED
+! /SIGNAL_NAMES=
+! /SIGNAL_COMPONENTS=
+/RESULT_TYPES=TARGET
+/RESULT_FOLDERS=UNITS_MM
+! /RESULT_NAME=
+! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=
+/CONSTANT=1000
+;
+
+!heavily interpolated because gaps are set to zero by WebGL 3d
+Interpolate
+/SIGNAL_TYPES=TARGET
+/SIGNAL_FOLDER=UNITS_MM
+! /SIGNAL_NAMES=
+/RESULT_FOLDER=UNITS_MM
+! /RESULT_SUFFIX=
+/MAXIMUM_GAP=PARAMETERS::POINT::RATE / 5
+! /NUM_FIT=3
+! /POLYNOMIAL_ORDER=3
+;
+
+! Forces
+! store force, cop and free moment in components
+Transform_Data_Coordinate_System
+/SIGNAL_TYPES=COFP
+/SIGNAL_FOLDER=ORIGINAL
+! /SIGNAL_NAMES=
+! /FROM_SEGMENT_CS=LAB
+/TO_SEGMENT_CS=LAB
+/RESULT_TYPES=DERIVED
+/RESULT_FOLDERS=FORCE
+/RESULT_NAME=_COP
+/APPLY_AS_SUFFIX_TO_SIGNAL_NAME=TRUE
+! /ORIENTATION_ONLY=FALSE
+! /USE_DATA_RATE=FALSE
+;
+
+! WebGL 3d viewer requires data in [mm]
+Multiply_Signals_By_Constant
+/SIGNAL_TYPES=DERIVED
+/SIGNAL_FOLDER=FORCE
+! /SIGNAL_NAMES=
+! /SIGNAL_COMPONENTS=
+/RESULT_TYPES=DERIVED
+/RESULT_FOLDERS=FORCE
+! /RESULT_NAME=
+! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=
+/CONSTANT=1000
+;
+
+Transform_Data_Coordinate_System
+/SIGNAL_TYPES=FORCE
+/SIGNAL_FOLDER=ORIGINAL
+! /SIGNAL_NAMES=
+! /FROM_SEGMENT_CS=LAB
+/TO_SEGMENT_CS=LAB
+/RESULT_TYPES=DERIVED
+/RESULT_FOLDERS=FORCE
+/RESULT_NAME=_FORCE
+/APPLY_AS_SUFFIX_TO_SIGNAL_NAME=TRUE
+! /ORIENTATION_ONLY=FALSE
+! /USE_DATA_RATE=FALSE
+;
+
+Transform_Data_Coordinate_System
+/SIGNAL_TYPES=FREEMOMENT
+/SIGNAL_FOLDER=ORIGINAL
+! /SIGNAL_NAMES=
+! /FROM_SEGMENT_CS=LAB
+/TO_SEGMENT_CS=LAB
+/RESULT_TYPES=DERIVED
+/RESULT_FOLDERS=FORCE
+/RESULT_NAME=_FREEMOMENT
+/APPLY_AS_SUFFIX_TO_SIGNAL_NAME=TRUE
+! /ORIENTATION_ONLY=FALSE
+! /USE_DATA_RATE=FALSE
+;
+
+Set_Pipeline_Parameter_To_List_Of_Signal_Names
+/PARAMETER_NAME=fp_names
+/SIGNAL_TYPES=FORCE
+! /SIGNAL_FOLDER=ORIGINAL
+;
+
+Set_Pipeline_Parameter
+/PARAMETER_NAME=fp_numbers
+/PARAMETER_VALUE=::fp_names
+/PARAMETER_VALUE_SEARCH_FOR=FP
+/PARAMETER_VALUE_REPLACE_WITH=
+! /PARAMETER_VALUE_PREFIX=
+! /PARAMETER_VALUE_APPEND=
+! /MULTI_PASS=FALSE
+;
+
+! Extract FP coordinates
+Metric_From_C3D_Parameter
+/METRIC_NAME=C3D_CORNERS
+/PARAMETER_GROUP=FORCE_PLATFORM
+/PARAMETER_NAME=CORNERS
+;
+
+!add FP corners
+Set_Pipeline_Parameter
+/PARAMETER_NAME=corner_no
+/PARAMETER_VALUE=0
+;
+
+For_Each
+/ITERATION_PARAMETER_NAME=fp
+! /ITERATION_PARAMETER_COUNT_NAME=
+/ITEMS=::fp_numbers
+;
+
+			Evaluate_Expression
+			/EXPRESSION=vector(METRIC::PROCESSED::C3D_CORNERS[&::corner_no& + 1],METRIC::PROCESSED::C3D_CORNERS[&::corner_no& + 2],METRIC::PROCESSED::C3D_CORNERS[&::corner_no& + 3])
+			/RESULT_NAME=FP&::fp&_CORNER1
+			/RESULT_TYPE=METRIC
+			/RESULT_FOLDER=FORCE
+			;
+
+			Evaluate_Expression
+			/EXPRESSION=vector(METRIC::PROCESSED::C3D_CORNERS[&::corner_no& + 4],METRIC::PROCESSED::C3D_CORNERS[&::corner_no& + 5],METRIC::PROCESSED::C3D_CORNERS[&::corner_no& + 6])
+			/RESULT_NAME=FP&::fp&_CORNER2
+			/RESULT_TYPE=METRIC
+			/RESULT_FOLDER=FORCE
+			;
+
+			Evaluate_Expression
+			/EXPRESSION=vector(METRIC::PROCESSED::C3D_CORNERS[&::corner_no& + 7],METRIC::PROCESSED::C3D_CORNERS[&::corner_no& + 8],METRIC::PROCESSED::C3D_CORNERS[&::corner_no& + 9])
+			/RESULT_NAME=FP&::fp&_CORNER3
+			/RESULT_TYPE=METRIC
+			/RESULT_FOLDER=FORCE
+			;
+
+			! Evaluate_Expression
+			! /EXPRESSION=vector(METRIC::PROCESSED::C3D_CORNERS[&::corner_no& + 10],METRIC::PROCESSED::C3D_CORNERS[&::corner_no& + 11],METRIC::PROCESSED::C3D_CORNERS[&::corner_no& + 12])
+			! /RESULT_NAME=FP&::fp&_CORNER4
+			! /RESULT_TYPE=METRIC
+			! /RESULT_FOLDER=FORCE
+			! ;
+
+			Set_Pipeline_Parameter_From_Expression
+			/PARAMETER_NAME=corner_no
+			/EXPRESSION=&::corner_no& + 12
+			! /AS_INTEGER=TRUE
+			;
+
+End_For_Each
+/ITERATION_PARAMETER_NAME=fp
+;
+
+Select_Active_File
+/FILE_NAME=Dynamic
+! /QUERY=
+;
+
+!set start and end frame (QTM 2.12.2552 or later is required)
+Evaluate_Expression
+/EXPRESSION=PARAMETERS::PROCESSING::Cropped Measurement Start Frame / PARAMETERS::POINT::RATE
+/RESULT_TYPES=METRIC
+/RESULT_FOLDERS=PROCESSED
+/RESULT_NAME=startTime
+! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+;
+
+Evaluate_Expression
+/EXPRESSION=PARAMETERS::PROCESSING::Cropped Measurement End Frame / PARAMETERS::POINT::RATE
+/RESULT_TYPES=METRIC
+/RESULT_FOLDERS=PROCESSED
+/RESULT_NAME=endTime
+! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+;
+
+Evaluate_Expression
+/EXPRESSION=PARAMETERS::PROCESSING::Uncropped Measurement Length
+/RESULT_TYPES=METRIC
+/RESULT_FOLDERS=PROCESSED
+/RESULT_NAME=Uncropped Measurement Length
+! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+;
+
+Evaluate_Expression
+/EXPRESSION=PARAMETERS::POINT::RATE
+/RESULT_TYPES=METRIC
+/RESULT_FOLDERS=PROCESSED
+/RESULT_NAME=Frame Rate
+! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+;
+
+! Export each trial in separate .xml
+Set_Pipeline_Parameter_To_List_Of_Tagged_Files
+/PARAMETER_NAME=files
+/TAG_NAME=Dynamic
+! /GET_CURRENT_SELECTED_FILES=false
+! /USE_SHORT_FILENAMES=false
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=olga
+/EXPRESSION=((Data_Exists(TARGET::ORIGINAL::R_SIAS) = 1) | (Data_Exists(TARGET::ORIGINAL::L_SIPS) = 1)) !Olga
+! /AS_INTEGER=TRUE
+;
+
+	Set_Pipeline_Parameter_To_List_Of_Signal_Names
+	/PARAMETER_NAME=marker_list_3dv
+	/SIGNAL_TYPES=TARGET
+	/SIGNAL_FOLDER=PROCESSED
+	;
+	
+	Set_Pipeline_Parameter
+	/PARAMETER_NAME=sig_type_3dv
+	/PARAMETER_VALUE=TARGET
+	;
+
+	Set_Pipeline_Parameter
+	/PARAMETER_NAME=sig_folder_3dv
+	/PARAMETER_VALUE=UNITS_MM
+	;
+
+	Get_Pipeline_Parameter_Count
+	/PARAMETER_NAME=count
+	/PARAMETER_VALUE=::marker_list_3dv
+	;
+
+	Set_Pipeline_Parameter_From_For_Loop
+	/PARAMETER_NAME=list
+	/PARAMETER_INDEX_START=1
+	/PARAMETER_INDEX_END=&::count& - 1
+	/PARAMETER_INDEX_STEP=1
+	! /PARAMETER_INDEX_TYPE=INTEGER
+	;
+
+		For_Each
+		/ITERATION_PARAMETER_NAME=loop
+		! /ITERATION_PARAMETER_COUNT_NAME=
+		/ITEMS=::list
+		;
+		
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=sig_type_3dv
+			/PARAMETER_VALUE=&::sig_type_3dv&+TARGET
+			;
+
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=sig_folder_3dv
+			/PARAMETER_VALUE=&::sig_folder_3dv&+UNITS_MM
+			;
+
+	End_For_Each
+	/ITERATION_PARAMETER_NAME=loop
+	;
+
+	!add trailing '+'
+	Set_Pipeline_Parameter
+	/PARAMETER_NAME=sig_type_3dv
+	/PARAMETER_VALUE=&::sig_type_3dv&+
+	;
+
+	Set_Pipeline_Parameter
+	/PARAMETER_NAME=sig_folder_3dv
+	/PARAMETER_VALUE=&::sig_folder_3dv&+
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=olga
+;
+
+For_Each
+/ITERATION_PARAMETER_NAME=file
+! /ITERATION_PARAMETER_COUNT_NAME=
+/ITEMS=::files
+;
+
+	Select_Active_File
+	/FILE_NAME=::file
+	! /QUERY=
+	;
+
+	Set_Pipeline_Parameter
+	/PARAMETER_NAME=filename
+	/PARAMETER_VALUE=::file
+	/PARAMETER_VALUE_SEARCH_FOR=::working_directory
+	/PARAMETER_VALUE_REPLACE_WITH=
+	! /PARAMETER_VALUE_PREFIX=
+	! /PARAMETER_VALUE_APPEND=
+	! /MULTI_PASS=FALSE
+	;
+
+	Set_Pipeline_Parameter
+	/PARAMETER_NAME=filename
+	/PARAMETER_VALUE=::filename
+	/PARAMETER_VALUE_SEARCH_FOR=.c3d
+	/PARAMETER_VALUE_REPLACE_WITH=
+	! /PARAMETER_VALUE_PREFIX=
+	! /PARAMETER_VALUE_APPEND=
+	! /MULTI_PASS=FALSE
+	;
+
+	Set_Pipeline_Parameter_From_Expression
+	/PARAMETER_NAME=norm_points
+	/EXPRESSION=PARAMETERS::POINT::FRAMES
+	! /AS_INTEGER=TRUE
+	;
+
+	Get_Pipeline_Parameter_Count
+	/PARAMETER_NAME=count
+	/PARAMETER_VALUE=::marker_list_3dv
+	;
+
+	Set_Pipeline_Parameter_From_For_Loop
+	/PARAMETER_NAME=list
+	/PARAMETER_INDEX_START=1
+	/PARAMETER_INDEX_END=&::count& - 1
+	/PARAMETER_INDEX_STEP=1
+	! /PARAMETER_INDEX_TYPE=INTEGER
+	;
+
+	Set_Pipeline_Parameter
+	/PARAMETER_NAME=npoint
+	/PARAMETER_VALUE=&::norm_points&
+	;
+
+	For_Each
+	/ITERATION_PARAMETER_NAME=nn
+	! /ITERATION_PARAMETER_COUNT_NAME=
+	/ITEMS=::list
+	;
+
+		Set_Pipeline_Parameter
+		/PARAMETER_NAME=npoint
+		/PARAMETER_VALUE=&::npoint&+&::norm_points&
+		;
+
+	End_For_Each
+	/ITERATION_PARAMETER_NAME=nn
+	;
+
+	!Prepare force variables for export
+	! !reset following parameters for each trial (Dummy is just a workaround as parameter can't be empty)
+	Set_Pipeline_Parameter
+	/PARAMETER_NAME=force_type
+	/PARAMETER_VALUE=DUMMY
+	;
+
+	Set_Pipeline_Parameter
+	/PARAMETER_NAME=force_folder
+	/PARAMETER_VALUE=DUMMY
+	;
+
+	Set_Pipeline_Parameter
+	/PARAMETER_NAME=force_sig_name
+	/PARAMETER_VALUE=DUMMY
+	;
+
+	Set_Pipeline_Parameter
+	/PARAMETER_NAME=force_norm_points
+	/PARAMETER_VALUE=DUMMY
+	;
+
+	For_Each
+	/ITERATION_PARAMETER_NAME=fp
+	! /ITERATION_PARAMETER_COUNT_NAME=
+	/ITEMS=::fp_numbers
+	;
+
+		Set_Pipeline_Parameter
+		/PARAMETER_NAME=force_type
+		/PARAMETER_VALUE=&::force_type& +METRIC+METRIC+METRIC+DERIVED+DERIVED+DERIVED
+		;
+		
+		Set_Pipeline_Parameter
+		/PARAMETER_NAME=force_folder
+		/PARAMETER_VALUE=&::force_folder& +FORCE+FORCE+FORCE+FORCE+FORCE+FORCE
+		;
+		
+		Set_Pipeline_Parameter
+		/PARAMETER_NAME=force_sig_name
+		/PARAMETER_VALUE=&::force_sig_name&+FP&::fp&_CORNER1+FP&::fp&_CORNER2+FP&::fp&_CORNER3+FP&::fp&_FORCE+FP&::fp&_FREEMOMENT+FP&::fp&_COP
+		;
+		
+		Set_Pipeline_Parameter
+		/PARAMETER_NAME=force_norm_points
+		/PARAMETER_VALUE=&::force_norm_points& +1+1+1+&::norm_points&+&::norm_points&+&::norm_points&
+		;
+
+	End_For_Each
+	/ITERATION_PARAMETER_NAME=fp
+	;
+
+	Export_Data_To_Ascii_File
+	/SIGNAL_TYPES=&::sig_type_3dv&
+		METRIC+METRIC+METRIC+METRIC+
+		DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+
+		DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+
+		DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+DERIVED+
+		METRIC+METRIC+METRIC+METRIC+METRIC+METRIC+METRIC+METRIC+METRIC+METRIC+
+		METRIC+METRIC+METRIC+METRIC+METRIC+
+		&::force_type&
+	/SIGNAL_FOLDER=&::sig_folder_3dv&
+		PROCESSED+PROCESSED+PROCESSED+PROCESSED+
+		SEG_ROT+SEG_ROT+SEG_ROT+SEG_ROT+SEG_ROT+SEG_ROT+SEG_ROT+SEG_ROT+SEG_ROT+SEG_ROT+
+		SEG_ROT+SEG_ROT+SEG_ROT+SEG_ROT+SEG_ROT+SEG_POS+SEG_POS+SEG_POS+SEG_POS+SEG_POS+
+		SEG_POS+SEG_POS+SEG_POS+SEG_POS+SEG_POS+SEG_POS+SEG_POS+SEG_POS+SEG_POS+SEG_POS+
+		SEG_LENGTH+SEG_LENGTH+SEG_LENGTH+SEG_LENGTH+SEG_LENGTH+SEG_LENGTH+SEG_LENGTH+SEG_LENGTH+SEG_LENGTH+SEG_LENGTH+
+		SEG_LENGTH+SEG_LENGTH+SEG_LENGTH+SEG_LENGTH+SEG_LENGTH+
+		&::force_folder&
+	/SIGNAL_NAMES=&::marker_list_3dv&+
+		startTime+endTime+Uncropped Measurement Length+Frame Rate+
+		Pelvis_wrt_Lab+RThigh_wrt_Lab+RLeg_wrt_Lab+RFoot_wrt_Lab+LThigh_wrt_Lab+LLeg_wrt_Lab+LFoot_wrt_Lab+Thorax_wrt_Lab+RArm_wrt_Lab+RForearm_wrt_Lab+
+		RHand_wrt_Lab+LArm_wrt_Lab+LForearm_wrt_Lab+LHand_wrt_Lab+Head_wrt_Lab+Pelvis+RHip+RKnee+RAnkle+LHip+
+		LKnee+LAnkle+Thorax+RShoulder+RElbow+RWrist+LShoulder+LElbow+LWrist+Head+
+		Pelvis+RThigh+RLeg+RFoot+LThigh+LLeg+LFoot+Thorax+RArm+RForearm+
+		RHand+LArm+LForearm+LHand+Head+
+		&::force_sig_name&
+	/FILE_NAME=&::working_directory&&::filename&-3d-data.xml
+	! /SIGNAL_COMPONENTS=
+	/COMPONENT_SEQUENCE=ALL
+	! /SIGNAL_PRECISION=
+	! /START_LABEL=
+	! /END_LABEL=
+	! /EVENT_SEQUENCE=
+	! /EXCLUDE_EVENTS=
+	! /USE_POINT_RATE=FALSE
+	/NORMALIZE_DATA=TRUE
+	/NORMALIZE_POINTS=&::npoint&+
+		1+1+1+1+
+		&::norm_points&+&::norm_points&+&::norm_points&+&::norm_points&+&::norm_points&+&::norm_points&+&::norm_points&+&::norm_points&+&::norm_points&+&::norm_points&+
+		&::norm_points&+&::norm_points&+&::norm_points&+&::norm_points&+&::norm_points&+&::norm_points&+&::norm_points&+&::norm_points&+&::norm_points&+&::norm_points&+
+		&::norm_points&+&::norm_points&+&::norm_points&+&::norm_points&+&::norm_points&+&::norm_points&+&::norm_points&+&::norm_points&+&::norm_points&+&::norm_points&+
+		1+1+1+1+1+1+1+1+1+1+
+		1+1+1+1+1+
+		&::force_norm_points&
+	! /EXPORT_MEAN_AND_STD_DEV=FALSE
+	! /USE_P2D_FORMAT=FALSE
+	/USE_XML_FORMAT=TRUE
+	/USE_SHORT_FILENAME=TRUE
+	! /EXPORT_EMPTY_SIGNALS=FALSE
+	! /EXPORT_WITHOUT_HEADER=FALSE
+	! /EXPORT_NAN=FALSE
+	;
+
+End_For_Each
+/ITERATION_PARAMETER_NAME=file
+;
+
+! Export session_data used by online web report
+Select_Active_File
+/FILE_NAME=Dynamic
+! /QUERY=
+;
+
+Evaluate_Expression
+/EXPRESSION=PARAMETERS::PROCESSING::Uncropped Measurement Length
+/RESULT_TYPES=METRIC
+! /RESULT_FOLDERS=PROCESSED
+/RESULT_NAME=Uncropped Measurement Length
+! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+;
+
+Evaluate_Expression
+/EXPRESSION=PARAMETERS::PROCESSING::Uncropped Measurement Frames
+/RESULT_TYPES=METRIC
+! /RESULT_FOLDERS=PROCESSED
+/RESULT_NAME=Uncropped Measurement Frames
+! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+;
+
+Evaluate_Expression
+/EXPRESSION=PARAMETERS::PROCESSING::Cropped Measurement Start Frame
+/RESULT_TYPES=METRIC
+! /RESULT_FOLDERS=PROCESSED
+/RESULT_NAME=Cropped Measurement Start Frame
+! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+;
+
+Evaluate_Expression
+/EXPRESSION=PARAMETERS::PROCESSING::Cropped Measurement End Frame
+/RESULT_TYPES=METRIC
+! /RESULT_FOLDERS=PROCESSED
+/RESULT_NAME=Cropped Measurement End Frame
+! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+;
+
+Evaluate_Expression
+/EXPRESSION=PARAMETERS::POINT::RATE
+/RESULT_TYPES=METRIC
+! /RESULT_FOLDERS=PROCESSED
+/RESULT_NAME=Frame_rate
+! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=Data_Exists(PARAMETERS::ANALOG::RATE)
+! /AS_INTEGER=TRUE
+;
+
+	Evaluate_Expression
+	/EXPRESSION=PARAMETERS::ANALOG::RATE
+	/RESULT_TYPES=METRIC
+	! /RESULT_FOLDERS=PROCESSED
+	/RESULT_NAME=Analog_rate
+	! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Export_Data_To_Ascii_File
+/SIGNAL_TYPES=::sig_types_web
+/SIGNAL_FOLDER=::sig_folder_web
+/SIGNAL_NAMES=::sig_names_web
+/FILE_NAME=&::working_directory&session_data.xml
+! /SIGNAL_COMPONENTS=
+/COMPONENT_SEQUENCE=ALL
+/SIGNAL_PRECISION=8
+! /START_LABEL=
+! /END_LABEL=
+! /EVENT_SEQUENCE=
+! /EXCLUDE_EVENTS=
+! /USE_POINT_RATE=FALSE
+! /NORMALIZE_DATA=FALSE
+! /NORMALIZE_POINTS=101
+! /EXPORT_MEAN_AND_STD_DEV=FALSE
+! /USE_P2D_FORMAT=FALSE
+/USE_XML_FORMAT=TRUE
+/USE_SHORT_FILENAME=TRUE
+! /EXPORT_EMPTY_SIGNALS=FALSE
+! /EXPORT_WITHOUT_HEADER=FALSE
+! /EXPORT_NAN=FALSE
+/USE_SCIENTIFIC_NOTATION=TRUE
+;
+
+!====================================
+!Save the CMO
+!====================================
+
+Recalc
+;
+
+Clear_Recalc_Pipeline
+;
+
+File_Save_As
+/FILE_NAME=::cmo_file
+;
+
+Exit_Workspace
+;

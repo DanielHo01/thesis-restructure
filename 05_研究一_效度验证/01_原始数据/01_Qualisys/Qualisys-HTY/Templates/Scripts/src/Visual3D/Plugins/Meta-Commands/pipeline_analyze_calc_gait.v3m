@@ -1,0 +1,727 @@
+! BEGIN_META
+! META_CMD_NAME	= Pipeline_Analyze_Calc_Gait
+! META_PARAM	= includes_OFM  :   string ::yes						
+! META_PARAM	= analog_filter_fq  :   string ::yes						
+! META_PARAM	= analog_filter_fq_treadmill  :   string ::yes						
+! META_PARAM	= analog_filter_fq_str  :   string ::yes						
+! META_PARAM	= event_mode  :   string ::yes						
+! META_PARAM	= force_threshold  :   string ::yes		
+! META_PARAM	= instrumented_treadmill  :   string ::yes						
+! META_PARAM	= report_template_directory  :   string ::yes						
+! META_PARAM	= report_template  :   string ::yes						
+! META_PARAM	= subject_info_page  :   string ::yes						
+! META_PARAM	= model_used  :   string ::yes						
+! META_PARAM	= first_name  :   string ::yes						
+! META_PARAM	= last_name  :   string ::yes						
+! META_PARAM	= patient_ID  :   string ::yes						
+! META_PARAM	= creation_date_patient  :   string ::yes						
+! META_PARAM	= date_of_birth  :   string ::yes						
+! META_PARAM	= height_w_units  :   string ::yes						
+! META_PARAM	= weight_w_units  :   string ::yes						
+! META_PARAM	= full_body  :   string ::yes						
+! META_PARAM	= left_foot_normalized  :   string ::yes						
+! META_PARAM	= right_foot_normalized  :   string ::yes						
+! META_PARAM	= foot_norm_info  :   string ::yes						
+! META_PARAM	= normative_data  :   string ::yes						
+! META_PARAM	= normative_file_exists  :   string ::yes						
+! META_PARAM	= normative_file  :   string ::yes						
+! META_PARAM	= page_nums_annot  :   string ::yes						
+! META_PARAM	= left_norm_event  :   string ::yes						
+! META_PARAM	= right_norm_event  :   string ::yes						
+! META_PARAM	= page_titles_list  :   string ::yes						
+! META_PARAM	= test_condition  :   string ::yes						
+! END_META
+
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!  Copyright notice
+!  This PAF and its content is copyright of Qualisys AB © 2012-2019. All rights reserved. 
+!  The PAF script is only to be used in conjunction with a Qualisys Motion Capture System. 
+!  Only legal PAF owners are entitled to use the script and only in relation with related PAF.
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Select_Active_File
+/FILE_NAME=ALL_FILES
+! /QUERY=
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::includes_OFM&" = "TRUE")
+! /AS_INTEGER=TRUE
+;
+
+	! calculate arch height (Stebbins 2006)
+	For_Each
+	/ITERATION_PARAMETER_NAME=side
+	! /ITERATION_PARAMETER_COUNT_NAME=
+	/ITEMS=L+R
+	;
+
+		Evaluate_Expression
+		/EXPRESSION=distance(TARGET::PROCESSED::&::side&_P1MT, LANDMARK::ORIGINAL::&::side&_P1MT_FF)
+		/RESULT_NAME=&::side&_arch_height
+		/RESULT_TYPE=DERIVED
+		/RESULT_FOLDER=ARCH_HEIGHT
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=olga
+		/EXPRESSION=((Data_Exists(TARGET::ORIGINAL::R_SIAS) = 1) | (Data_Exists(TARGET::ORIGINAL::L_SIPS) = 1))
+		! /AS_INTEGER=TRUE
+		;
+		
+			Evaluate_Expression
+			/EXPRESSION=distance(TARGET::PROCESSED::&::side&_HEEL_CALC, TARGET::PROCESSED::&::side&_TOE_2_MET)
+			/RESULT_NAME=&::side&_foot_length
+			/RESULT_TYPE=DERIVED
+			/RESULT_FOLDER=ARCH_HEIGHT
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=olga
+		;
+		
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=notolga
+		/EXPRESSION=((Data_Exists(TARGET::ORIGINAL::R_SIAS) <> 1) | (Data_Exists(TARGET::ORIGINAL::L_SIPS) <> 1))
+		! /AS_INTEGER=TRUE
+		;
+
+			Evaluate_Expression
+			/EXPRESSION=distance(TARGET::PROCESSED::&::side&_FCC, TARGET::PROCESSED::&::side&_FM2)
+			/RESULT_NAME=&::side&_foot_length
+			/RESULT_TYPE=DERIVED
+			/RESULT_FOLDER=ARCH_HEIGHT
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=notolga
+		;
+		
+	End_For_Each
+	/ITERATION_PARAMETER_NAME=side
+	;
+
+	Evaluate_Expression
+	/EXPRESSION=(DERIVED::ARCH_HEIGHT::L_arch_height / DERIVED::ARCH_HEIGHT::L_foot_length) * 100 !in percent
+	/RESULT_NAME=Left Arch Height
+	/RESULT_TYPE=DERIVED
+	/RESULT_FOLDER=ARCH_HEIGHT
+	;
+
+	Evaluate_Expression
+	/EXPRESSION=(DERIVED::ARCH_HEIGHT::R_arch_height / DERIVED::ARCH_HEIGHT::R_foot_length) * 100 !in percent
+	/RESULT_NAME=Right Arch Height
+	/RESULT_TYPE=DERIVED
+	/RESULT_FOLDER=ARCH_HEIGHT
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Select_Active_File
+/FILE_NAME=Dynamic
+! /QUERY=
+;
+
+!=================================
+! Filter Force data with high frequency for plots
+!=================================
+!compute Force signals used in graphs (lowpass filter cut off fq is set to ::analog_filter_fq_graphs Hz)
+Compute_Model_Based_Data
+/RESULT_NAME=Right GRF
+/FUNCTION=GRF_DATA
+/SEGMENT=RFT
+/REFERENCE_SEGMENT=
+/RESOLUTION_COORDINATE_SYSTEM=Virtual Lab
+! /USE_CARDAN_SEQUENCE=FALSE
+/NORMALIZATION=TRUE
+/NORMALIZATION_METHOD=DEFAULT_NORMALIZATION
+! /NORMALIZATION_METRIC=
+/NEGATEX=TRUE
+! /NEGATEY=FALSE
+! /NEGATEZ=FALSE
+! /AXIS1=X
+! /AXIS2=Y
+! /AXIS3=Z
+;
+
+Compute_Model_Based_Data
+/RESULT_NAME=Left GRF
+/FUNCTION=GRF_DATA
+/SEGMENT=LFT
+/REFERENCE_SEGMENT=
+/RESOLUTION_COORDINATE_SYSTEM=Virtual Lab
+! /USE_CARDAN_SEQUENCE=FALSE
+/NORMALIZATION=TRUE
+/NORMALIZATION_METHOD=DEFAULT_NORMALIZATION
+! /NORMALIZATION_METRIC=
+! /NEGATEX=FALSE
+! /NEGATEY=FALSE
+! /NEGATEZ=FALSE
+! /AXIS1=X
+! /AXIS2=Y
+! /AXIS3=Z
+;
+
+Multiply_Signals_By_Constant
+/SIGNAL_TYPES=LINK_MODEL_BASED
+! /SIGNAL_FOLDER=ORIGINAL
+/SIGNAL_NAMES=Right GRF
+! /SIGNAL_COMPONENTS=
+! /RESULT_TYPES=
+/RESULT_FOLDERS=FORCE_GRAPH
+/RESULT_NAME=Right GRF
+/APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+/CONSTANT=1
+;
+
+Multiply_Signals_By_Constant
+/SIGNAL_TYPES=LINK_MODEL_BASED
+! /SIGNAL_FOLDER=ORIGINAL
+/SIGNAL_NAMES=Left GRF
+! /SIGNAL_COMPONENTS=
+! /RESULT_TYPES=
+/RESULT_FOLDERS=FORCE_GRAPH
+/RESULT_NAME=Left GRF
+/APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+/CONSTANT=1
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(&::analog_filter_fq& > 0) &::AMP& ("&::instrumented_treadmill&" = "FALSE")
+! /AS_INTEGER=TRUE
+;
+
+	Lowpass_Filter
+	/SIGNAL_TYPES=ANALOG
+	! /SIGNAL_NAMES=
+	/SIGNAL_FOLDER=ORIGINAL
+	! /RESULT_SUFFIX=
+	! /RESULT_FOLDER=PROCESSED
+	! /FILTER_CLASS=BUTTERWORTH
+	/FREQUENCY_CUTOFF=::analog_filter_fq_str
+	/NUM_REFLECTED=0
+	! /TOTAL_BUFFER_SIZE=6
+	! /NUM_BIDIRECTIONAL_PASSES=1
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(&::analog_filter_fq_treadmill& > 0) &::AMP& ("&::instrumented_treadmill&" = "TRUE")
+! /AS_INTEGER=TRUE
+;
+
+	Lowpass_Filter
+	/SIGNAL_TYPES=ANALOG
+	! /SIGNAL_NAMES=
+	/SIGNAL_FOLDER=ORIGINAL
+	! /RESULT_SUFFIX=
+	! /RESULT_FOLDER=PROCESSED
+	! /FILTER_CLASS=BUTTERWORTH
+	/FREQUENCY_CUTOFF=::analog_filter_fq_str
+	/NUM_REFLECTED=0
+	! /TOTAL_BUFFER_SIZE=6
+	! /NUM_BIDIRECTIONAL_PASSES=1
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::instrumented_treadmill&" = "TRUE")
+! /AS_INTEGER=TRUE
+;
+
+	!Calculate treadmill speed from foot velocity
+	Set_Pipeline_Parameter_To_List_Of_Tagged_Files
+	/PARAMETER_NAME=files
+	/TAG_NAME=Dynamic
+	! /GET_CURRENT_SELECTED_FILES=false
+	! /USE_SHORT_FILENAMES=false
+	;
+
+	For_Each
+	/ITERATION_PARAMETER_NAME=file
+	! /ITERATION_PARAMETER_COUNT_NAME=
+	/ITEMS=::files
+	;
+
+		Select_Active_File
+		/FILE_NAME=::file
+		! /QUERY=
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond1
+		/EXPRESSION=(METRIC::TREADMILL::SPEED::X = 0)
+		! /AS_INTEGER=TRUE
+		;
+
+			Metric_Minimum
+			! /RESULT_METRIC_FOLDER=PROCESSED
+			/RESULT_METRIC_NAME=LFT_CGVel_min
+			! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+			/SIGNAL_TYPES=KINETIC_KINEMATIC
+			/SIGNAL_FOLDER=LFT
+			/SIGNAL_NAMES=CGVel
+			/COMPONENT_SEQUENCE=ALL
+			/EVENT_SEQUENCE=RON+RHS
+			/EXCLUDE_EVENTS=
+			/SEQUENCE_PERCENT_START=
+			/SEQUENCE_PERCENT_END=
+			/GENERATE_MEAN_AND_STDDEV=FALSE
+			! /APPEND_TO_EXISTING_VALUES=FALSE
+			! /CREATE_GLOBAL_MINIMUM=FALSE
+			;
+
+			Metric_Mean
+			! /RESULT_METRIC_FOLDER=PROCESSED
+			/RESULT_METRIC_NAME=_mean
+			/APPLY_AS_SUFFIX_TO_SIGNAL_NAME=TRUE
+			/SIGNAL_TYPES=METRIC
+			/SIGNAL_FOLDER=PROCESSED
+			/SIGNAL_NAMES=LFT_CGVel_min
+			/COMPONENT_SEQUENCE=ALL
+			/EVENT_SEQUENCE=
+			/EXCLUDE_EVENTS=
+			/SEQUENCE_PERCENT_START=
+			/SEQUENCE_PERCENT_END=
+			/GENERATE_MEAN_AND_STDDEV=FALSE
+			! /APPEND_TO_EXISTING_VALUES=FALSE
+			;
+
+			Evaluate_Expression
+			/EXPRESSION=METRIC::PROCESSED::LFT_CGVel_min_mean::X * -1
+			/RESULT_TYPES=METRIC
+			/RESULT_FOLDERS=TREADMILL
+			/RESULT_NAME=SPEED
+			! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+			;
+
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond1
+		;
+
+	Conditional_Statement_End
+	/ITERATION_PARAMETER_NAME=cond
+	;
+
+End_For_Each
+/ITERATION_PARAMETER_NAME=file
+;
+
+! ==================================
+! Load report template. 
+! It contains definitions of the link_model_based items but these will be replaced later with recalc.v3s.
+! ==================================
+
+Open_Report_Template
+/REPORT_TEMPLATE=&::report_template_directory&&::report_template
+;
+
+! delete subject info page based on settings.php
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::subject_info_page&" = "FALSE")
+! /AS_INTEGER=TRUE
+;
+
+	Delete_Report_Page
+	/PAGE_NUMBER=1
+	! /DELETE_ALL_PAGES=FALSE
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::subject_info_page&" = "TRUE")
+! /AS_INTEGER=TRUE
+;
+
+	Delete_Report_Page
+	/PAGE_NUMBER=2
+	! /DELETE_ALL_PAGES=FALSE
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::model_used&" = "CGM")
+! /AS_INTEGER=TRUE
+;
+
+	Select_Active_File
+	/FILE_NAME=STATIC
+	! /QUERY=
+	;
+
+	!============================================
+	!Prepare the PiG ankle angle calculations
+	!============================================
+
+	Metric_Mean
+	! /RESULT_METRIC_FOLDER=PROCESSED
+	/RESULT_METRIC_NAME=GLOBAL::LAnkleAnglesOffsets
+	! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+	/SIGNAL_TYPES=LINK_MODEL_BASED
+	! /SIGNAL_FOLDER=ORIGINAL
+	/SIGNAL_NAMES=LAnkleAnglesStaticOnly
+	/COMPONENT_SEQUENCE=ALL
+	/EVENT_SEQUENCE=
+	/EXCLUDE_EVENTS=
+	/SEQUENCE_PERCENT_START=
+	/SEQUENCE_PERCENT_END=
+	/GENERATE_MEAN_AND_STDDEV=FALSE
+	! /APPEND_TO_EXISTING_VALUES=FALSE
+	;
+
+	Metric_Mean
+	! /RESULT_METRIC_FOLDER=PROCESSED
+	/RESULT_METRIC_NAME=GLOBAL::RAnkleAnglesOffsets
+	! /APPLY_AS_SUFFIX_TO_SIGNAL_NAME=FALSE
+	/SIGNAL_TYPES=LINK_MODEL_BASED
+	! /SIGNAL_FOLDER=ORIGINAL
+	/SIGNAL_NAMES=RAnkleAnglesStaticOnly
+	/COMPONENT_SEQUENCE=ALL
+	/EVENT_SEQUENCE=
+	/EXCLUDE_EVENTS=
+	/SEQUENCE_PERCENT_START=
+	/SEQUENCE_PERCENT_END=
+	/GENERATE_MEAN_AND_STDDEV=FALSE
+	! /APPEND_TO_EXISTING_VALUES=FALSE
+	;
+
+	Select_Active_File
+	/FILE_NAME=ALL_FILES
+	!/QUERY=
+	;
+
+	Evaluate_Expression
+	/EXPRESSION=vector(
+		GLOBAL::METRIC::PROCESSED::LAnkleAnglesOffsets::x,
+		GLOBAL::METRIC::PROCESSED::LAnkleAnglesOffsets::y,
+		0)
+	/RESULT_TYPES=METRIC
+	/RESULT_NAME=LAnkleAnglesOffsets
+	;
+
+	Evaluate_Expression
+	/EXPRESSION=vector(
+		GLOBAL::METRIC::PROCESSED::RAnkleAnglesOffsets::x,
+		GLOBAL::METRIC::PROCESSED::RAnkleAnglesOffsets::y,
+		0)
+	/RESULT_TYPES=METRIC
+	/RESULT_NAME=RAnkleAnglesOffsets
+	;
+
+	!Recalc pipeline will apply these offsets to the ankle angle
+	Recalc
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+! add meta data to first page
+Select_Active_File
+/FILE_NAME=GLOBAL
+! /QUERY=
+;
+
+Set_Text_Item
+/SIGNAL_NAME=First name
+/SIGNAL_FOLDER=META
+/SIGNAL_DATA_VALUE=::first_name
+;
+
+Set_Text_Item
+/SIGNAL_NAME=Last name
+/SIGNAL_FOLDER=META
+/SIGNAL_DATA_VALUE=::last_name
+;
+
+Set_Text_Item
+/SIGNAL_NAME=ID
+/SIGNAL_FOLDER=META
+/SIGNAL_DATA_VALUE=::patient_ID
+;
+
+Set_Text_Item
+/SIGNAL_NAME=Creation date
+/SIGNAL_FOLDER=META
+/SIGNAL_DATA_VALUE=::creation_date_patient
+;
+
+Set_Text_Item
+/SIGNAL_NAME=DOB
+/SIGNAL_FOLDER=META
+/SIGNAL_DATA_VALUE=::date_of_birth
+;
+
+Set_Text_Item
+/SIGNAL_NAME=Height
+/SIGNAL_FOLDER=META
+/SIGNAL_DATA_VALUE=::height_w_units
+;
+
+Set_Text_Item
+/SIGNAL_NAME=Weight
+/SIGNAL_FOLDER=META
+/SIGNAL_DATA_VALUE=::weight_w_units
+;
+
+Select_Active_File
+/FILE_NAME=ALL_FILES
+! /QUERY=
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::full_body&" = "TRUE")
+! /AS_INTEGER=TRUE
+;
+
+	!=========================================
+	! Include Upper Body
+	!=========================================
+	Append_Report_Template
+	/REPORT_TEMPLATE=&::report_template_directory&Report_upper_body_gait.rgt
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::model_used&" = "CGM")
+! /AS_INTEGER=TRUE
+;
+
+	Evaluate_Expression
+	/EXPRESSION=LINK_MODEL_BASED::ORIGINAL::Left Ankle Angles_CGM
+	/RESULT_TYPES=LINK_MODEL_BASED
+	/RESULT_NAME=Left Ankle Angles
+	;
+	
+	Evaluate_Expression
+	/EXPRESSION=LINK_MODEL_BASED::ORIGINAL::Right Ankle Angles_CGM
+	/RESULT_TYPES=LINK_MODEL_BASED
+	/RESULT_NAME=Right Ankle Angles
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(("&::left_foot_normalized&" = "TRUE" + "&::right_foot_normalized&" = "TRUE") > 0)
+! /AS_INTEGER=TRUE
+;
+
+	Make_Text_Annotation
+	/FONT_NAME=Arial
+	! /FONT_SIZE=NORMAL
+	! /FONT_BOLD=FALSE
+	! /FONT_ITALIC=FALSE
+	! /FONT_UNDERLINE=FALSE
+	/FONT_COLOR=RED
+	! /ALIGN_TOP=TRUE
+	! /ALIGNMENT=LEFT
+	/ANNOTATION_NAME=equinus
+	/PAGE_NUMBER=1
+	/X_POS=3
+	/Y_POS=60
+	/BALLOON_TEXT=Note: &::foot_norm_info
+	/DRAW_BOX=FALSE
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+! ==================================
+! ! Load normative data for kinematic data
+! ==================================
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::normative_data&" = "Custom")
+! /AS_INTEGER=TRUE
+;
+
+	File_Open
+	! /FILE_NAME=
+	! /SUFFIX=
+	/SET_PROMPT=Select normative data (.vnd) file!
+	! /FILTER=VND
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Select_Active_File
+/FILE_NAME=ALL_FILES
+! /QUERY=
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::normative_data&" <> "Custom" * "&::normative_file_exists&" = "TRUE")
+! /AS_INTEGER=TRUE
+;
+
+	File_Open
+	/FILE_NAME=::normative_file
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+! Add annotations for normative events on page 3,4,9 (comparison graphs)
+For_Each
+/ITERATION_PARAMETER_NAME=p
+/ITEMS=::page_nums_annot
+;
+
+	Set_Pipeline_Parameter_From_For_Loop
+	/PARAMETER_NAME=col
+	/PARAMETER_INDEX_START=1
+	/PARAMETER_INDEX_END=3
+	/PARAMETER_INDEX_STEP=1
+	! /PARAMETER_INDEX_TYPE=INTEGER
+	;
+	
+	For_Each
+	/ITERATION_PARAMETER_NAME=cl
+	! /ITERATION_PARAMETER_COUNT_NAME=
+	/ITEMS=::col
+	;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond
+		/EXPRESSION=(&::p& = 3)
+		! /AS_INTEGER=TRUE
+		;
+
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=r
+			/PARAMETER_VALUE=5
+			;	
+		
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond
+		;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond
+		/EXPRESSION=(&::p& <> 3)
+		! /AS_INTEGER=TRUE
+		;
+
+			Set_Pipeline_Parameter
+			/PARAMETER_NAME=r
+			/PARAMETER_VALUE=4
+			;	
+		
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond
+		;
+
+		Set_Pipeline_Parameter_From_For_Loop
+		/PARAMETER_NAME=row
+		/PARAMETER_INDEX_START=1
+		/PARAMETER_INDEX_END=::r
+		/PARAMETER_INDEX_STEP=1
+		! /PARAMETER_INDEX_TYPE=INTEGER
+		;
+	
+		For_Each
+		/ITERATION_PARAMETER_NAME=rw
+		! /ITERATION_PARAMETER_COUNT_NAME=
+		/ITEMS=::row
+		;
+
+			Add_Graph_Annotation
+			/PAGE_NUMBER=::p
+			/COLUMN_NUMBER=::cl
+			/ROW_NUMBER=::rw
+			/DRAW_ORDER=1
+			/ANNOTATION_EVENT=::left_norm_event
+			/ANNOTATION_STYLE=Bottom TICKS
+			/ANNOTATION_COLOR=Red
+			/ANNOTATION_SIZE=Large
+			/ANNOTATION_GLOBAL=True
+			/ANNOTATION_AVERAGE_EVENT=True
+			;
+
+			Add_Graph_Annotation
+			/PAGE_NUMBER=::p
+			/COLUMN_NUMBER=::cl
+			/ROW_NUMBER=::rw
+			/DRAW_ORDER=1
+			/ANNOTATION_EVENT=::right_norm_event
+			/ANNOTATION_STYLE=Bottom TICKS
+			/ANNOTATION_COLOR=Blue
+			/ANNOTATION_SIZE=Large
+			/ANNOTATION_GLOBAL=True
+			/ANNOTATION_AVERAGE_EVENT=True
+			;
+
+		End_For_Each
+		/ITERATION_PARAMETER_NAME=rw
+		;
+
+	End_For_Each
+	/ITERATION_PARAMETER_NAME=cl
+	;
+	
+End_For_Each
+/ITERATION_PARAMETER_NAME=p
+;
+
+For_Each
+/ITERATION_PARAMETER_NAME=page_title
+/ITERATION_PARAMETER_COUNT_NAME=p_num
+/ITEMS=::page_titles_list
+;
+
+	Set_Pipeline_Parameter
+	/PARAMETER_NAME=page_title_full
+	/PARAMETER_VALUE=&::page_title& - &::test_condition
+	;
+
+	Set_Report_Page_Title
+	/PAGE_NUMBER=::p_num
+	/PAGE_TITLE=::page_title_full
+	! /PAGE_TITLE_FONT=Arial
+	! /PAGE_TITLE_FONT_SIZE=12
+	! /PAGE_TITLE_FONT_BOLD=FALSE
+	! /PAGE_TITLE_FONT_ITALIC=FALSE
+	! /PAGE_TITLE_FONT_UNDERLINE=FALSE
+	! /PAGE_TITLE_ALIGN=ALIGN_CENTER
+	! /PAGE_TITLE_COLOR=BLACK
+	;
+
+End_For_Each
+/ITERATION_PARAMETER_NAME=page_title
+;
+

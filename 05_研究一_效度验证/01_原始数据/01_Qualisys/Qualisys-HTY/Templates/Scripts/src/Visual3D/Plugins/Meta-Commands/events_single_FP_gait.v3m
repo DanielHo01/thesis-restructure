@@ -1,0 +1,407 @@
+! BEGIN_META
+! META_CMD_NAME	= Events_Single_FP_Gait
+! META_PARAM	= working_directory  :   string ::yes						
+! META_PARAM	= force_threshold  :   string ::yes						
+! END_META
+
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!  Copyright notice
+!  This PAF and its content is copyright of Qualisys AB © 2012-2017. All rights reserved. 
+!  The PAF script is only to be used in conjunction with a Qualisys Motion Capture System. 
+!  Only legal PAF owners are entitled to use the script and only in relation with related PAF.
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+! ==================================
+! PAF pipeline to generate gait events based on a single FP.
+! May be included in processing pipeline, depending on the mode that is set for the event detection.
+! PHP code is used by QTM to populate script before running it in Visual3D
+!
+! Assumes that $force_threshold has been set in main pipeline
+!
+! NB, 14/05/2012
+! ==================================
+
+! ==================================
+! Find name of file for pattern recognition.
+! ==================================
+!Calculate the size of the window that will be used for the event detection. This changes depending on the frame rate.
+!=========================================
+!Note: a single file has to be selected to set pipeline parameter
+Select_Active_File
+/FILE_NAME=0
+! /QUERY=
+;
+
+Set_Pipeline_Parameter_To_Data_Value
+/PARAMETER_NAME=WINDOW
+/SIGNAL_TYPES=METRIC
+/SIGNAL_NAMES=WINDOW
+/SIGNAL_FOLDER=PROCESSED
+! /SIGNAL_COMPONENTS=ALL_COMPONENTS
+;
+
+!Events detection
+!=========================================
+Select_Active_File
+/FILE_NAME=ALL_FILES
+! /QUERY=
+;
+
+!Prepare a list with all file names
+Set_Pipeline_Parameter_To_List_Of_Files
+/PARAMETER_NAME=FILES
+/FOLDER=::working_directory
+! /SEARCH_SUBFOLDERS=FALSE
+/FILE_MASK=Gait *.c3d
+;
+
+Set_Pipeline_Parameter
+/PARAMETER_NAME=FILES_wo_path
+/PARAMETER_VALUE=::FILES
+/PARAMETER_VALUE_SEARCH_FOR=::working_directory
+/PARAMETER_VALUE_REPLACE_WITH=..\
+! /PARAMETER_VALUE_PREFIX=
+! /PARAMETER_VALUE_APPEND=
+;
+
+!Prompt the user to select a file
+Prompt_For_Pipeline_Parameter_Value
+/PIPELINE_PARAMETER_NAME=LEFT_wo_path
+/PROMPT=Select template file for LEFT side event detection (FP contact with left foot):
+! /DATA_TYPE=
+/DEFAULT_VALUE=::FILES_wo_path
+;
+
+Set_Pipeline_Parameter
+/PARAMETER_NAME=L_TEMPLATE_FILE
+/PARAMETER_VALUE=::LEFT_wo_path
+/PARAMETER_VALUE_SEARCH_FOR=..\
+/PARAMETER_VALUE_REPLACE_WITH=::working_directory
+! /PARAMETER_VALUE_PREFIX=
+! /PARAMETER_VALUE_APPEND=
+;
+
+Assign_Tags_To_Files
+/MOTION_FILE_NAMES=::L_TEMPLATE_FILE
+! /QUERY=
+/TAGS=left template
+;
+
+Prompt_For_Pipeline_Parameter_Value
+/PIPELINE_PARAMETER_NAME=RIGHT_wo_path
+/PROMPT=Select template file for RIGHT side event detection (FP contact with right foot):
+! /DATA_TYPE=
+/DEFAULT_VALUE=::FILES_wo_path
+;
+
+Set_Pipeline_Parameter
+/PARAMETER_NAME=R_TEMPLATE_FILE
+/PARAMETER_VALUE=::RIGHT_wo_path
+/PARAMETER_VALUE_SEARCH_FOR=..\
+/PARAMETER_VALUE_REPLACE_WITH=::working_directory
+! /PARAMETER_VALUE_PREFIX=
+! /PARAMETER_VALUE_APPEND=
+;
+
+Assign_Tags_To_Files
+/MOTION_FILE_NAMES=::R_TEMPLATE_FILE
+! /QUERY=
+/TAGS=right template
+;
+
+! =======================
+! Event detection
+! =======================
+Select_Active_File
+/FILE_NAME=ALL_FILES
+!/QUERY=
+;
+
+! Compute left and right foot GRF so that right and left side events can be assigned correctly.
+Compute_Model_Based_Data
+/RESULT_NAME=LFT_GRF
+/FUNCTION=GRF_DATA
+/SEGMENT=LFT
+/REFERENCE_SEGMENT=
+! /RESOLUTION_COORDINATE_SYSTEM=LAB
+! /USE_CARDAN_SEQUENCE=FALSE
+! /NORMALIZATION=FALSE
+! /NORMALIZATION_METHOD=
+! /NORMALIZATION_METRIC=
+! /NEGATEX=FALSE
+! /NEGATEY=FALSE
+! /NEGATEZ=FALSE
+! /AXIS1=X
+! /AXIS2=Y
+! /AXIS3=Z
+;
+Compute_Model_Based_Data
+/RESULT_NAME=RFT_GRF
+/FUNCTION=GRF_DATA
+/SEGMENT=RFT
+/REFERENCE_SEGMENT=
+! /RESOLUTION_COORDINATE_SYSTEM=LAB
+! /USE_CARDAN_SEQUENCE=FALSE
+! /NORMALIZATION=FALSE
+! /NORMALIZATION_METHOD=
+! /NORMALIZATION_METRIC=
+! /NEGATEX=FALSE
+! /NEGATEY=FALSE
+! /NEGATEZ=FALSE
+! /AXIS1=X
+! /AXIS2=Y
+! /AXIS3=Z
+;
+
+! Change Z-values from NO_DATA to zero so that the Event_Threshold command will work properly
+Set_Data_To_New_Values
+/SIGNAL_TYPES=LINK_MODEL_BASED+LINK_MODEL_BASED
+/SIGNAL_NAMES=LFT_GRF+RFT_GRF
+/SIGNAL_FOLDER=ORIGINAL+ORIGINAL
+/SIGNAL_COMPONENTS=Z
+! /RESULT_SUFFIX=
+! /RESULT_FOLDER=PROCESSED
+! /EVENT_SEQUENCE=
+! /EXCLUDE_EVENTS=
+! /START_FRAME=
+! /END_FRAME=
+! /USE_POINT_RATE=TRUE
+/REPLACEMENT_VALUES=0
+! /THRESHOLD_HIGH=NO_DATA
+/THRESHOLD_LOW=::force_threshold
+;
+
+! Find FP-based events in the template files
+
+Select_Active_File
+/FILE_NAME=ALL_FILES
+;
+
+Event_Threshold
+/SIGNAL_TYPES=LINK_MODEL_BASED
+/SIGNAL_NAMES=LFT_GRF
+/SIGNAL_FOLDER=PROCESSED
+/EVENT_NAME=LON
+! /SELECT_X=FALSE
+! /SELECT_Y=FALSE
+/SELECT_Z=TRUE
+! /SELECT_RESIDUAL=FALSE
+/THRESHOLD=::force_threshold
+/FRAME_WINDOW=::WINDOW
+/FRAME_OFFSET=-1
+/ASCENDING=TRUE
+! /DESCENDING=FALSE
+! /ENSURE_RANGE_FRAMES_BEFORE_THRESHOLD_CROSSING=FALSE
+! /ENSURE_RANGE_FRAMES_AFTER_THRESHOLD_CROSSING=FALSE
+! /START_AT_EVENT=
+! /END_AT_EVENT=
+/EVENT_INSTANCE=1
+;
+
+Event_Threshold
+/SIGNAL_TYPES=LINK_MODEL_BASED
+/SIGNAL_NAMES=LFT_GRF
+/SIGNAL_FOLDER=PROCESSED
+/EVENT_NAME=LOFF
+! /SELECT_X=FALSE
+! /SELECT_Y=FALSE
+/SELECT_Z=TRUE
+! /SELECT_RESIDUAL=FALSE
+/THRESHOLD=::force_threshold
+/FRAME_WINDOW=::WINDOW
+/FRAME_OFFSET=-1
+! /ASCENDING=FALSE
+/DESCENDING=TRUE
+! /ENSURE_RANGE_FRAMES_BEFORE_THRESHOLD_CROSSING=FALSE
+! /ENSURE_RANGE_FRAMES_AFTER_THRESHOLD_CROSSING=FALSE
+/START_AT_EVENT=LON
+! /END_AT_EVENT=
+/EVENT_INSTANCE=1
+;
+
+Event_Threshold
+/SIGNAL_TYPES=LINK_MODEL_BASED
+/SIGNAL_NAMES=RFT_GRF
+/SIGNAL_FOLDER=PROCESSED
+/EVENT_NAME=RON
+! /SELECT_X=FALSE
+! /SELECT_Y=FALSE
+/SELECT_Z=TRUE
+! /SELECT_RESIDUAL=FALSE
+/THRESHOLD=::force_threshold
+/FRAME_WINDOW=::WINDOW
+/FRAME_OFFSET=-1
+/ASCENDING=TRUE
+! /DESCENDING=FALSE
+! /ENSURE_RANGE_FRAMES_BEFORE_THRESHOLD_CROSSING=FALSE
+! /ENSURE_RANGE_FRAMES_AFTER_THRESHOLD_CROSSING=FALSE
+! /START_AT_EVENT=
+! /END_AT_EVENT=
+/EVENT_INSTANCE=1
+;
+
+Event_Threshold
+/SIGNAL_TYPES=LINK_MODEL_BASED
+/SIGNAL_NAMES=RFT_GRF
+/SIGNAL_FOLDER=PROCESSED
+/EVENT_NAME=ROFF
+! /SELECT_X=FALSE
+! /SELECT_Y=FALSE
+/SELECT_Z=TRUE
+! /SELECT_RESIDUAL=FALSE
+/THRESHOLD=::force_threshold
+/FRAME_WINDOW=::WINDOW
+/FRAME_OFFSET=-1
+! /ASCENDING=FALSE
+/DESCENDING=TRUE
+! /ENSURE_RANGE_FRAMES_BEFORE_THRESHOLD_CROSSING=FALSE
+! /ENSURE_RANGE_FRAMES_AFTER_THRESHOLD_CROSSING=FALSE
+/START_AT_EVENT=RON
+! /END_AT_EVENT=
+/EVENT_INSTANCE=1
+;
+
+!Identify the events based on the pattern in the template files.
+Select_Active_File
+/FILE_NAME=ALL_FILES
+!/QUERY=
+;
+
+Event_TPR_Signal
+/PATTERN_FILE=::L_TEMPLATE_FILE
+/PATTERN_TYPE=KINETIC_KINEMATIC
+/PATTERN_SIGNAL=ProxEndPos
+/PATTERN_FOLDER=LFT
+/PATTERN_EVENT_NAME=LON
+! /PATTERN_EVENT_INSTANCE=1
+! /SELECT_X=FALSE
+! /SELECT_Y=FALSE
+/SELECT_Z=TRUE
+/TPR_WINDOW=::WINDOW
+/TOLERANCE=20
+/SIGNAL_TYPES=KINETIC_KINEMATIC
+/SIGNAL_NAMES=ProxEndPos
+/SIGNAL_FOLDER=LFT
+/EVENT_NAME=LHS
+;
+
+Event_TPR_Signal
+/PATTERN_FILE=::L_TEMPLATE_FILE
+/PATTERN_TYPE=KINETIC_KINEMATIC
+/PATTERN_SIGNAL=ProxEndPos
+/PATTERN_FOLDER=LFT
+/PATTERN_EVENT_NAME=LOFF
+! /PATTERN_EVENT_INSTANCE=1
+! /SELECT_X=FALSE
+! /SELECT_Y=FALSE
+/SELECT_Z=TRUE
+/TPR_WINDOW=::WINDOW
+/TOLERANCE=20
+/SIGNAL_TYPES=KINETIC_KINEMATIC
+/SIGNAL_NAMES=ProxEndPos
+/SIGNAL_FOLDER=LFT
+/EVENT_NAME=LTO
+;
+
+Event_TPR_Signal
+/PATTERN_FILE=::R_TEMPLATE_FILE
+/PATTERN_TYPE=KINETIC_KINEMATIC
+/PATTERN_SIGNAL=ProxEndPos
+/PATTERN_FOLDER=RFT
+/PATTERN_EVENT_NAME=RON
+! /PATTERN_EVENT_INSTANCE=1
+! /SELECT_X=FALSE
+! /SELECT_Y=FALSE
+/SELECT_Z=TRUE
+/TPR_WINDOW=::WINDOW
+/TOLERANCE=20
+/SIGNAL_TYPES=KINETIC_KINEMATIC
+/SIGNAL_NAMES=ProxEndPos
+/SIGNAL_FOLDER=RFT
+/EVENT_NAME=RHS
+;
+
+Event_TPR_Signal
+/PATTERN_FILE=::R_TEMPLATE_FILE
+/PATTERN_TYPE=KINETIC_KINEMATIC
+/PATTERN_SIGNAL=ProxEndPos
+/PATTERN_FOLDER=RFT
+/PATTERN_EVENT_NAME=ROFF
+! /PATTERN_EVENT_INSTANCE=1
+! /SELECT_X=FALSE
+! /SELECT_Y=FALSE
+/SELECT_Z=TRUE
+/TPR_WINDOW=::WINDOW
+/TOLERANCE=20
+/SIGNAL_TYPES=KINETIC_KINEMATIC
+/SIGNAL_NAMES=ProxEndPos
+/SIGNAL_FOLDER=RFT
+/EVENT_NAME=RTO
+;
+
+
+!=======================================
+!Remove any LHS/RHS events that the TPR command may have generated between LON/RON and LOFF/ROFF.
+!=======================================
+
+Event_Explicit
+/EVENT_NAME=START
+/FRAME=1
+! /TIME=
+;
+
+
+Event_Delete
+/EVENT_NAME=LHS
+/EVENT_SEQUENCE=START+LOFF
+! /EXCLUDE_EVENTS=
+! /TIME=
+;
+
+Event_Delete
+/EVENT_NAME=RHS
+/EVENT_SEQUENCE=START+ROFF
+! /EXCLUDE_EVENTS=
+! /TIME=
+;
+
+Event_Copy
+/EVENT_NAME=LON
+/NEW_EVENT_NAME=LHS
+/FRAME_OFFSET=0
+/TIME_OFFSET=0
+/PERCENT_OFFSET=0
+/EVENT_INSTANCE=1
+! /RANGE_INSTANCE=0
+!/EVENT_SEQUENCE=START+LON
+! /EXCLUDE_EVENTS=
+! /START_AT_EVENT=
+! /END_AT_EVENT=
+;
+
+Event_Copy
+/EVENT_NAME=RON
+/NEW_EVENT_NAME=RHS
+/FRAME_OFFSET=0
+/TIME_OFFSET=0
+/PERCENT_OFFSET=0
+/EVENT_INSTANCE=1
+! /RANGE_INSTANCE=0
+!/EVENT_SEQUENCE=START+LON
+! /EXCLUDE_EVENTS=
+! /START_AT_EVENT=
+! /END_AT_EVENT=
+;
+
+Assign_Tags_To_Files
+/MOTION_FILE_NAMES=Dynamic
+/QUERY=EVENT_LABEL::ORIGINAL::RON>0
+/TAGS=r
+;
+
+Assign_Tags_To_Files
+/MOTION_FILE_NAMES=Dynamic
+/QUERY=EVENT_LABEL::ORIGINAL::LON>0
+/TAGS=l
+;
+

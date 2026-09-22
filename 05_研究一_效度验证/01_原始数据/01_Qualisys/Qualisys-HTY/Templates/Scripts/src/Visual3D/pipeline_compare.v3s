@@ -1,0 +1,204 @@
+<?php
+// include php variables
+if (file_exists($template_directory .'settings.php')) 	
+	require($template_directory . 'settings.php');
+	
+$wd = substr_replace($working_directory,'',-1); //remove last backslash
+$file_mask = 'exp.cmz'; // if 'exp' $file_mask = 'Visual3D files (*exp.cmo)|*exp.cmo|All Files (*.*)|*.*' elseif 'cmo' $file_mask = 'Visual3D files (*.cmo)|*.cmo|All Files (*.*)|*.*' 
+
+exec('"' . $v3dScriptDirectory. 'FolderSelector.exe" "'. $wd . '" ' . $file_mask);
+
+$working_directory_array = file($working_directory . 'comparison_folders.txt', FILE_IGNORE_NEW_LINES);
+
+// copy session.xml and meta.xml from pre folder to post folder and rename it to *_pre.xml
+// copy xml files from pre folder to post folder and rename them to *_pre.xml
+$fileContent = file_get_contents($working_directory_array[1] . '\session.xml');
+file_put_contents($working_directory . 'session_pre.xml', $fileContent);
+
+$fileContent = file_get_contents($working_directory_array[1] . '\meta.xml');
+file_put_contents($working_directory . 'meta_pre.xml', $fileContent);
+
+$fileContent = file_get_contents($working_directory_array[1] . '\metrics.xml');
+file_put_contents($working_directory . 'metrics_pre.xml', $fileContent);
+
+$fileContent = file_get_contents($working_directory_array[1] . '\events.xml');
+file_put_contents($working_directory . 'events_pre.xml', $fileContent);
+
+$fileContent = file_get_contents($working_directory_array[1] . '\events_global.xml');
+file_put_contents($working_directory . 'events_global_pre.xml', $fileContent);
+
+$fileContent = file_get_contents($working_directory_array[1] . '\timeseries.xml');
+file_put_contents($working_directory . 'timeseries_pre.xml', $fileContent);
+
+$fileContent = file_get_contents($working_directory_array[1] . '\timeseries_means.xml');
+file_put_contents($working_directory . 'timeseries_means_pre.xml', $fileContent);
+
+if (file_exists($working_directory_array[1] . '\metrics_EMG.xml')) {
+	$fileContent = file_get_contents($working_directory_array[1] . '\metrics_EMG.xml');
+	file_put_contents($working_directory . 'metrics_EMG_pre.xml', $fileContent);
+}
+
+$post_cmo_file = $working_directory_array[4];
+$pre_cmo_directory = $working_directory_array[1];
+$pre_cmo_file = $working_directory_array[3];
+
+//store meta_pre.xml and meta.xml data to string/arrays
+$xml = $working_directory . 'meta_pre.xml';
+$meta_pre = simplexml_load_file($xml);
+$EMG_pre_exists = (string) $meta_pre->includes_EMG;
+
+$xml = $working_directory . 'meta.xml';
+$meta_post = simplexml_load_file($xml);
+$EMG_post_exists = (string) $meta_post->includes_EMG;
+
+$xml = $working_directory . 'session_pre.xml';
+$session_pre = simplexml_load_file($xml);
+$test_condition_pre = (string) $session_pre->Session->Subsession->Fields->Test_condition;
+
+// Include php variables.
+include_once($v3dScriptDirectory . 'prepare_variables.php');
+?> 
+
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!  Copyright notice
+!  This PAF and its content is copyright of Qualisys AB © 2012-2017. All rights reserved. 
+!  The PAF script is only to be used in conjunction with a Qualisys Motion Capture System. 
+!  Only legal PAF owners are entitled to use the script and only in relation with related PAF.
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Pipeline_Compare_gait
+/working_directory							= <?=$working_directory;?> 
+/EMG_pre_exists								= <?=$EMG_pre_exists;?> 
+/EMG_post_exists							= <?=$EMG_post_exists;?> 
+/test_condition_pre							= <?=$test_condition_pre;?> 
+/full_body									= <?=$full_body;?> 
+/includes_OFM								= <?=$includes_OFM;?>
+/post_cmo_file								= <?=$post_cmo_file;?>
+/pre_cmo_file								= <?=$pre_cmo_file;?>
+/pre_cmo_directory							= <?=$pre_cmo_directory;?>
+/report_template_directory					= <?=$reportTemplateDirectory;?> 
+/comparative_report_template				= <?=$comparative_report_template;?> 
+/subject_info_page							= <?=$subject_info_page;?> 
+/normative_file								= <?=$normative_file;?> 
+/norm_file_short							= <?=$norm_file_short;?> 
+/last_name									= <?=$last_name;?> 
+/date_of_birth								= <?=$date_of_birth;?> 
+/left_norm_event							= <?=$left_norm_event;?> 
+/right_norm_event							= <?=$right_norm_event;?> 
+;
+
+<?
+if ($EMG_pre_exists == "no")
+	echo "!No EMG data in PRE session\n";
+
+if ($EMG_post_exists == "no")
+	echo "!No EMG data in POST session\n";
+
+if ($EMG_pre_exists == "yes" || $EMG_post_exists == "yes") {
+	include($v3dScriptDirectory. '/EMG_prepare_variables.php');
+?> 
+
+	EMG_Normatives_Gait
+	/analysis_name							= <?=$analysis_name;?> 
+	/EMG_names_array_left_exists			= <?=$EMG_names_array_left_exists;?> 
+	/EMG_names_array_right_exists			= <?=$EMG_names_array_right_exists;?> 
+	/EMG_names_list							= <?=$EMG_names_list;?> 
+	/EMG_graph_signals_name_left			= <?=$EMG_graph_signals_name_left;?> 
+	/EMG_graph_signals_name_right			= <?=$EMG_graph_signals_name_right;?> 
+	/EMG_units_pct							= <?=$EMG_units_pct;?> 
+	/noraxon_exists 						= <?=$noraxon_exists;?> 
+	/normative_non_noraxon_file_exists		= <?=$normative_non_noraxon_file_exists;?> 
+	/hide_messages							= <?=$hide_messages;?> 
+	/EMG_valid_names_list					= <?=$EMG_valid_names_list;?> 
+	/p2d_signal_names_list					= <?=$p2d_signal_names_list;?> 
+	;
+	
+	EMG_Make_Graphs_Gait
+	/page_number							= <?=$page_number;?> 
+	/first_EMG_page							= <?=$first_EMG_page;?> 
+	/last_EMG_page							= <?=$last_EMG_page;?> 
+	/EMG_names_array_left_exists			= <?=$EMG_names_array_left_exists;?> 
+	/EMG_names_array_right_exists			= <?=$EMG_names_array_right_exists;?> 
+	/EMG_graph_signals_name_left			= <?=$EMG_graph_signals_name_left;?> 
+	/EMG_graph_signals_name_right			= <?=$EMG_graph_signals_name_right;?> 
+	/count_EMG_signals_left					= <?=$count_EMG_signals_left;?> 
+	/count_EMG_signals_right				= <?=$count_EMG_signals_right;?> 
+	/add_test_condition_pre					= <?=$add_test_condition_pre;?> 
+	/test_condition							= <?=$test_condition;?> 
+	/event_mode								= <?=$event_mode;?> 
+	/analysis_name							= <?=$analysis_name;?> 
+	/c3d_files_count						= <?=$c3d_files_count;?> 
+	/noraxon_exists 						= <?=$noraxon_exists;?> 
+	/normative_non_noraxon_file_exists		= <?=$normative_non_noraxon_file_exists;?> 
+	/hide_messages							= <?=$hide_messages;?> 
+	/EMG_valid_names_list					= <?=$EMG_valid_names_list;?> 
+	/p2d_signal_names_list					= <?=$p2d_signal_names_list;?> 
+	/left_norm_event						= <?=$left_norm_event;?> 
+	/right_norm_event						= <?=$right_norm_event;?> 
+	/selected_files							= <?=$selected_files;?> 
+	/sd_line_style							= <?=$sd_line_style;?> 
+	/sd_line_bold							= <?=$sd_line_bold;?> 
+	/EMG_pages_nums_list					= <?=$EMG_pages_nums_list;?> 
+	/picturesDirectory						= <?=$picturesDirectory;?> 
+	/col_num								= <?=$col_num;?> 
+	;
+	
+	EMG_Set_Y_Axes_Gait
+	/page_number							= <?=$page_number;?> 
+	/first_EMG_page							= <?=$first_EMG_page;?> 
+	/EMG_names_array_left_exists			= <?=$EMG_names_array_left_exists;?> 
+	/EMG_names_array_right_exists			= <?=$EMG_names_array_right_exists;?> 
+	/EMG_graph_signals_name_left			= <?=$EMG_graph_signals_name_left;?> 
+	/EMG_graph_signals_name_right			= <?=$EMG_graph_signals_name_right;?> 
+	/count_EMG_signals_left					= <?=$count_EMG_signals_left;?> 
+	/count_EMG_signals_right				= <?=$count_EMG_signals_right;?> 
+	;
+
+	EMG_Cleanup_Gait
+	/event_mode								= <?=$event_mode;?> 
+	/analog_filter_fq						= <?=$analog_filter_fq;?> 
+	/analog_filter_fq_treadmill				= <?=$analog_filter_fq_treadmill;?> 
+	/analog_filter_fq_graphs				= <?=$analog_filter_fq_graphs;?> 
+	/EMG_signal_names						= <?=$EMG_signal_names;?> 
+	;
+<?
+}?> 
+
+Pipeline_Compare_Mid_Gait
+/page_titles								= <?=$page_titles;?> 
+;
+
+<?
+//Load recalc pipeline (joint angles, moments, power) from text file
+if ($EMG_pre_exists == "no")
+	echo "!No EMG data in PRE session\n";
+
+if ($EMG_post_exists == "no")
+	echo "!No EMG data in POST session\n";
+
+if ($EMG_pre_exists == "yes" || $EMG_post_exists == "yes") {
+	ob_start();
+	include($v3dScriptDirectory . 'recalc.v3s');
+	$recalc_pipeline =  ob_get_contents();
+	ob_end_clean();
+}
+
+file_put_contents($working_directory . 'recalc.v3s', $recalc_pipeline);
+?> 
+
+Replace_Recalc_Pipeline_Gait
+/working_directory							= <?=$working_directory;?> 
+;
+
+Pipeline_Compare_Finish_Gait
+/working_directory							= <?=$working_directory;?> 
+/includes_OFM								= <?=$includes_OFM;?>
+/report_template_directory					= <?=$reportTemplateDirectory;?> 
+/comparative_report_template_OFM			= <?=$comparative_report_template_OFM;?> 
+/first_EMG_page								= <?=$first_EMG_page;?> 
+/count_EMG_signals_left						= <?=$count_EMG_signals_left;?> 
+/count_EMG_signals_right					= <?=$count_EMG_signals_right;?> 
+/cmo_file									= <?=$cmo_file;?> 
+/EMG_pre_exists								= <?=$EMG_pre_exists;?> 
+/EMG_post_exists							= <?=$EMG_post_exists;?> 
+;

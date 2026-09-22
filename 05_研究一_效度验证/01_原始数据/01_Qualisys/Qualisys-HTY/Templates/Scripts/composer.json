@@ -1,0 +1,33 @@
+{
+	 "repositories": [
+		{
+			"type": "git",
+			"url": "https://tfs.qualisys.se/tfs/DefaultCollection/PAF/_git/PAF-Toolbelt"
+		},
+		{
+			"type": "git",
+			"url": "https://tfs.qualisys.se/tfs/DefaultCollection/PAF/_git/PAF-Gait-Web"
+		},
+		{
+			"type": "git",
+			"url": "https://tfs.qualisys.se/tfs/DefaultCollection/PAF/_git/cryptopp-dsasign"
+		}
+    ],
+	"require": {
+		"docopt/docopt": "1.0.0-rc1",
+		"qualisys/paf-toolbelt": "dev-v2-dev",
+		"qualisys/paf-gait-web": "dev-builds#v0.9.3",
+		"danielstjules/stringy": "~2.3",
+		"kevinlebrun/colors.php": "1.*"	
+	},
+	"autoload": {
+		"psr-4": {
+			"Qualisys\\Gait\\": "src/"
+		}
+	},
+    "minimum-stability": "dev",
+    "scripts": {
+    	"post-install-cmd": "if exist vendor\\ocramius\\proxy-manager\\tests rmdir /q /s vendor\\ocramius\\proxy-manager\\tests && if exist vendor\\qualisys\\cryptopp-dsasign rmdir /q /s vendor\\qualisys\\cryptopp-dsasign",
+		"post-update-cmd": "if exist vendor\\ocramius\\proxy-manager\\tests rmdir /q /s vendor\\ocramius\\proxy-manager\\tests && if exist vendor\\qualisys\\cryptopp-dsasign rmdir /q /s vendor\\qualisys\\cryptopp-dsasign"
+    }
+}

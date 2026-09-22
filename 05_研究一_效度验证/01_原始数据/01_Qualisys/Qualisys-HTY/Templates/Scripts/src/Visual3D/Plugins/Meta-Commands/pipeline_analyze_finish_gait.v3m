@@ -1,0 +1,143 @@
+! BEGIN_META
+! META_CMD_NAME	= Pipeline_Analyze_Finish_Gait
+! META_PARAM	= working_directory  :   string ::yes						
+! META_PARAM	= includes_OFM  :   string ::yes						
+! META_PARAM	= includes_RFM  :   string ::yes						
+! META_PARAM	= report_template_directory  :   string ::yes						
+! META_PARAM	= report_template_OFM  :   string ::yes						
+! META_PARAM	= report_template_RFM  :   string ::yes						
+! META_PARAM	= norm_file_short  :   string ::yes						
+! META_PARAM	= date_of_birth  :   string ::yes						
+! META_PARAM	= last_name  :   string ::yes						
+! META_PARAM	= creation_date_session  :   string ::yes						
+! META_PARAM	= cmo_file  :   string ::yes						
+! END_META
+
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!  Copyright notice
+!  This PAF and its content is copyright of Qualisys AB © 2012-2017. All rights reserved. 
+!  The PAF script is only to be used in conjunction with a Qualisys Motion Capture System. 
+!  Only legal PAF owners are entitled to use the script and only in relation with related PAF.
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Recalc
+;
+
+Select_Active_File
+/FILE_NAME=ALL_FILES
+! /QUERY=
+;
+
+! Include Oxford FM
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::includes_OFM&" = "TRUE")
+! /AS_INTEGER=TRUE
+;
+
+	Append_Report_Template
+	/REPORT_TEMPLATE=&::report_template_directory&&::report_template_OFM
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Set_Report_Options
+/PAGE_LAYOUT=PORTRAIT
+! /PAPER_SIZE=-
+! /COLLECTOR=-
+! /FACILITY_LINE_2=-
+! /ADDRESS_LINE_1=-
+! /ADDRESS_LINE_2=-
+! /ADDRESS_LINE_3=-
+! /PHONE=-
+! /FAX=-
+! /NOTES_LINE_1=-
+! /NOTES_LINE_2=-
+! /NOTES_LINE_3=-
+! /LOGO=-
+! /MARGIN_TOP=-
+! /MARGIN_BOTTOM=-
+! /MARGIN_LEFT=-
+! /MARGIN_RIGHT=-
+! /PAGE_NUMBER_POSITION=-
+! /PAGE_NUMBER_ALIGNMENT=-
+/PAGE_TAG_LINE_2=::norm_file_short
+/PAGE_TAG_LINE_3=- &::last_name&: &::date_of_birth&: 
+/PAGE_TAG_LINE_4=&::creation_date_session
+;
+
+! Include Rizzoli FM
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::includes_RFM&" = "TRUE")
+! /AS_INTEGER=TRUE
+;
+
+	Append_Report_Template
+	/REPORT_TEMPLATE=&::report_template_directory&&::report_template_RFM
+	;
+
+	Select_Active_File
+	/FILE_NAME=ALL_FILES
+	! /QUERY=
+	;
+
+	Subtract_Signals
+	/SIGNAL_TYPES=LINK_MODEL_BASED+METRIC
+	/SIGNAL_FOLDER=ORIGINAL+RIZZOLI
+	/SIGNAL_NAMES=Right Hindfoot Tibia Angle+GLOBAL::Right ShaCal_Static_Offset_MEAN
+	/COMPONENT_SEQUENCE=Y, X
+	/RESULT_FOLDER=RIZZOLI
+	/RESULT_NAME=Right Hindfoot Tibia Angle_Offset
+	;
+
+	Subtract_Signals
+	/SIGNAL_TYPES=LINK_MODEL_BASED+METRIC
+	/SIGNAL_FOLDER=ORIGINAL+RIZZOLI
+	/SIGNAL_NAMES=Left Hindfoot Tibia Angle+GLOBAL::Left ShaCal_Static_Offset_MEAN
+	/COMPONENT_SEQUENCE=Y, X
+	/RESULT_FOLDER=RIZZOLI
+	/RESULT_NAME=Left Hindfoot Tibia Angle_Offset
+	;
+	
+	Recalc
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Set_Report_Options
+/PAGE_LAYOUT=PORTRAIT
+! /PAPER_SIZE=-
+! /COLLECTOR=-
+! /FACILITY_LINE_2=-
+! /ADDRESS_LINE_1=-
+! /ADDRESS_LINE_2=-
+! /ADDRESS_LINE_3=-
+! /PHONE=-
+! /FAX=-
+! /NOTES_LINE_1=-
+! /NOTES_LINE_2=-
+! /NOTES_LINE_3=-
+! /LOGO=-
+! /MARGIN_TOP=-
+! /MARGIN_BOTTOM=-
+! /MARGIN_LEFT=-
+! /MARGIN_RIGHT=-
+! /PAGE_NUMBER_POSITION=-
+! /PAGE_NUMBER_ALIGNMENT=-
+/PAGE_TAG_LINE_2=::norm_file_short
+/PAGE_TAG_LINE_3=- &::last_name&: &::date_of_birth&: 
+/PAGE_TAG_LINE_4=&::creation_date_session
+;
+
+!====================================
+!Save the CMO
+!====================================
+
+File_Save_As
+/FILE_NAME=::cmo_file
+;

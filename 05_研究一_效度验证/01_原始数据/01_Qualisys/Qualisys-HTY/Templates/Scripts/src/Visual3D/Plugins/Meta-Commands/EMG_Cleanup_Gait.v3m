@@ -1,0 +1,58 @@
+! BEGIN_META
+! META_CMD_NAME	= EMG_Cleanup_Gait
+! META_PARAM	= analog_filter_fq  :   string ::yes						
+! META_PARAM	= analog_filter_fq_treadmill  :   string ::yes						
+! META_PARAM	= analog_filter_fq_graphs  :   string ::yes						
+! META_PARAM	= event_mode  :   string ::yes						
+! META_PARAM	= EMG_signal_names  :   string ::yes						
+! END_META
+
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!  Copyright notice
+!  This PAF and its content is copyright of Qualisys AB © 2012-2017. All rights reserved. 
+!  The PAF script is only to be used in conjunction with a Qualisys Motion Capture System. 
+!  Only legal PAF owners are entitled to use the script and only in relation with related PAF.
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+! remove EMG data from ANALOG PROCESSED filter in case the force data has been filtered
+
+**__Add_a_Comment__**
+! /COMMENT=
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(&::analog_filter_fq& > 0 + ((&::analog_filter_fq_treadmill& > 0 + "&::event_mode&" = "Instrumented treadmill") > 1) > 0)
+! /AS_INTEGER=TRUE
+;
+
+	Select_Active_File
+	/FILE_NAME=ALL_FILES
+	! /QUERY=
+	;
+	
+	Remove_Signals
+	/SIGNAL_TYPES=ANALOG
+	/SIGNAL_NAMES=::EMG_signal_names
+	/SIGNAL_FOLDER=PROCESSED
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=(&::analog_filter_fq_graphs& > 0)
+! /AS_INTEGER=TRUE
+;
+
+	Remove_Signals
+	/SIGNAL_TYPES=ANALOG
+	/SIGNAL_NAMES=::EMG_signal_names
+	/SIGNAL_FOLDER=FILTERED_HI_FQ
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;

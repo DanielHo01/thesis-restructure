@@ -1,0 +1,127 @@
+!No valid EMG signals found. Signals have to start with "EMG" for analog AD board or "Left "/"L " or "Right "/"R" for digital AD board\! 
+  
+
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!  Copyright notice
+!  This PAF and its content is copyright of Qualisys AB © 2012-2019. All rights reserved. 
+!  The PAF script is only to be used in conjunction with a Qualisys Motion Capture System. 
+!  Only legal PAF owners are entitled to use the script and only in relation with related PAF.
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Pipeline_Analyze_Model_Gait
+/r3d_template_directory						= C:\ProgramData\Reckon3D 
+/template_directory							= C:\Users\admin\Documents\Qualisys-HTY\Templates\ 
+/working_directory							= C:\Users\admin\Documents\Qualisys-HTY\Data\Chen_Xinjun_2001-11-12_005\2025-12-03\2025-12-03_unspecified\ 
+/model_directory							= C:\Users\admin\Documents\Qualisys-HTY\Templates\Assets/Visual3D Models/ 
+/normative_directory						= C:\Users\admin\Documents\Qualisys-HTY\Templates\Assets/Visual3D Normatives/ 
+/picturesDirectory							= C:\Users\admin\Documents\Qualisys-HTY\Templates\Assets/Pictures/ 
+/script_directory							= C:\Users\admin\Documents\Qualisys-HTY\Templates\Scripts/src/Visual3D/ 
+/cmo_file									= C:\Users\admin\Documents\Qualisys-HTY\Data\Chen_Xinjun_2001-11-12_005\2025-12-03\2025-12-03_unspecified\Report_005_Chen_unspecified_2025-12-03.cmz 
+/event_mode									= Multiple forceplates 
+/CGM_pipeline_breakpoint					= FALSE 
+/instrumented_treadmill						= FALSE 
+/model_template								= Lower_Body_CAST_gait 
+/append_model								= Thorax_gait+Arms_gait 
+/includes_thorax							= TRUE 
+/includes_arms								= TRUE 
+/full_body									= TRUE 
+/includes_OFM								= FALSE 
+/includes_RFM								= FALSE 
+/model_used									= CAST 
+/include_alternative_pelvis					=  
+/pose_algorithm								= 6DOF 
+/left_foot_normalization					= 0 
+/right_foot_normalization					= 0 
+/leg_length_left							= 0 
+/leg_length_right							= 0 
+/ankle_width_left							= 0 
+/knee_width_left							= 0 
+/ankle_width_right							= 0 
+/knee_width_right							= 0 
+/weight										= 79.000000000 
+/height										= 1.789999962 
+/window_size_divisor						= 10 
+/force_threshold							= 10 
+/fp_zero_start								= 0 
+/fp_zero_end								= 20 
+/max_gap									= 10 
+/marker_filter_fq							= 6 
+/analog_filter_fq_graphs					= 25 
+/static_filename							= Static FB Anterior*.c3d 
+/filenames									= Gait FB - CAST 11.c3d+Gait FB - CAST 12.c3d+Gait FB - CAST 13.c3d+Gait FB - CAST 15.c3d+Gait FB - CAST 16.c3d+Gait FB - CAST 17.c3d+Gait FB - CAST 18.c3d+Gait FB - CAST 19.c3d+Gait FB - CAST 20.c3d+Gait FB - CAST 22.c3d+Gait FB - CAST 23.c3d+Gait FB - CAST 24.c3d+Gait FB - CAST 4.c3d+Gait FB - CAST 5.c3d+Gait FB - CAST 6.c3d+Gait FB - CAST 7.c3d+Gait FB - CAST 8.c3d+Gait FB - CAST 9.c3d 
+/treadmill_speeds							= 0.000000000+0.000000000+0.000000000+0.000000000+0.000000000+0.000000000+0.000000000+0.000000000+0.000000000+0.000000000+0.000000000+0.000000000+0.000000000+0.000000000+0.000000000+0.000000000+0.000000000+0.000000000 
+/treadmill_type								= Treadmetrix 
+;
+
+
+ 
+	Events_Multiple_FPs_Gait
+	;
+ 
+
+Pipeline_Analyze_Calc_Gait
+/report_template_directory					= C:\Users\admin\Documents\Qualisys-HTY\Templates\Assets/Visual3D Report Templates/ 
+/includes_OFM								= FALSE 
+/includes_RFM								= FALSE 
+/event_mode									= Multiple forceplates 
+/analog_filter_fq							= 25 
+/analog_filter_fq_treadmill					= 30 
+/analog_filter_fq_str						= 25 
+/force_threshold							= 10 
+/instrumented_treadmill						= FALSE 
+/report_template							= Report_gait.rgt 
+/subject_info_page							= FALSE 
+/model_used									= CAST 
+/first_name									= Xinjun 
+/last_name									= Chen 
+/patient_ID									= 005 
+/creation_date_patient						= 2025-12-03 
+/date_of_birth								= 2001-11-12 
+/height_w_units								= 1.79 m 
+/weight_w_units								= 79.0 kg 
+/full_body									= TRUE 
+/left_foot_normalized						= TRUE 
+/right_foot_normalized						= TRUE 
+/foot_norm_info								= Both left and right foot segments used for joint angle calculations have been normalised to foot position at static trial. 
+/normative_data								= Default 
+/normative_file_exists						= TRUE 
+/normative_file								= C:\Users\admin\Documents\Qualisys-HTY\Templates\Assets/Visual3D Normatives/41kids_13ofm_modHFaxis.vnd 
+/page_nums_annot							= 3+4+9 
+/left_norm_event							= 61 
+/right_norm_event							= 60 
+/page_titles_list							= Subject Information+Temporal and spatial data+Joint Angle Comparison+Joint Kinetics Comparison+Consistency Graphs - Kinematics+Consistency Graphs - Kinetics+Centre of Pressure+Centre of Pressure+Upper Body Joint Angles Comparison+Consistency Graphs - Upper Body Joint Angles 
+/test_condition								= unspecified 
+;
+
+ 
+	MAP_Gait
+	/model_used								= CAST 
+	/normative_data							= Default 
+	;
+ 
+
+Replace_Recalc_Pipeline_Gait
+/working_directory							= C:\Users\admin\Documents\Qualisys-HTY\Data\Chen_Xinjun_2001-11-12_005\2025-12-03\2025-12-03_unspecified\ 
+;
+
+COP_Gait
+/event_mode									= Multiple forceplates 
+/normative_directory						= C:\Users\admin\Documents\Qualisys-HTY\Templates\Assets/Visual3D Normatives/ 
+/select_tags								= Dynamic 
+/COP_start_shift							= 0.02 
+;
+
+Pipeline_Analyze_Finish_Gait
+/working_directory							= C:\Users\admin\Documents\Qualisys-HTY\Data\Chen_Xinjun_2001-11-12_005\2025-12-03\2025-12-03_unspecified\ 
+/includes_OFM								= FALSE 
+/includes_RFM								= FALSE 
+/report_template_directory					= C:\Users\admin\Documents\Qualisys-HTY\Templates\Assets/Visual3D Report Templates/ 
+/report_template_OFM						= Report_OxfordFM_gait.rgt 
+/report_template_RFM						= Report_RizzoliFM_gait.rgt 
+/norm_file_short							= 41kids_13ofm_modHFaxis.vnd 
+/last_name									= Chen 
+/creation_date_session						= 2025-12-03 
+/date_of_birth								= 2001-11-12 
+/cmo_file									= C:\Users\admin\Documents\Qualisys-HTY\Data\Chen_Xinjun_2001-11-12_005\2025-12-03\2025-12-03_unspecified\Report_005_Chen_unspecified_2025-12-03.cmz 
+;
+

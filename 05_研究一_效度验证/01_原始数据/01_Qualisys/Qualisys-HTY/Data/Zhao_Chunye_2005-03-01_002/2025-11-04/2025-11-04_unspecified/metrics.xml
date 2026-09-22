@@ -1,0 +1,11 @@
+<v3d>
+	<owner value="GLOBAL">
+		<type value="METRIC">
+			<folder value="TMPD">
+				<name value="NUM_FILES">
+					<component value="X" frames="1" data="4.00" />
+				</name>
+			</folder>
+		</type>
+	</owner>
+</v3d>

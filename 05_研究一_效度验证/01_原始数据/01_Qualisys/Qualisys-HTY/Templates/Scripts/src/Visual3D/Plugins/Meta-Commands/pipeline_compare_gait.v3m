@@ -1,0 +1,315 @@
+! BEGIN_META
+! META_CMD_NAME	= Pipeline_Compare_Gait
+! META_PARAM	= working_directory  :   string ::yes
+! META_PARAM	= EMG_pre_exists  :   string ::yes
+! META_PARAM	= EMG_post_exists  :   string ::yes
+! META_PARAM	= test_condition_pre  :   string ::yes
+! META_PARAM	= full_body  :   string ::yes
+! META_PARAM	= post_cmo_file  :   string ::yes
+! META_PARAM	= pre_cmo_file  :   string ::yes
+! META_PARAM	= pre_cmo_directory  :   string ::yes
+! META_PARAM	= report_template_directory  :   string ::yes
+! META_PARAM	= comparative_report_template  :   string ::yes
+! META_PARAM	= subject_info_page  :   string ::yes
+! META_PARAM	= normative_file  :   string ::yes
+! META_PARAM	= norm_file_short  :   string ::yes
+! META_PARAM	= last_name  :   string ::yes
+! META_PARAM	= date_of_birth  :   string ::yes
+! META_PARAM	= left_norm_event  :   string ::yes
+! META_PARAM	= right_norm_event  :   string ::yes
+! END_META
+
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!  Copyright notice
+!  This PAF and its content is copyright of Qualisys AB © 2012-2017. All rights reserved. 
+!  The PAF script is only to be used in conjunction with a Qualisys Motion Capture System. 
+!  Only legal PAF owners are entitled to use the script and only in relation with related PAF.
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Set_Default_Folders
+! /PIPELINE=
+! /REPORT_TEMPLATE=
+! /MODEL_TEMPLATE=
+/MOTION_FILE=&::working_directory& 
+! /DEFAULT_DATA=
+! /DEFAULT_MODEL_TEMPLATE=
+! /DEFAULT_REPORT_TEMPLATE=
+! /CMO_LIBRARY_PATH=
+;
+
+File_Open
+/FILE_NAME=&::working_directory&&::post_cmo_file
+! /SUFFIX=
+/SET_PROMPT=Open POST cmo file
+;
+
+File_Rename
+/EXISTING_FILE_NAME=ALL_FILES
+! /NEW_FILE_NAME=
+/USE_SEARCH_REPLACE=TRUE
+/SEARCH_FOR=.c3d
+/REPLACE_WITH=_post.c3d
+! /REMOVE_FILE_PATH=FALSE
+! /RENAME_STATIC_CALIBRATION_FILES=TRUE
+;
+
+Assign_Model_File
+/CALIBRATION_FILE=Static*_post.c3d
+/MOTION_FILE_NAMES=*_post.c3d
+! /REMOVE_EXISTING_ASSIGNMENTS=FALSE
+;
+
+Assign_Tags_To_Files
+/MOTION_FILE_NAMES=ALL_FILES
+! /QUERY=
+/TAGS=post
+;
+
+Assign_Tags_To_Files
+/MOTION_FILE_NAMES=*Static*_post.c3d
+! /QUERY=
+/TAGS=Static_post
+;
+
+Combine_Tags
+/ORIGINAL_TAGS=Dynamic+post
+/LOGICAL_OPERATORS=AND
+/NEW_TAG=Dynamic_post
+;
+
+Select_Active_File
+/FILE_NAME=GLOBAL
+! /QUERY=
+;
+
+Rename_Folder
+/SIGNAL_TYPE=METRIC
+/EXISTING_FOLDER=SHORT
+/NEW_FOLDER_NAME=SHORT_post
+;
+
+Rename_Folder
+/SIGNAL_TYPE=METRIC
+/EXISTING_FOLDER=TMPD
+/NEW_FOLDER_NAME=TMPD_post
+;
+
+Rename_Folder
+/SIGNAL_TYPE=METRIC
+/EXISTING_FOLDER=MAP
+/NEW_FOLDER_NAME=MAP_post
+;
+
+Rename_Folder
+/SIGNAL_TYPE=METRIC
+/EXISTING_FOLDER=EVENTS_NORMALISED
+/NEW_FOLDER_NAME=EVENTS_NORMALISED_post
+;
+
+Rename_Folder
+/SIGNAL_TYPE=P2D
+/EXISTING_FOLDER=TIMESERIES
+/NEW_FOLDER_NAME=TIMESERIES_post
+;
+
+Select_Active_File
+/FILE_NAME=Dynamic_post
+! /QUERY=
+;
+
+Rename_Folder
+/SIGNAL_TYPE=ANALOG
+/EXISTING_FOLDER=EMG_PROCESSED
+/NEW_FOLDER_NAME=EMG_PROCESSED_post
+;
+
+Rename_Folder
+/SIGNAL_TYPE=ANALOG
+/EXISTING_FOLDER=EMG_RAW
+/NEW_FOLDER_NAME=EMG_RAW_post
+;
+
+Copy_Folder
+/SIGNAL_TYPE=LINK_MODEL_BASED
+/EXISTING_FOLDER=ORIGINAL
+/NEW_FOLDER_NAME=ORIGINAL_post
+! /OVERWRITE_EXISTING_SIGNALS=FALSE
+;
+
+File_Open
+/FILE_NAME=&::pre_cmo_directory&\&::pre_cmo_file
+/SET_PROMPT=Open PRE cmo file
+;
+
+Assign_Tags_To_Files
+/MOTION_FILE_NAMES=ALL_FILES
+/QUERY=ALL_FILES & NOT (post)
+/TAGS=pre
+;
+
+Assign_Tags_To_Files
+/MOTION_FILE_NAMES=ALL_FILES
+/QUERY=Static & NOT (Static_post)
+/TAGS=Static_pre
+;
+
+Combine_Tags
+/ORIGINAL_TAGS=Dynamic+pre
+/LOGICAL_OPERATORS=AND
+/NEW_TAG=Dynamic_pre
+;
+
+!Open report template
+!------------------------------
+Open_Report_Template
+/REPORT_TEMPLATE=&::report_template_directory&&::comparative_report_template
+;
+
+! delete subject info page based on settings.php
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::subject_info_page&" = "false")
+! /AS_INTEGER=TRUE
+;
+
+	Delete_Report_Page
+	/PAGE_NUMBER=1
+	! /DELETE_ALL_PAGES=FALSE
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::subject_info_page&" = "true")
+! /AS_INTEGER=TRUE
+;
+
+	Delete_Report_Page
+	/PAGE_NUMBER=2
+	! /DELETE_ALL_PAGES=FALSE
+	;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+
+Conditional_Statement
+/ITERATION_PARAMETER_NAME=cond
+/EXPRESSION=("&::full_body&" = "TRUE")
+! /AS_INTEGER=TRUE
+;
+
+	Append_Report_Template
+	/REPORT_TEMPLATE=&::report_template_directory&Report_comparative_upper_body_gait.rgt
+;
+
+Conditional_Statement_End
+/ITERATION_PARAMETER_NAME=cond
+;
+
+Set_Report_Options
+/PAGE_LAYOUT=PORTRAIT
+! /PAPER_SIZE=-
+! /COLLECTOR=-
+! /FACILITY_LINE_2=-
+! /ADDRESS_LINE_1=-
+! /ADDRESS_LINE_2=-
+! /ADDRESS_LINE_3=-
+! /PHONE=-
+! /FAX=-
+! /NOTES_LINE_1=-
+! /NOTES_LINE_2=-
+! /NOTES_LINE_3=-
+! /LOGO=-
+! /MARGIN_TOP=-
+! /MARGIN_BOTTOM=-
+! /MARGIN_LEFT=-
+! /MARGIN_RIGHT=-
+! /PAGE_NUMBER_POSITION=-
+! /PAGE_NUMBER_ALIGNMENT=-
+/PAGE_TAG_LINE_2=Normatives: &::norm_file_short
+/PAGE_TAG_LINE_3=- &::last_name&: *&::date_of_birth&: 
+!/PAGE_TAG_LINE_4=
+;
+
+! Add annotations for normative events on page 3 (Joint angles)
+Set_Pipeline_Parameter
+/PARAMETER_NAME=page
+/PARAMETER_VALUE=3
+;
+
+Set_Pipeline_Parameter_From_For_Loop
+/PARAMETER_NAME=columns
+/PARAMETER_INDEX_START=1
+/PARAMETER_INDEX_END=3
+/PARAMETER_INDEX_STEP=1
+! /PARAMETER_INDEX_TYPE=INTEGER
+;
+
+Set_Pipeline_Parameter_From_For_Loop
+/PARAMETER_NAME=rows
+/PARAMETER_INDEX_START=1
+/PARAMETER_INDEX_END=5
+/PARAMETER_INDEX_STEP=1
+! /PARAMETER_INDEX_TYPE=INTEGER
+;
+
+For_Each
+/ITERATION_PARAMETER_NAME=col
+! /ITERATION_PARAMETER_COUNT_NAME=
+/ITEMS=::columns
+;
+
+	For_Each
+	/ITERATION_PARAMETER_NAME=row
+	! /ITERATION_PARAMETER_COUNT_NAME=
+	/ITEMS=::rows
+	;
+
+		Conditional_Statement
+		/ITERATION_PARAMETER_NAME=cond
+		/EXPRESSION=(&::row& <> 4 &::AMP& &::col& <> 2)
+		! /AS_INTEGER=TRUE
+		;
+
+			Add_Graph_Annotation
+			/PAGE_NUMBER=::page
+			/COLUMN_NUMBER=::col
+			/ROW_NUMBER=::row
+			/DRAW_ORDER=1
+			/ANNOTATION_EVENT=::left_norm_event
+			/ANNOTATION_STYLE=Bottom TICKS
+			/ANNOTATION_COLOR=Red
+			/ANNOTATION_SIZE=Large
+			/ANNOTATION_GLOBAL=True
+			/ANNOTATION_AVERAGE_EVENT=True
+			;
+
+			Add_Graph_Annotation
+			/PAGE_NUMBER=::page
+			/COLUMN_NUMBER=::col
+			/ROW_NUMBER=::row
+			/DRAW_ORDER=1
+			/ANNOTATION_EVENT=::right_norm_event
+			/ANNOTATION_STYLE=Bottom TICKS
+			/ANNOTATION_COLOR=Blue
+			/ANNOTATION_SIZE=Large
+			/ANNOTATION_GLOBAL=True
+			/ANNOTATION_AVERAGE_EVENT=True
+			;
+		
+		Conditional_Statement_End
+		/ITERATION_PARAMETER_NAME=cond
+		;
+
+	End_For_Each
+	/ITERATION_PARAMETER_NAME=row
+	;
+
+End_For_Each
+/ITERATION_PARAMETER_NAME=col
+;

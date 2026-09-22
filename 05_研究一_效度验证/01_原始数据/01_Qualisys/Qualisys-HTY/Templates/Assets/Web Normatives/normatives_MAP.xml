@@ -1,0 +1,226 @@
+<v3d>
+	<owner value="GLOBAL">
+		<type value="METRIC">
+			<folder value="MAP_normatives_Adults">
+				<name value="Overall_GPS_norm_Median">
+					<component value="X" frames="1" data="4.6" />
+				</name>
+				<name value="Left_GPS_norm_Median">
+					<component value="X" frames="1" data="4.5" />
+				</name>
+				<name value="Right_GPS_norm_Median">
+					<component value="X" frames="1" data="4.5" />
+				</name>
+				<name value="GVS_Left_Pelvis_X_norm_Median">
+					<component value="X" frames="1" data="2.1" />
+				</name>
+				<name value="GVS_Left_Pelvis_Y_norm_Median">
+					<component value="X" frames="1" data="1.4" />
+				</name>
+				<name value="GVS_Left_Pelvis_Z_norm_Median">
+					<component value="X" frames="1" data="1.9" />
+				</name>
+				<name value="GVS_Left_Hip_X_norm_Median">
+					<component value="X" frames="1" data="4.2" />
+				</name>
+				<name value="GVS_Right_Hip_X_norm_Median">
+					<component value="X" frames="1" data="4.2" />
+				</name>
+				<name value="GVS_Left_Hip_Y_norm_Median">
+					<component value="X" frames="1" data="2.6" />
+				</name>
+				<name value="GVS_Right_Hip_Y_norm_Median">
+					<component value="X" frames="1" data="2.6" />
+				</name>
+				<name value="GVS_Left_Hip_Z_norm_Median">
+					<component value="X" frames="1" data="4.6" />
+				</name>
+				<name value="GVS_Right_Hip_Z_norm_Median">
+					<component value="X" frames="1" data="4.6" />
+				</name>
+				<name value="GVS_Left_Knee_X_norm_Median">
+					<component value="X" frames="1" data="4.4" />
+				</name>
+				<name value="GVS_Right_Knee_X_norm_Median">
+					<component value="X" frames="1" data="4.4" />
+				</name>
+				<name value="GVS_Left_Ankle_X_norm_Median">
+					<component value="X" frames="1" data="3.7" />
+				</name>
+				<name value="GVS_Right_Ankle_X_norm_Median">
+					<component value="X" frames="1" data="3.7" />
+				</name>
+				<name value="GVS_Left_Foot_Prog_Z_norm_Median">
+					<component value="X" frames="1" data="5.6" />
+				</name>
+				<name value="GVS_Right_Foot_Prog_Z_norm_Median">
+					<component value="X" frames="1" data="5.6" />
+				</name>
+				<name value="Overall_GPS_norm_IQR">
+					<component value="X" frames="1" data="0.7" />
+				</name>
+				<name value="Left_GPS_norm_IQR">
+					<component value="X" frames="1" data="0.7" />
+				</name>
+				<name value="Right_GPS_norm_IQR">
+					<component value="X" frames="1" data="0.7" />
+				</name>
+				<name value="GVS_Left_Pelvis_X_norm_IQR">
+					<component value="X" frames="1" data="1.1" />
+				</name>
+				<name value="GVS_Left_Pelvis_Y_norm_IQR">
+					<component value="X" frames="1" data="0.5" />
+				</name>
+				<name value="GVS_Left_Pelvis_Z_norm_IQR">
+					<component value="X" frames="1" data="0.9" />
+				</name>
+				<name value="GVS_Left_Hip_X_norm_IQR">
+					<component value="X" frames="1" data="1.3" />
+				</name>
+				<name value="GVS_Right_Hip_X_norm_IQR">
+					<component value="X" frames="1" data="1.3" />
+				</name>
+				<name value="GVS_Left_Hip_Y_norm_IQR">
+					<component value="X" frames="1" data="0.7" />
+				</name>
+				<name value="GVS_Right_Hip_Y_norm_IQR">
+					<component value="X" frames="1" data="0.7" />
+				</name>
+				<name value="GVS_Left_Hip_Z_norm_IQR">
+					<component value="X" frames="1" data="2.2" />
+				</name>
+				<name value="GVS_Right_Hip_Z_norm_IQR">
+					<component value="X" frames="1" data="2.2" />
+				</name>
+				<name value="GVS_Left_Knee_X_norm_IQR">
+					<component value="X" frames="1" data="1.5" />
+				</name>
+				<name value="GVS_Right_Knee_X_norm_IQR">
+					<component value="X" frames="1" data="1.5" />
+				</name>
+				<name value="GVS_Left_Ankle_X_norm_IQR">
+					<component value="X" frames="1" data="1.5" />
+				</name>
+				<name value="GVS_Right_Ankle_X_norm_IQR">
+					<component value="X" frames="1" data="1.5" />
+				</name>
+				<name value="GVS_Left_Foot_Prog_Z_norm_IQR">
+					<component value="X" frames="1" data="1.9" />
+				</name>
+				<name value="GVS_Right_Foot_Prog_Z_norm_IQR">
+					<component value="X" frames="1" data="1.9" />
+				</name>
+			</folder>
+			<folder value="MAP_normatives_Paeds">
+				<name value="Overall_GPS_norm_Median">
+					<component value="X" frames="1" data="4.6" />
+				</name>
+				<name value="Left_GPS_norm_Median">
+					<component value="X" frames="1" data="4.0" />
+				</name>
+				<name value="Right_GPS_norm_Median">
+					<component value="X" frames="1" data="4.0" />
+				</name>
+				<name value="GVS_Left_Pelvis_X_norm_Median">
+					<component value="X" frames="1" data="3.0" />
+				</name>
+				<name value="GVS_Left_Pelvis_Y_norm_Median">
+					<component value="X" frames="1" data="1.7" />
+				</name>
+				<name value="GVS_Left_Pelvis_Z_norm_Median">
+					<component value="X" frames="1" data="2.7" />
+				</name>
+				<name value="GVS_Left_Hip_X_norm_Median">
+					<component value="X" frames="1" data="4.5" />
+				</name>
+				<name value="GVS_Right_Hip_X_norm_Median">
+					<component value="X" frames="1" data="4.5" />
+				</name>
+				<name value="GVS_Left_Hip_Y_norm_Median">
+					<component value="X" frames="1" data="2.2" />
+				</name>
+				<name value="GVS_Right_Hip_Y_norm_Median">
+					<component value="X" frames="1" data="2.2" />
+				</name>
+				<name value="GVS_Left_Hip_Z_norm_Median">
+					<component value="X" frames="1" data="4.6" />
+				</name>
+				<name value="GVS_Right_Hip_Z_norm_Median">
+					<component value="X" frames="1" data="4.6" />
+				</name>
+				<name value="GVS_Left_Knee_X_norm_Median">
+					<component value="X" frames="1" data="2.8" />
+				</name>
+				<name value="GVS_Right_Knee_X_norm_Median">
+					<component value="X" frames="1" data="2.8" />
+				</name>
+				<name value="GVS_Left_Ankle_X_norm_Median">
+					<component value="X" frames="1" data="3.8" />
+				</name>
+				<name value="GVS_Right_Ankle_X_norm_Median">
+					<component value="X" frames="1" data="3.8" />
+				</name>
+				<name value="GVS_Left_Foot_Prog_Z_norm_Median">
+					<component value="X" frames="1" data="4.3" />
+				</name>
+				<name value="GVS_Right_Foot_Prog_Z_norm_Median">
+					<component value="X" frames="1" data="4.3" />
+				</name>
+				<name value="Overall_GPS_norm_IQR">
+					<component value="X" frames="1" data="0.9" />
+				</name>
+				<name value="Left_GPS_norm_IQR">
+					<component value="X" frames="1" data="0.7" />
+				</name>
+				<name value="Right_GPS_norm_IQR">
+					<component value="X" frames="1" data="0.7" />
+				</name>
+				<name value="GVS_Left_Pelvis_X_norm_IQR">
+					<component value="X" frames="1" data="1.8" />
+				</name>
+				<name value="GVS_Left_Pelvis_Y_norm_IQR">
+					<component value="X" frames="1" data="0.6" />
+				</name>
+				<name value="GVS_Left_Pelvis_Z_norm_IQR">
+					<component value="X" frames="1" data="0.8" />
+				</name>
+				<name value="GVS_Left_Hip_X_norm_IQR">
+					<component value="X" frames="1" data="1.6" />
+				</name>
+				<name value="GVS_Right_Hip_X_norm_IQR">
+					<component value="X" frames="1" data="1.6" />
+				</name>
+				<name value="GVS_Left_Hip_Y_norm_IQR">
+					<component value="X" frames="1" data="0.7" />
+				</name>
+				<name value="GVS_Right_Hip_Y_norm_IQR">
+					<component value="X" frames="1" data="0.7" />
+				</name>
+				<name value="GVS_Left_Hip_Z_norm_IQR">
+					<component value="X" frames="1" data="0.8" />
+				</name>
+				<name value="GVS_Right_Hip_Z_norm_IQR">
+					<component value="X" frames="1" data="0.8" />
+				</name>
+				<name value="GVS_Left_Knee_X_norm_IQR">
+					<component value="X" frames="1" data="0.9" />
+				</name>
+				<name value="GVS_Right_Knee_X_norm_IQR">
+					<component value="X" frames="1" data="0.9" />
+				</name>
+				<name value="GVS_Left_Ankle_X_norm_IQR">
+					<component value="X" frames="1" data="1.1" />
+				</name>
+				<name value="GVS_Right_Ankle_X_norm_IQR">
+					<component value="X" frames="1" data="1.1" />
+				</name>
+				<name value="GVS_Left_Foot_Prog_Z_norm_IQR">
+					<component value="X" frames="1" data="1.7" />
+				</name>
+				<name value="GVS_Right_Foot_Prog_Z_norm_IQR">
+					<component value="X" frames="1" data="1.7" />
+				</name>
+			</folder>
+		</type>
+	</owner>
+</v3d>

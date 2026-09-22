@@ -1,0 +1,47 @@
+# LaTeX 临时文件
+*.aux
+*.toc
+*.log
+*.out
+*.bbl
+*.blg
+*.run.xml
+*.lof
+*.lot
+*.bcf
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+
+# PDF 输出
+*.pdf
+
+# Python 缓存
+__pycache__/
+*.pyc
+
+# Word 临时文件
+~$*.docx
+
+# OS 文件
+.DS_Store
+Thumbs.db
+
+# 模板仓库（不跟踪）
+tongji_template/
+ucasthesis_template/
+
+# 开发脚本（不跟踪）
+insert_citations*.py
+update_word*.ps1
+analyze_word.ps1
+fix_pdf.ps1
+00_frontmatter.tex
+
+# 官方模板（不跟踪，作为参考）
+*template*.docx
+
+# 本地模板开发产物
+*.log
+*.aux
+*.toc

@@ -1,0 +1,191 @@
+! BEGIN_META
+! META_CMD_NAME	= Events_No_FP_Temp_File_Gait
+! META_PARAM	= working_directory  :   string ::yes						
+! END_META
+
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!  Copyright notice
+!  This PAF and its content is copyright of Qualisys AB © 2012-2017. All rights reserved. 
+!  The PAF script is only to be used in conjunction with a Qualisys Motion Capture System. 
+!  Only legal PAF owners are entitled to use the script and only in relation with related PAF.
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+! ==================================
+! PAF pipeline to generate gait events based on a single FP.
+! May be included in processing pipeline, depending on the mode that is set for the event detection.
+! PHP code is used by QTM to populate script before running it in Visual3D
+!
+! Assumes that $force_threshold has been set in main pipeline
+!
+! NB, 14/05/2012
+! ==================================
+
+! ==================================
+! Find name of file for pattern recognition.
+
+! ==================================
+!Calculate the size of the window that will be used for the event detection. This changes depending on the frame rate.
+!=========================================
+!Note: a single file has to be selected to set pipeline parameter
+Select_Active_File
+/FILE_NAME=0
+! /QUERY=
+;
+
+Set_Pipeline_Parameter_To_Data_Value
+/PARAMETER_NAME=WINDOW
+/SIGNAL_TYPES=METRIC
+/SIGNAL_NAMES=WINDOW
+/SIGNAL_FOLDER=PROCESSED
+! /SIGNAL_COMPONENTS=ALL_COMPONENTS
+;
+
+Select_Active_File
+/FILE_NAME=ALL_FILES
+! /QUERY=
+;
+
+!Prepare a list with all file names
+Set_Pipeline_Parameter_To_List_Of_Files
+/PARAMETER_NAME=FILES
+/FOLDER=::working_directory
+! /SEARCH_SUBFOLDERS=FALSE
+/FILE_MASK=Gait *.c3d
+;
+
+Set_Pipeline_Parameter
+/PARAMETER_NAME=FILES_wo_path
+/PARAMETER_VALUE=::FILES
+/PARAMETER_VALUE_SEARCH_FOR=::working_directory
+/PARAMETER_VALUE_REPLACE_WITH=..\
+! /PARAMETER_VALUE_PREFIX=
+! /PARAMETER_VALUE_APPEND=
+;
+
+!Prompt the user to select a file
+Prompt_For_Pipeline_Parameter_Value
+/PIPELINE_PARAMETER_NAME=LEFT_wo_path
+/PROMPT=Select template file that includes manually entered LHS and LTO:
+! /DATA_TYPE=
+/DEFAULT_VALUE=::FILES_wo_path
+;
+
+Set_Pipeline_Parameter
+/PARAMETER_NAME=L_TEMPLATE_FILE
+/PARAMETER_VALUE=::LEFT_wo_path
+/PARAMETER_VALUE_SEARCH_FOR=..\
+/PARAMETER_VALUE_REPLACE_WITH=::working_directory
+! /PARAMETER_VALUE_PREFIX=
+! /PARAMETER_VALUE_APPEND=
+;
+
+Assign_Tags_To_Files
+/MOTION_FILE_NAMES=::L_TEMPLATE_FILE
+! /QUERY=
+/TAGS=left template
+;
+
+Prompt_For_Pipeline_Parameter_Value
+/PIPELINE_PARAMETER_NAME=RIGHT_wo_path
+/PROMPT=Select template file that includes manually entered RHS and RTO:
+! /DATA_TYPE=
+/DEFAULT_VALUE=::FILES_wo_path
+;
+
+Set_Pipeline_Parameter
+/PARAMETER_NAME=R_TEMPLATE_FILE
+/PARAMETER_VALUE=::RIGHT_wo_path
+/PARAMETER_VALUE_SEARCH_FOR=..\
+/PARAMETER_VALUE_REPLACE_WITH=::working_directory
+! /PARAMETER_VALUE_PREFIX=
+! /PARAMETER_VALUE_APPEND=
+;
+
+Assign_Tags_To_Files
+/MOTION_FILE_NAMES=::R_TEMPLATE_FILE
+! /QUERY=
+/TAGS=right template
+;
+
+!Identify the events based on the pattern in the template files.
+Select_Active_File
+/FILE_NAME=ALL_FILES
+/QUERY=Dynamic & NOT(left template)
+;
+
+Event_TPR_Signal
+/PATTERN_FILE=::L_TEMPLATE_FILE
+/PATTERN_TYPE=KINETIC_KINEMATIC
+/PATTERN_SIGNAL=ProxEndPos
+/PATTERN_FOLDER=LFT
+/PATTERN_EVENT_NAME=LHS
+! /PATTERN_EVENT_INSTANCE=1
+! /SELECT_X=FALSE
+! /SELECT_Y=FALSE
+/SELECT_Z=TRUE
+/TPR_WINDOW=::WINDOW
+/TOLERANCE=30
+/SIGNAL_TYPES=KINETIC_KINEMATIC
+/SIGNAL_NAMES=ProxEndPos
+/SIGNAL_FOLDER=LFT
+/EVENT_NAME=LHS
+;
+
+Event_TPR_Signal
+/PATTERN_FILE=::L_TEMPLATE_FILE
+/PATTERN_TYPE=KINETIC_KINEMATIC
+/PATTERN_SIGNAL=ProxEndPos
+/PATTERN_FOLDER=LFT
+/PATTERN_EVENT_NAME=LTO
+! /PATTERN_EVENT_INSTANCE=1
+! /SELECT_X=FALSE
+! /SELECT_Y=FALSE
+/SELECT_Z=TRUE
+/TPR_WINDOW=::WINDOW
+/TOLERANCE=30
+/SIGNAL_TYPES=KINETIC_KINEMATIC
+/SIGNAL_NAMES=ProxEndPos
+/SIGNAL_FOLDER=LFT
+/EVENT_NAME=LTO
+;
+
+Select_Active_File
+/FILE_NAME=ALL_FILES
+/QUERY=Dynamic & NOT(right template)
+;
+
+Event_TPR_Signal
+/PATTERN_FILE=::R_TEMPLATE_FILE
+/PATTERN_TYPE=KINETIC_KINEMATIC
+/PATTERN_SIGNAL=ProxEndPos
+/PATTERN_FOLDER=RFT
+/PATTERN_EVENT_NAME=RHS
+! /PATTERN_EVENT_INSTANCE=1
+! /SELECT_X=FALSE
+! /SELECT_Y=FALSE
+/SELECT_Z=TRUE
+/TPR_WINDOW=::WINDOW
+/TOLERANCE=30
+/SIGNAL_TYPES=KINETIC_KINEMATIC
+/SIGNAL_NAMES=ProxEndPos
+/SIGNAL_FOLDER=RFT
+/EVENT_NAME=RHS
+;
+
+Event_TPR_Signal
+/PATTERN_FILE=::R_TEMPLATE_FILE
+/PATTERN_TYPE=KINETIC_KINEMATIC
+/PATTERN_SIGNAL=ProxEndPos
+/PATTERN_FOLDER=RFT
+/PATTERN_EVENT_NAME=RTO
+! /PATTERN_EVENT_INSTANCE=1
+! /SELECT_X=FALSE
+! /SELECT_Y=FALSE
+/SELECT_Z=TRUE
+/TPR_WINDOW=::WINDOW
+/TOLERANCE=30
+/SIGNAL_TYPES=KINETIC_KINEMATIC
+/SIGNAL_NAMES=ProxEndPos
+/SIGNAL_FOLDER=RFT
+/EVENT_NAME=RTO
+;

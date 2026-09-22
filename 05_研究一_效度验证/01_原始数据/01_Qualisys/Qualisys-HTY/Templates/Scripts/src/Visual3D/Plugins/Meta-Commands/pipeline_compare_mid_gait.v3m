@@ -1,0 +1,43 @@
+! BEGIN_META
+! META_CMD_NAME	= Pipeline_Compare_Mid_Gait
+! META_PARAM	= page_titles  :   string ::yes
+! END_META
+
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!  Copyright notice
+!  This PAF and its content is copyright of Qualisys AB © 2012-2017. All rights reserved. 
+!  The PAF script is only to be used in conjunction with a Qualisys Motion Capture System. 
+!  Only legal PAF owners are entitled to use the script and only in relation with related PAF.
+! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+!=========================================
+! EMG
+!=========================================
+
+**__Add_a_Comment__**
+! /COMMENT=
+;
+
+!Add condition to all pages of report (EMG pages added separately)
+For_Each
+/ITERATION_PARAMETER_NAME=page_title
+/ITERATION_PARAMETER_COUNT_NAME=page_num
+/ITEMS=::page_titles
+;
+
+	Set_Report_Page_Title
+	/PAGE_NUMBER=::page_num
+	/PAGE_TITLE=::page_title
+	! /PAGE_TITLE_FONT=Arial
+	! /PAGE_TITLE_FONT_SIZE=12
+	! /PAGE_TITLE_FONT_BOLD=FALSE
+	! /PAGE_TITLE_FONT_ITALIC=FALSE
+	! /PAGE_TITLE_FONT_UNDERLINE=FALSE
+	! /PAGE_TITLE_ALIGN=ALIGN_CENTER
+	! /PAGE_TITLE_COLOR=BLACK
+	;
+
+End_For_Each
+/ITERATION_PARAMETER_NAME=page_title
+;
+
