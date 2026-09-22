@@ -66,8 +66,45 @@
     beforeskip = {12pt},
     afterskip = {6pt},
     fixskip = true
+  },
+  subsubsection = {
+    format = {\raggedright\heiti\fontsize{12pt}{12pt}\selectfont},
+    aftername = {\hspace{1em}},
+    beforeskip = {6pt},
+    afterskip = {3pt},
+    fixskip = true
+  },
+  paragraph = {
+    format = {\raggedright\heiti\fontsize{12pt}{12pt}\selectfont},
+    aftername = {\hspace{1em}},
+    beforeskip = {6pt},
+    afterskip = {3pt}
   }
 }
+
+% 锁定目录深度：仅编至三级标题（chapter / section / subsection）
+% 锁定编号深度：仅编号至三级 subsection（subsubsection/paragraph 不编号）
+\usepackage{titletoc}
+\titlecontents{subsubsection}[4.5em]
+  {\songti\fontsize{10.5pt}{10.5pt}\selectfont}
+  {\thecontentslabel\hspace{1em}}
+  {}
+  {\titlerule*[0.5pc]{.}\contentspage}
+\titlecontents{paragraph}[6.0em]
+  {\songti\fontsize{10.5pt}{10.5pt}\selectfont}
+  {\thecontentslabel\hspace{1em}}
+  {}
+  {}
+
+% 五级标题命令（无编号内联加粗，不进目录）
+\newcommand{\wuwei}[1]{{\heiti\bfseries （#1）\hspace{1em}}}
+
+% 锁定目录抓取深度：仅收录章/节/条目（1 → 1.1 → 1.1.1）
+% 锁定编号深度：仅编号至三级 subsection，subsubsection/paragraph 不编号
+\makeatletter
+\setcounter{tocdepth}{2}    % 目录收录至 subsection 止
+\setcounter{secnumdepth}{3} % 编号至 subsection 止
+\makeatother
 
 % ==================== 4. 页眉页脚配置（彻底剔除模板提示语） ====================
 \usepackage{fancyhdr}
