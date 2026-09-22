@@ -45,3 +45,4 @@ fix_pdf.ps1
 *.log
 *.aux
 *.toc
+*.zip
