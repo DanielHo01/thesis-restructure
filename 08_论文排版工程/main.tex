@@ -200,16 +200,17 @@
 \begin{document}
 
 % ==================== 1. 中文封面 ====================
-\begin{titlepage}
+\newgeometry{left=2.7cm,right=2.7cm,top=2.75cm,bottom=1.92cm}\begin{titlepage}
   \thispagestyle{empty}
   % 顶部信息栏：改用 minipage 彻底消除 Underfull \hbox 告警
   \noindent
   \begin{minipage}{\textwidth}
+    \centering
     \fontsize{10.5pt}{18pt}\selectfont
-    \null\hfill\makebox[4\ccwd][s]{分类号}：\coverline{3.2cm}{} \hfill
-    \makebox[4\ccwd][s]{学校代码}：\coverline[c]{2.8cm}{10585} \\[0.1cm]
-    \null\hfill\makebox[4\ccwd][s]{密级}：\coverline{3.2cm}{} \hfill
-    \makebox[4\ccwd][s]{学号}：\coverline[c]{2.8cm}{105852024400158}
+    \coverline[c]{3.2cm}{分类号}：\coverline[c]{3.2cm}{} \hfill
+    \coverline[c]{2.8cm}{学校代码}：\coverline[c]{2.8cm}{10585} \[0.1cm]
+    \coverline[c]{3.2cm}{密级}：\coverline[c]{3.2cm}{} \hfill
+    \coverline[c]{3.8cm}{学号}：\coverline[c]{3.8cm}{105852024400158}
   \end{minipage}
 
   \vspace{1.0cm}
@@ -233,6 +234,7 @@
     {\songti\fontsize{12pt}{12pt}\selectfont\ziju{0.25} 二〇二六 年九月}
   \end{center}
 \end{titlepage}
+\restoregeometry
 
 % ==================== 2. 英文封面 ====================
 \begin{titlepage}
@@ -611,14 +613,19 @@ Currier 等（2026）明确将其推荐对象限定为“经验丰富的健康�
 \end{enumerate}
 
 \subsection{既有研究的主要局限}
-综合本章评述，现有文献在以下四个方面存在明显局限：
-\begin{enumerate}
-  \item \textbf{VBT 与规范化 RIR 训练的直接对比证据极为稀缺}：现有直接对比研究仅有 Naclerio 系列两项，且均为短期急性训练产出评估，缺乏中长期训练适应的随机对照证据。
-  \item \textbf{“可比”结果的解释尚未建立}：现有研究仅报告了客观反馈与主观反馈在训练产出上的统计可比性，但未从生理学机制层面解释这一可比性的成因。
-  \item \textbf{真实训练场景的生态效度证据不足}：现有 VBT 研究多在受控实验室条件下实施，移动端 CV 方案在真实训练场景中的测量稳定性、训练者操作可行性与长期依从性均缺乏系统评估。
-  \item \textbf{训练者主观体验维度的系统性缺失}：现有研究普遍以体能表现结果为核心结局指标，对训练者在不同反馈路径下的主观体验、决策逻辑、工具信任与自主权感受缺乏系统的质性探究。
-\end{enumerate}
+综合本章评述，现有文献在以下四个方面存在明显局限。
 
+\subsubsection{VBT 与规范化 RIR 训练的直接对比证据极为稀缺}
+现有直接对比研究仅有 Naclerio 系列两项，且均为短期急性训练产出评估，缺乏中长期训练适应的随机对照证据。
+
+\subsubsection{"可比"结果的解释尚未建立}
+现有研究仅报告了客观反馈与主观反馈在训练产出上的统计可比性，但未从生理学机制层面解释这一可比性的成因。
+
+\subsubsection{真实训练场景的生态效度证据不足}
+现有 VBT 研究多在受控实验室条件下实施，移动端 CV 方案在真实训练场景中的测量稳定性、训练者操作可行性与长期依从性均缺乏系统评估。
+
+\subsubsection{训练者主观体验维度的系统性缺失}
+现有研究普遍以体能表现结果为核心结局指标，对训练者在不同反馈路径下的主观体验、决策逻辑、工具信任与自主权感受缺乏系统的质性探究。
 \subsection{本研究的回应定位}
 本研究的设计直接回应上述四个局限。针对第一个局限，研究二采用两组平行随机对照预试验设计，以基于计算机视觉 AI 系统的客观速度反馈组与基于 RIR 的规范化主观反馈组作为直接对比条件，在 4 周下肢抗阻训练干预中系统评估两条路径的可行性、执行质量与初步适应差异。针对第二个局限，研究二通过训练负荷结构、内部负荷反应与体能适应的多维度比较，为“可比”结果的解释提供实证素材。针对第三个局限，研究一通过移动端 AI 系统与专业 LPT 设备的效度验证，研究二通过嵌入移动端系统的静默生态效度记录，系统评估低成本 CV 方案在真实训练场景中的测量可行性。针对第四个局限，第三阶段通过半结构化深度访谈与主题分析，从主观体验层面揭示训练者在两条反馈路径下的决策逻辑、工具信任与自主权平衡感受。
 
