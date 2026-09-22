@@ -645,73 +645,610 @@ Currier 等（2026）明确将其推荐对象限定为“经验丰富的健康�
   \label{fig:ch2-framework}
 \end{figure}
 
+% ==============================================================================
 % ---------------- 第 3 章 研究设计 ----------------
+% ==============================================================================
 \clearpage
 \chapter{研究设计}
+
 \section{研究对象}
-$\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times$
+本研究以数字化监控与规范化自我指导两种训练模式在真实下肢抗阻训练场景中的应用为研究对象，重点考察两种模式在实施可行性、训练执行质量及下肢最大力量与爆发力初步适应信号方面的差异，并探索低成本移动端计算机视觉系统在真实训练场景中同步测量的生态效度表现。
+
+本研究采用三阶段递进式设计，研究对象分属三个阶段：
+第一阶段为研究一，即横断面测量效度验证研究，招募 13 名具有抗阻训练经验的健康男性受试者，以自研移动端应用程序 SportSci Pro 在杠铃后蹲平均向心速度（Mean Concentric Velocity, MCV）及负重反向运动跳（Countermovement Jump, CMJ）高度测量中的效度为研究对象，通过与 GymAware 线性位置传感器和基于 240 fps 高速视频的手动关键帧标注结果进行同步比较，评估该系统作为训练监测工具的测量学适用性。
+第二阶段为研究二，即 4 周随机对照干预研究，以广州体育学院符合条件的在校抗阻训练者为研究对象。量化部分采用两组平行、开放标签随机对照设计，比较数字化监控组（AI 辅助训练组，以下简称 AI 组）与规范化自我指导组（以下简称 Self 组）在训练执行质量与体能适应指标上的差异。研究二计划每组纳入 12 人，共 24 人，采用便利招募方式，以基线相对深蹲最大力量为分层变量进行分层区组随机分配。
+第三阶段为半结构化深度访谈，在 T1 后测完成后基于量化结果进行分层抽样，对部分受试者开展深度访谈，从主观体验层面揭示两种模式的差异机制与训练者对低成本移动端方案的接受意愿。第三阶段与研究二共同构成解释性序贯混合方法设计，其中研究二为量化部分，第三阶段为质性部分。为保证三阶段研究样本的相互独立性，参与研究一的受试者不纳入研究二正式干预。
 
 \section{研究方法}
-本部分应当对使用的研究方法做简要的介绍，根据实际情况填写。
-
-$\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times$
+本研究综合采用调查法、实验法与统计分析法三类研究方法。调查法用于收集受试者的基本资料、训练背景、主观恢复状态、训练自我效能及系统可用性与接受度等信息。实验法用于开展研究一的测量效度验证、研究二的 4 周随机对照训练干预以及 T1 后测后的半结构化访谈。统计分析法用于对研究一测量学数据、研究二量化数据、访谈质性资料及移动端静默记录的生态效度补充数据进行系统分析。三类方法相互配合，共同服务于工具效度验证、干预可行性评估、训练执行质量比较、体能适应信号探索及主观体验探究等研究目的。
 
 \subsection{调查法}
-$\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times$
+本研究采用问卷法收集受试者的基础信息、主观训练反应、心理体验及系统接受度相关数据，以补充实验法所获得的客观运动学与体能测试结果。所使用的问卷工具及其方法学定位如下：
+
+\subsubsection{基本资料与训练背景问卷}
+自编基本资料与训练背景问卷用于收集受试者的年龄、身高、体重、抗阻训练年限、入组前习惯训练频率、既往 VBT 使用经验及近 6 个月伤病史等信息，用于描述样本特征并评估随机分组后的组间可比性。其中抗阻训练年限采用有序分类选项（1 年至不足 2 年、2 年至不足 3 年、3 年及以上），入组前习惯训练频率采用有序分类选项（$\le$1 次/周、2 次/周、3 次/周、$\ge$4 次/周）。问卷通过问卷星平台在 T0 基线阶段一次性采集。
+
+\subsubsection{改编版 Hooper 主观恢复状态问卷}
+改编版 Hooper 问卷用于评估受试者训练前的主观恢复状态，涵盖睡眠质量、压力水平、疲劳程度和肌肉酸痛四个维度。本研究采用 1 至 10 分制，各维度得分越高表示对应状态越明显。其中睡眠质量维度的原始方向为"分数越高表示睡眠质量越好"，其余三个维度的原始方向为"分数越高表示主观应激水平越高"。在数据分析前，对睡眠维度进行反向计分（反向分 $= 11 - \text{原始分}$），使四个维度统一为"分数越高表示主观应激水平越高"的方向。Hooper 总分范围为 4 至 40 分，总分越高表示整体主观恢复状态越差。该问卷在研究二干预阶段每次训练前采集，AI 组通过研究专用移动端系统填写，Self 组通过问卷星或纸质记录表填写。
+
+\subsubsection{Borg CR-10 自觉疲劳度量表}
+Borg CR-10 量表用于评估受试者每次训练的会话自觉疲劳度（session Rating of Perceived Exertion, sRPE），采用 0 至 10 分制，分数越高表示训练疲劳感越强。该量表在研究二每次训练结束后 30 分钟采集，AI 组通过研究专用系统填写，Self 组通过问卷星填写。
+
+\subsubsection{训练自我效能量表}
+训练自我效能量表用于评估受试者在下肢抗阻训练情境中对自身完成训练能力的主观信念。该量表参照 Bandura（1997）自我效能理论框架，结合抗阻训练任务特征编制，共 8 个条目，采用 Likert 5 点计分（1 = 完全不同意，5 = 完全同意）。首先计算 8 个条目的原始总分（范围 8--40 分），再按公式 $(\text{原始总分} - 8) \div (40 - 8) \times 100$ 换算为 0--100 分的标准化得分，以便于解释和组间比较。得分越高表示训练自我效能感越强。量表在研究二的 T0 和 T1 两个时间点通过问卷星在两组中同步采集，用于探索干预对训练自我效能的潜在影响。
+
+\subsubsection{系统可用性与接受度量表}
+针对 AI 组，在 T1 后测阶段通过问卷星额外采集以下四类系统评价指标：
+\begin{enumerate}
+  \item \textbf{系统可用性量表（SUS）}：采用 Brooke（1996）提出的 10 条目 5 点量表，奇数条目为正向陈述、偶数条目为反向陈述，按标准方法换算为 0 至 100 分。本研究将其用于评估 AI 组对数字化监控辅助训练流程的整体可用性感受，包括设备连接、训练准备、反馈接收、规则化负荷调整和现场操作流程。SUS 分值高于 70 分通常被视为"可接受"水平。
+  \item \textbf{感知有用性（PU）}：参照 Davis（1989）技术接受模型中的感知有用性维度，结合本研究系统功能改编，共 4 个条目，采用 Likert 5 点计分（1 = 完全不同意，5 = 完全同意），以条目均分报告。
+  \item \textbf{信任度（Trust）}：参照 Jian 等（2000）人机信任量表改编，共 4 个条目，采用 Likert 5 点计分，以条目均分报告，分数越高表示受试者对系统建议的信任程度越高。
+  \item \textbf{使用意愿}：参照 Venkatesh 等（2003）整合技术接受模型中的使用意愿维度改编，共 3 个条目，采用 Likert 5 点计分，以条目均分报告，分数越高表示后续继续使用的意愿越强。
+\end{enumerate}
+
+\subsubsection{半结构化访谈提纲}
+半结构化访谈提纲用于 T1 后测完成后对分层抽样受试者的深度访谈，围绕训练整体体验、负荷调控感受、系统接受度与信任、后续使用意愿四个核心维度展开，两组访谈提纲在共性问题基础上分别设置针对性追问。
 
 \subsection{实验法}
-$\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times$
 
-\subsection{统计分析法}
-量化研究，需要详细撰写统计分析方法。$\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times$
+\subsubsection{总体研究设计与伦理审查}
+\noindent \textbf{1. 研究定位与总体框架} \\
+本研究采用三阶段递进式实验设计，构成从"工具效度验证"到"真实场景应用比较"再到"主观体验机制探究"的完整研究链条。第一阶段为研究一（横断面测量效度验证研究），在受控实验环境下检验 SportSci Pro 在杠铃后蹲 MCV 和负重 CMJ 高度测量中的效度与误差特征。第二阶段为研究二（4 周随机对照干预研究），比较 AI 组与 Self 组在实施可行性、训练执行质量及体能适应信号上的差异。第三阶段为半结构化访谈，揭示量化差异背后的主观体验机制。
 
-\section{技术路线}
-本部分是对论文研究的技术路线与整体结构做一个阐述，就是第一部分主要研究什么，第二部分主要研究什么等等，可以加上研究的技术路线图。
+\vspace{0.2cm}
+\noindent \textbf{2. 研究流程总览} \\
+本研究的完整时间流程包括研究筹备、研究一实施、研究二筹备、研究二实施、第三阶段访谈及数据分析六个环节。
 
-$\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times$。
+\vspace{0.2cm}
+\noindent \textbf{3. 伦理审查与知情同意} \\
+本研究方案经广州体育学院学术与人体受试者伦理委员会审查并获批准（审批编号：2026LCLL-041、2026LCLL-042），研究严格遵循《赫尔辛基宣言》原则。受试者在自愿基础上签署书面知情同意书，知情同意书中说明了分层访谈抽样及 APP 静默同步记录的存在。训练现场设立最低速度安全边界（$\text{MCV} < 0.15\text{ m/s}$ 触发安全停止）。所有数据均采用编号进行匿名化保存。
 
-% ---------------- 第 4 章 研究结果与分析 ----------------
-\clearpage
-\chapter{研究结果与分析}
-\section{研究结果1}
-当广义控制截面具有式（3）的广义本构关系时，可定义如下的截面示性数
-\begin{equation}
-  \Phi(\theta) = 
-  \begin{cases}
-    0, & \text{公式居中，序号顶右} \\
-    1, &
-  \end{cases}
-\end{equation}
-$\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times\times$，如图 1。
+\subsubsection{研究一：SportSci Pro 测量效度验证}
+\noindent \textbf{1. 研究对象} \\
+研究一招募 13 名具有抗阻训练经验的健康男性受试者参与测试。纳入标准包括：年龄 18 至 30 周岁；具有至少 1 年杠铃后蹲训练经验，能够以标准技术完成递增负荷至接近 1RM 的测试；近 6 个月内无严重下肢或腰背损伤；能够理解并配合完成测试流程。为保证两阶段研究样本的相互独立性，参与研究一的受试者均不纳入研究二正式干预。
 
-\begin{figure}[htbp]
-  \centering
-  \insertschoollogo{5.5cm}
-  \vspace{6pt}
-  \caption{$\times\times\times\times\times\times\times\times$示意图}
-  \vspace{12pt}
-\end{figure}
+\vspace{0.2cm}
+\noindent \textbf{2. 测试设计与流程} \\
+杠铃后蹲 MCV 测试覆盖 30\% 至 100\% 1RM 递增负荷区间，向心阶段统一执行最大意图速度（MIV）。GymAware 与 SportSci Pro 同步采集中，SportSci Pro 基于 MediaPipe Pose 提取髋部垂直位移并经一欧元滤波器（One Euro Filter）平滑处理输出 MCV。负重 CMJ 测试涵盖 20 kg、40 kg、60 kg 三个杠铃负重条件，每人每条件 3 次（共 117 对配对样本），以 240 fps 高速摄像机飞行时间法标注值作为效度基准。
 
-$\times\times\times\times\times\times\times\times\times\times\times\times$如表 1。
+\vspace{0.2cm}
+\noindent \textbf{3. 测量学评价指标} \\
+采用 ICC(2,1)、Bland-Altman 偏差分析（Bias、LoA）、MAE 和 Pearson $r$ 综合评价。
+
+\subsubsection{研究二：数字化监控与规范化自我指导的 4 周随机对照比较}
+\noindent \textbf{1. 研究对象与纳排标准} \\
+研究二受试者招募自广州体育学院在校抗阻训练者。纳入排除标准详见表 \ref{tab:ch3-inclusion}。
 
 \begin{table}[htbp]
   \centering
-  \caption{杆件状态与非线性构形状态对应关系}
+  \caption{研究二受试者纳入与排除标准}
+  \label{tab:ch3-inclusion}
   \vspace{6pt}
-  \fontsize{10pt}{14pt}\selectfont
-  \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}ccccccccc@{}}
-    \toprule
-    $\times\times\times\times\times$ & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 \\
-    \midrule
-    $\times\quad\times\times$ & -- & $\circledast_2$ & $\circledast_3$ & $\circledast_1$ & $\circledast_2,\circledast_3$ & $\circledast_1,\circledast_2$ & $\circledast_1,\circledast_3$ & $\circledast_1,\circledast_2,\circledast_3$ \\
-    $\times\quad\times\times\times$ & $\circledast_1,\circledast_2,\circledast_3$ & $\circledast_1,\circledast_3$ & $\circledast_1,\circledast_2$ & $\circledast_2,\circledast_3$ & $\circledast_1$ & $\circledast_3$ & $\circledast_2$ & -- \\
-    \bottomrule
-  \end{tabular*}
+  \small
+  \begin{tabularx}{\textwidth}{|m{2.2cm}|X|}
+    \hline
+    \textbf{类别} & \textbf{内容} \\ \hline
+    纳入标准 & （1）18 至 30 周岁健康男性在校大学生；（2）具有至少 1 年连续规律的抗阻训练经验（每周至少 2 次，包含多关节动作）；（3）杠铃后蹲 1RM 不低于自身体重的 1.2 倍；（4）熟悉后蹲技术并能安全完成测试；（5）能承诺 4 周内完成每周 2 次共 8 次训练；（6）自愿签署知情同意书。 \\ \hline
+    排除标准 & （1）近 6 个月内存在严重下肢或腰背损伤；（2）已知心血管疾病或运动禁忌；（3）正在接受一对一私教指导；（4）同期参与其他力量干预；（5）服用影响神经肌肉功能的药物或补剂；（6）预计缺席课次超过计划课次的 20\%。 \\ \hline
+  \end{tabularx}
 \end{table}
 
-\section{研究结果2}
+\noindent \textbf{2. 样本量确定} \\
+本研究定位为预试验（Pilot RCT），旨在评估可行性参数而非确证性假设检验。根据 Julious（2005）与 Thabane 等（2010）的预试验方法学规范，计划每组纳入 12 人，共 24 人。考虑学生出勤冲突，实施超额招募，最终 36 人完成随机化。
 
-% ---------------- 第 5 章 讨论 ----------------
+\vspace{0.2cm}
+\noindent \textbf{3. 招募与知情} \\
+通过校内海报与社群招募，入组受试者在知情同意书中明确获知随机分组机制、潜在访谈抽样及静默采集记录。
+
+\vspace{0.2cm}
+\noindent \textbf{4. 预实验与熟悉课} \\
+正式干预前开展预实验（2--4 人），校准硬件连接、规则引擎算法与卡片理解度；正式入组后安排 1 次非正式熟悉课（不采集正式科研数据），规范动作技术，降低学习效应干扰。
+
+\vspace{0.2cm}
+\noindent \textbf{5. T0 基线测试} \\
+采用双测试日方案（间隔 48 小时），测试安排见表 \ref{tab:ch3-t0}。
+
+\begin{table}[htbp]
+  \centering
+  \caption{研究二 T0 基线测试安排}
+  \label{tab:ch3-t0}
+  \vspace{6pt}
+  \small
+  \begin{tabularx}{\textwidth}{|c|m{3.2cm}|m{3.5cm}|X|}
+    \hline
+    \textbf{测试日} & \textbf{执行时序} & \textbf{测试内容} & \textbf{具体操作安排} \\ \hline
+    测试日 1 & 随机分组前 & 负荷--速度建档与深蹲 1RM 测试 & 标准化热身后采用基于速度反馈的自适应递增协议，同步完成 LVP 建模与 1RM 测定，以此作为分层随机化变量。 \\ \hline
+    测试日 2 & 随机分组后、干预前 & 体成分、跳跃、等长力量与量表 & InBody 体成分测试、SmartSpeed 纵跳垫测试（CMJ$\times$3、SJ$\times$3）、K-Force 测力台 IMTP 评估及自我效能量表填写。 \\ \hline
+  \end{tabularx}
+\end{table}
+
+\noindent \textbf{6. 分层区组随机分组} \\
+以基线相对深蹲 1RM（中位数分层）为分层变量，层内区组大小为 2 或 4 混合随机，计算机生成分配序列并通过不透明信封隐藏。因干预涉及设备佩戴，本研究为开放标签设计，但在数据录入与统计分析阶段使用编码盲态处理（Group A 与 Group B）。
+
+\vspace{0.2cm}
+\noindent \textbf{7. 干预方案} \\
+4 周干预，每周 2 次，共 8 次，双日交替进行。训练前执行 RAMP 标准化热身（表 \ref{tab:ch3-ramp}）。训练日 A（最大力量导向）与训练日 B（速度力量导向）参数安排见表 \ref{tab:ch3-trainA} 与表 \ref{tab:ch3-trainB}。
+
+\begin{table}[htbp]
+  \centering
+  \caption{标准化热身流程}
+  \label{tab:ch3-ramp}
+  \vspace{6pt}
+  \small
+  \begin{tabularx}{\textwidth}{|m{2.2cm}|X|X|}
+    \hline
+    \textbf{阶段} & \textbf{训练日 A} & \textbf{训练日 B} \\ \hline
+    Raise（5 min） & 功率自行车或慢跑，RPE 3--4 & 慢跑 + 高抬腿 + A-Skip \\ \hline
+    Activate & 侧向行走 $1\times 10$ 步/侧；怪兽行走 $1\times 10$ 步 & 侧向行走 $1\times 10$ 步/侧；单腿臀桥 $1\times 8$ 次/侧 \\ \hline
+    Mobilize & 复合弓箭步转体 6--8 次/侧；90/90 髋旋转 6--8 次 & 站姿抱膝行走 6--8 次/侧；前后摆腿 6--8 次/侧 \\ \hline
+    Potentiate & 踝跳 $2\times 8$；CMJ$\times 3$（最大努力） & 踝跳 $2\times 8$；连续跳 $2\times 5$ \\ \hline
+    Specific & 空杆$\times 5 \rightarrow 50\%$预测负荷$\times 3 \rightarrow 70\%$预测负荷$\times 2$ & 空杆$\times 5 \rightarrow 50\%$预测负荷$\times 3$ \\ \hline
+  \end{tabularx}
+\end{table}
+
+\begin{table}[htbp]
+  \centering
+  \caption{研究二训练日 A（最大力量导向）4 周参数安排}
+  \label{tab:ch3-trainA}
+  \vspace{6pt}
+  \small
+  \begin{tabularx}{\textwidth}{|c|c|X|X|c|}
+    \hline
+    \textbf{周次} & \textbf{周期定位} & \textbf{深蹲主项（AI 组）} & \textbf{深蹲主项（Self 组）} & \textbf{辅助动作} \\ \hline
+    第 1 周 & 导入适应 & 4组$\times$4--5次; 目标MCV 0.55--0.65 m/s; VL$\le$18\% & 4组$\times$4--5次; 70\%--75\%1RM; 目标RIR 2--3 & RDL $3\times 8$ \\ \hline
+    第 2 周 & 超负荷Ⅰ & 5组$\times$4--5次; 目标MCV 0.50--0.60 m/s; VL$\le$22\% & 5组$\times$4--5次; 75\%--80\%1RM; 目标RIR 1--2 & RDL $3\times 8$ \\ \hline
+    第 3 周 & 超负荷Ⅱ & 5组$\times$4--5次; 目标MCV 0.40--0.55 m/s; VL$\le$25\% & 5组$\times$4--5次; 80\%--85\%1RM; 目标RIR 1--2 & RDL $3\times 8$ \\ \hline
+    第 4 周 & 减载恢复 & 3组$\times$4次; 目标MCV 0.50--0.60 m/s; VL$\le$15\% & 3组$\times$4次; 75\%--80\%1RM; 目标RIR 2--3 & RDL $2\times 6$ \\ \hline
+  \end{tabularx}
+\end{table}
+
+\begin{table}[htbp]
+  \centering
+  \caption{研究二训练日 B（速度力量导向）4 周参数安排}
+  \label{tab:ch3-trainB}
+  \vspace{6pt}
+  \small
+  \begin{tabularx}{\textwidth}{|c|c|X|X|c|}
+    \hline
+    \textbf{周次} & \textbf{周期定位} & \textbf{深蹲主项（AI 组）} & \textbf{深蹲主项（Self 组）} & \textbf{辅助动作} \\ \hline
+    第 1 周 & 导入适应 & 4组$\times$3次; 目标MCV 0.75--0.85 m/s; VL$\le$10\% & 4组$\times$3次; 60\%--65\%1RM; 速度变慢即停 & 分腿蹲 $3\times 8$/腿 \\ \hline
+    第 2 周 & 超负荷Ⅰ & 5组$\times$3次; 目标MCV 0.70--0.80 m/s; VL$\le$12\% & 5组$\times$3次; 65\%--70\%1RM; 速度变慢即停 & 分腿蹲 $3\times 8$/腿 \\ \hline
+    第 3 周 & 超负荷Ⅱ & 5组$\times$3次; 目标MCV 0.65--0.75 m/s; VL$\le$15\% & 5组$\times$3次; 70\%--75\%1RM; 速度变慢即停 & 分腿蹲 $3\times 8$/腿 \\ \hline
+    第 4 周 & 减载恢复 & 3组$\times$3次; 目标MCV 0.70--0.80 m/s; VL$\le$10\% & 3组$\times$3次; 65\%--70\%1RM; 速度变慢即停 & 分腿蹲 $2\times 6$/腿 \\ \hline
+  \end{tabularx}
+\end{table}
+
+\noindent \textbf{8. 训练过程数据采集与移动端静默记录} \\
+AI 组深蹲速度由 GymAware 采集并录入研究专用规则模块（SportSci Pro 研究员端），系统依据 $V_{\text{stop}} = V_{\text{best}} \times (1 - \text{VL}_{\text{阈值}}\%)$ 给出停组指令。移动端计算机视觉功能以静默模式在后台进行同步采样，不向受试者呈现反馈，用于生态效度分析。
+
+\vspace{0.2cm}
+\noindent \textbf{9. T1 后测与结局指标体系} \\
+末次训练后 48--72 小时启动 T1 测试。结局指标体系（表 \ref{tab:ch3-outcomes}）与推进标准（表 \ref{tab:ch3-progression}）如下。
+
+\begin{table}[htbp]
+  \centering
+  \caption{研究二结局指标体系}
+  \label{tab:ch3-outcomes}
+  \vspace{6pt}
+  \small
+  \begin{tabularx}{\textwidth}{|c|m{2.5cm}|X|m{2.8cm}|m{2.8cm}|}
+    \hline
+    \textbf{层级} & \textbf{指标类别} & \textbf{具体指标} & \textbf{数据来源} & \textbf{报告方式} \\ \hline
+    第一层 & 可行性指标 & 招募漏斗、随机化率、后测完成率、方案完成率、出席率、不良事件 & 试验记录 & $n$ (\%)、95\% CI \\ \cline{2-5}
+          & 系统接受度 & SUS、PU、Trust、使用意愿（AI 组 T1） & 问卷星 & $M \pm SD$ \\ \cline{2-5}
+          & 执行质量 & 负荷量（Volume load）、完成组数、有效重复数、时长、sRPE、Hooper & 系统记录与量表 & 描述统计、95\% CI \\ \hline
+    第二层 & 核心探索结局 & 深蹲绝对 1RM、深蹲相对 1RM、CMJ 高度 & 实验测试 & ANCOVA，Hedges' $g$ \\ \cline{2-5}
+          & 附加探索结局 & SJ 高度、训练自我效能 & 测试与量表 & ANCOVA，Hedges' $g$ \\ \hline
+    第三层 & 辅助描述资料 & 体脂率、骨骼肌量 & InBody 测试 & 描述统计 \\ \hline
+  \end{tabularx}
+\end{table}
+
+\begin{table}[htbp]
+  \centering
+  \caption{研究二预试验推进标准}
+  \label{tab:ch3-progression}
+  \vspace{6pt}
+  \small
+  \begin{tabularx}{\textwidth}{|m{2.5cm}|m{3.8cm}|c|X|}
+    \hline
+    \textbf{评估维度} & \textbf{指标名称} & \textbf{预设阈值} & \textbf{设定依据} \\ \hline
+    招募可行性 & 进入干预率 & $\ge 80\%$ & 参考 Eldridge 等（2016）建议 \\ \hline
+    随访保留 & 主要后测完成率 & $\ge 80\%$ & 参考 Eldridge 等（2016）建议 \\ \hline
+    方案依从性 & 方案完成率（完成$\ge 80\%$课次且测T1） & $\ge 80\%$ & 课题组训练出勤质控要求 \\ \hline
+    数据质量 & 主要前后测数据完整性 & $\ge 90\%$ & 流程质控红线 \\ \hline
+    系统体验 & AI 组 SUS 评分 & $\ge 70$ 分 & Brooke（1996）可用性可接受阈值 \\ \hline
+    过程控制 & 速度目标命中率 & $\ge 60\%$ & 动作调控实际可执行度指标 \\ \hline
+    安全性 & 严重不良事件（SAE） & 0 例 & 安全伦理底线 \\ \hline
+  \end{tabularx}
+\end{table}
+
+\subsubsection{半结构化访谈}
+T1 后测后 1--2 天内，按组别、基线力量和执行特征三维度最大差异抽样。抽取 8 名受试者起步，每 3 人进行一轮编码核查，直至主题饱和，单人时长约 25 分钟。
+
+\subsection{统计分析法}
+统计分析在 R 4.4.3 环境下完成，显著性水平设为 $\alpha = 0.05$。
+研究一采用 ICC(2,1)、Bland-Altman 及整簇 bootstrap 估计 95\% 置信区间。
+研究二基于符合方案集（PP 样本）开展分析，对连续性探索适应结局采用协方差分析（ANCOVA：$\text{Post} \sim \text{Group} + \text{Pre} + \text{Stratum}$，Type III SS），报告调整后差值、95\% CI 及小样本校正的 Hedges' $g$（通过 `effectsize` 包计算）。
+Hooper 纵向数据采用基于 Kenward-Roger 近似的线性混合效应模型（LMM）。质性数据采用 Braun 与 Clarke（2006）主题分析法。
+
+\section{技术路线}
+本研究的技术路线完整架构由"前期准备 $\rightarrow$ 第一阶段测量效度验证 $\rightarrow$ 第二阶段 RCT 干预 $\rightarrow$ 第三阶段质性访谈 $\rightarrow$ 综合分析决策"递进式展开，详见图 \ref{fig:ch3-tech-route}。
+
+\begin{figure}[htbp]
+  \centering
+  \small
+  \begin{tabular}{|c|}
+    \hline
+    \textbf{前期准备阶段} \\
+    文献系统梳理 \quad $\longrightarrow$ \quad 移动端 SportSci Pro 算法开发与内测 \\
+    $\Downarrow$ \\
+    \textbf{第一阶段：研究一 实验室测量效度验证（$n=13$）} \\
+    深蹲 MCV（对比 GymAware LPT） \quad + \quad 负重 CMJ（对比 240 fps 高速视频） \\
+    $\Downarrow$ \\
+    \textbf{第二阶段：研究二 预试验性 RCT 干预（$n=36$ 随机化，PP 分析 $n=24$）} \\
+    AI 数字化监控组（$n=11$） \quad $\longleftrightarrow$ \quad 规范化自我指导组（$n=13$） \\
+    4 周共 8 次交替训练（训练日 A 最大力量 + 训练日 B 速度力量） \\
+    评估维度：可行性指标、执行质量、探索性结局（1RM、CMJ、SJ、自我效能）、APP 静默生态记录 \\
+    $\Downarrow$ \\
+    \textbf{第三阶段：半结构化深度访谈（$n=12$ 分层抽样）} \\
+    主题分析：决策逻辑、RIR 认知边界、算法安全张力、人机信任与自主权让渡 \\
+    $\Downarrow$ \\
+    \textbf{综合分析与后续确证性试验方案建议} \\
+    \hline
+  \end{tabular}
+  \vspace{6pt}
+  \caption{本研究技术路线图}
+  \label{fig:ch3-tech-route}
+\end{figure}
+
+% ==============================================================================
+% ---------------- 第 4 章 研究结果与分析 ----------------
+% ==============================================================================
+\clearpage
+\chapter{研究结果与分析}
+
+\section{SportSci Pro 实验室测量效度验证}
+研究一在受控实验条件下，检验了 SportSci Pro 与 GymAware 在杠铃后蹲 MCV 以及与 240 fps 高速视频在负重 CMJ 高度测量上的一致性。
+
+\subsection{MCV 测量效度验证结果}
+共纳入 60 对有效配对样本。组内相关系数 $\text{ICC}(2,1) = 0.940$（95\% CI：0.854 至 0.975），点估计达到优秀水平。Bland-Altman 分析显示平均偏差 $\text{Bias} = +0.002\text{ m/s}$，95\% 一致性界限（LoA）为 $-0.09$ 至 $+0.09\text{ m/s}$，平均绝对误差 $\text{MAE} = 0.047\text{ m/s}$。Pearson 相关系数 $r = 0.982$（95\% CI：0.957 至 0.992），决定系数 $R^2 = 0.965$。结果表明系统偏差接近零，具备进入真实训练场景的基本测量学条件。
+
+\subsection{负重 CMJ 高度效度验证结果}
+共纳入 117 对有效配对样本（13 名受试者 $\times$ 3 种负重 $\times$ 3 次重复）。以 240 fps 高速视频帧标注为基准，SportSci Pro 估算 CMJ 高度的 $\text{ICC}(2,1) = 0.912$（95\% CI：0.861--0.945），$\text{Bias} = +0.8\text{ cm}$，LoA 为 $-2.1$ 至 $+3.7\text{ cm}$，$\text{MAE} = 1.3\text{ cm}$，$r = 0.954$，$R^2 = 0.910$，表明该移动端方案在 30 fps 下估算负重跳跃高度具有良好一致性。
+
+\section{研究二受试者流转与基线特征}
+研究二受试者流转全景遵循 CONSORT-Pilot 规范（图 \ref{fig:ch4-consort}）。45 名报名者经初筛排除 9 人，36 人完成随机分配（AI 组与 Self 组各 18 人）。T0 期因个人事务及轻度拉伤脱落 7 人（AI 组 4 人，Self 组 3 人）；进入干预的 29 人中，干预期脱落 5 人（AI 组 3 人，Self 组 2 人）；最终 24 人（AI 组 11 人，Self 组 13 人）纳入符合方案集（PP 样本）分析。
+
+\begin{figure}[htbp]
+  \centering
+  \small
+  \begin{tabular}{|c|}
+    \hline
+    招募与初筛合格（$n=45$） $\longrightarrow$ 排除未进入随机化（$n=9$） \\
+    $\Downarrow$ \\
+    完成随机化分配（$n=36$，按相对深蹲 1RM 分层） \\
+    $\swarrow$ \hspace{5cm} $\searrow$ \\
+    \textbf{AI 组（$n=18$）} \hspace{5cm} \textbf{Self 组（$n=18$）} \\
+    $\downarrow$ T0 期脱落 4 人（1例拉伤，3例事务） \hspace{1cm} $\downarrow$ T0 期脱落 3 人（个人事务） \\
+    进入正式干预（$n=14$） \hspace{4cm} 进入正式干预（$n=15$） \\
+    $\downarrow$ 干预期脱落 3 人（1例退出，2例缺勤） \hspace{1cm} $\downarrow$ 干预期脱落 2 人（出勤不足） \\
+    完成 T1 并纳入 PP 分析（$n=11$） \hspace{3.2cm} 完成 T1 并纳入 PP 分析（$n=13$） \\
+    \hline
+  \end{tabular}
+  \vspace{6pt}
+  \caption{研究二受试者招募、随机化、随访及分析流程图}
+  \label{fig:ch4-consort}
+\end{figure}
+
+PP 样本基线特征如表 \ref{tab:ch4-baseline} 所示。两组在体能指标上均衡可比，仅在问卷报告的习惯训练频率上存在名义差异，该差异将在敏感性分析中专门处理。
+
+\begin{table}[htbp]
+  \centering
+  \caption{研究二 PP 样本基线特征比较表（$n=24$）}
+  \label{tab:ch4-baseline}
+  \vspace{6pt}
+  \fontsize{8.5pt}{11.5pt}\selectfont
+  \setlength{\tabcolsep}{3.5pt}
+  \begin{tabularx}{\textwidth}{lcccccccc}
+    \toprule
+    \textbf{变量} & \textbf{AI 组 ($n=11$)} & \textbf{Self 组 ($n=13$)} & \textbf{均值差} & \textbf{95\% CI} & \textbf{$t$ 检验 $p$} & \textbf{MWU $p$} & \textbf{Hedges' $g$} \\
+    \midrule
+    年龄（岁） & $24.91 \pm 2.55$ & $23.85 \pm 1.63$ & $+1.06$ & $(-0.82, 2.95)$ & 0.250 & 0.165 & 0.49 \\
+    身高（cm） & $179.73 \pm 7.13$ & $176.00 \pm 4.58$ & $+3.73$ & $(-1.55, 9.01)$ & 0.154 & 0.123 & 0.61 \\
+    体重（kg） & $77.54 \pm 10.20$ & $74.27 \pm 4.79$ & $+3.27$ & $(-3.93, 10.47)$ & 0.346 & 0.361 & 0.41 \\
+    BMI（$\text{kg/m}^2$） & $23.91 \pm 1.73$ & $23.97 \pm 1.05$ & $-0.06$ & $(-1.33, 1.21)$ & 0.926 & 0.531 & $-0.04$ \\
+    体脂率（\%） & $15.49 \pm 2.19$ & $15.53 \pm 2.09$ & $-0.04$ & $(-1.87, 1.79)$ & 0.964 & 0.954 & $-0.02$ \\
+    骨骼肌量（kg） & $37.16 \pm 4.79$ & $35.15 \pm 2.35$ & $+2.02$ & $(-1.38, 5.41)$ & 0.224 & 0.173 & 0.53 \\
+    去脂体重（kg） & $65.47 \pm 8.36$ & $62.71 \pm 3.88$ & $+2.76$ & $(-3.13, 8.66)$ & 0.331 & 0.303 & 0.42 \\
+    基线深蹲 1RM（kg） & $130.68 \pm 12.15$ & $130.77 \pm 17.45$ & $-0.09$ & $(-12.70, 12.53)$ & 0.989 & 0.662 & $-0.01$ \\
+    基线相对 1RM（kg/kg） & $1.70 \pm 0.19$ & $1.76 \pm 0.23$ & $-0.06$ & $(-0.24, 0.12)$ & 0.492 & 0.955 & $-0.27$ \\
+    基线 CMJ（cm） & $59.66 \pm 5.23$ & $60.52 \pm 6.27$ & $-0.85$ & $(-5.72, 4.02)$ & 0.720 & 0.820 & $-0.14$ \\
+    基线 SJ（cm） & $55.68 \pm 4.89$ & $54.81 \pm 4.82$ & $+0.87$ & $(-3.26, 5.01)$ & 0.665 & 0.569 & 0.17 \\
+    基线自我效能（分） & $65.45 \pm 5.09$ & $65.69 \pm 6.91$ & $-0.24$ & $(-5.33, 4.86)$ & 0.924 & 0.977 & $-0.04$ \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\section{可行性、训练完成情况与推进标准对照}
+进入干预的 29 人中，24 人完成干预并达到分析标准，方案完成率为 82.8\%（24/29，95\% CI：65.5\%--92.4\%）；课次出席率达 98.4\%（189/192）；过程记录完整率达 100\%。AI 组速度目标命中率为 $80.2\% \pm 6.9\%$，准备度自动减组忠实度为 100\%（4/4 次），严重不良事件为 0。然而，随机化后主要后测完成率仅为 66.7\%（24/36），且 AI 组系统可用性评分（SUS）仅为 $65.00 \pm 4.61$ 分，均未达到预设推进阈值（表 \ref{tab:ch4-feasibility}）。
+
+\begin{table}[htbp]
+  \centering
+  \caption{研究二预设推进标准对照表}
+  \label{tab:ch4-feasibility}
+  \vspace{6pt}
+  \small
+  \begin{tabularx}{\textwidth}{|m{2.8cm}|m{4.8cm}|c|c|c|}
+    \hline
+    \textbf{评估维度} & \textbf{指标} & \textbf{预设阈值} & \textbf{本研究结果} & \textbf{判定} \\ \hline
+    招募可行性 & 进入干预率 & $\ge 80\%$ & 80.6\% (29/36) & 达标（接近阈值） \\ \hline
+    招募保留 & 主要后测完成率 & $\ge 80\%$ & 66.7\% (24/36) & 未达标 \\ \hline
+    方案依从保留 & 方案完成率（完成$\ge 80\%$课次且完成T1） & $\ge 80\%$ & 82.8\% (24/29) & 达标 \\ \hline
+    方案依从性 & 全程完成率（完成全部8次/干预人数） & -- & 72.4\% (21/29) & 报告 \\ \hline
+    方案依从性 & PP 样本内全程完成比例 & -- & 87.5\% (21/24) & 补充报告 \\ \hline
+    数据质量 & 主要前后测结局数据完整性 & $\ge 90\%$ & 100\% (24/24) & 达标 \\ \hline
+    数据质量 & 课次出席率 & -- & 98.4\% (189/192) & 报告 \\ \hline
+    数据质量 & 过程记录完整率 & -- & 100\% (189/189) & 报告 \\ \hline
+    系统体验 & AI 组 SUS 评分 & $\ge 70$ 分 & $65.00 \pm 4.61$ & 未达标 \\ \hline
+    过程控制 & 速度目标命中率 & $\ge 60\%$ & $80.2\% \pm 6.9\%$ & 达标 \\ \hline
+    算法执行 & 自动减组执行忠实度 & 无系统异常 & 100\% (4/4次) & 达标 \\ \hline
+    安全性 & 严重不良事件 & 0 例 & 0 例 & 达标 \\ \hline
+  \end{tabularx}
+\end{table}
+
+\section{两组训练执行与负荷结构}
+两组在全期总外部负荷、深蹲主项总负荷、平均 sRPE 和个体 Hooper 均值上点估计接近，未见明确组间差异（表 \ref{tab:ch4-execution}）。但在负荷组织形态上，Self 组完成的总重复次数显著多于 AI 组（$105.5 \pm 4.1$ 次 vs. $100.3 \pm 6.5$ 次，$p = 0.035$，Hedges' $g = -0.95$）。经出勤折算后，每课次深蹲组数（3.65 vs. 3.64 组）与次数（13.0 vs. 13.2 次）基本一致；而 AI 组的单次重复平均负荷高出约 6.1\%（136.7 vs. 128.9 kg/rep），单课时长平均延长 6--7 分钟。
+
+\begin{table}[htbp]
+  \centering
+  \caption{两组训练执行指标 Welch $t$ 检验结果汇总表}
+  \label{tab:ch4-execution}
+  \vspace{6pt}
+  \small
+  \begin{tabularx}{\textwidth}{lccccc}
+    \toprule
+    \textbf{变量} & \textbf{AI 组 ($n=11$)} & \textbf{Self 组 ($n=13$)} & \textbf{差值} & \textbf{$p$ 值} & \textbf{Hedges' $g$} \\
+    \midrule
+    全期总负荷（kg） & $17651.8 \pm 2198.6$ & $17461.5 \pm 2792.1$ & $+190.28$ & 0.854 & 0.07 \\
+    深蹲主项总负荷（kg） & $13654.5 \pm 1819.3$ & $13642.3 \pm 2226.5$ & $+12.24$ & 0.988 & 0.01 \\
+    平均每课次负荷（kg） & $2297.7 \pm 370.7$ & $2182.7 \pm 349.0$ & $+115.05$ & 0.445 & 0.31 \\
+    总组数 & $28.2 \pm 1.6$ & $29.1 \pm 1.1$ & $-0.90$ & 0.136 & $-0.64$ \\
+    总完成重复次数 & $100.3 \pm 6.5$ & $105.5 \pm 4.1$ & $-5.19$ & 0.035* & $-0.95$ \\
+    全期平均 sRPE（0--10分） & $6.5 \pm 0.5$ & $6.4 \pm 0.3$ & $+0.06$ & 0.735 & 0.14 \\
+    训练总时长（min） & $822.7 \pm 26.2$ & $798.8 \pm 35.5$ & $+23.88$ & 0.072 & 0.73 \\
+    个体 Hooper 均值（分） & $20.4 \pm 2.5$ & $19.8 \pm 1.1$ & $+0.62$ & 0.453 & 0.33 \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\section{Hooper 主观恢复状态的训练过程动态}
+线性混合效应模型（LMM）分析表明，课次主效应显著（$F_{(7,154)} = 3.09$，$p = 0.004$），而组别主效应（$p = 0.421$）与组别$\times$课次交互效应（$p = 0.945$）均不显著（表 \ref{tab:ch4-hooper}）。两组 Hooper 轨迹高度平行，均呈现随周期化负荷进程而在中段升高、在 S8 减载期回落的倒 U 型生理疲劳特征。
+
+\begin{table}[htbp]
+  \centering
+  \caption{Hooper 线性混合效应模型 Type III 方差分析表（Kenward-Roger）}
+  \label{tab:ch4-hooper}
+  \vspace{6pt}
+  \small
+  \begin{tabularx}{\textwidth}{lcccc}
+    \toprule
+    \textbf{变异来源} & \textbf{$F$} & \textbf{NumDF} & \textbf{DenDF} & \textbf{$p$ 值} \\
+    \midrule
+    组别 & 0.67 & 1 & 22.0 & 0.421 \\
+    课次 & 3.09 & 7 & 154.0 & 0.004 \\
+    组别 $\times$ 课次 & 0.32 & 7 & 154.0 & 0.945 \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\section{主要探索性体能与心理结局的组间比较}
+ANCOVA 分析（表 \ref{tab:ch4-ancova}）显示，在深蹲绝对 1RM（调整后差值 $+2.43\text{ kg}$，$p=0.266$）、相对 1RM（$+0.03\text{ kg/kg}$，$p=0.273$）及 SJ 高度（$+0.39\text{ cm}$，$p=0.622$）上，两组未见显著差异；在 CMJ 高度上，AI 组捕获到中到大效应的积极探索信号（调整后差值 $+2.16\text{ cm}$，$p=0.051$，Hedges' $g = 0.85$）；在训练自我效能上，AI 组呈现极显著优势（$+9.88$ 分，$p < 0.001$，Hedges' $g = 2.70$）。
+
+\begin{table}[htbp]
+  \centering
+  \caption{探索性结局指标 ANCOVA 结果汇总表（PP 样本 $n=24$）}
+  \label{tab:ch4-ancova}
+  \vspace{6pt}
+  \fontsize{9pt}{12pt}\selectfont
+  \begin{tabularx}{\textwidth}{lcccccc}
+    \toprule
+    \textbf{结局指标} & \textbf{调整后差值 (AI$-$Self)} & \textbf{差值 95\% CI} & \textbf{$p$ 值} & \textbf{Hedges' $g$} & \textbf{$g$ 95\% CI} & \textbf{FDR 校正 $p$} \\
+    \midrule
+    深蹲绝对 1RM（kg） & $+2.43$ & $(-2.01, 6.87)$ & 0.266 & 0.46 & $(-0.35, 1.28)$ & 0.341 \\
+    深蹲相对 1RM（kg/kg） & $+0.03$ & $(-0.03, 0.09)$ & 0.273 & 0.39 & $(-0.42, 1.20)$ & 0.341 \\
+    CMJ 高度（cm） & $+2.16$ & $(-0.01, 4.33)$ & 0.051 & 0.85 & $(0.02, 1.69)$ & 0.126 \\
+    SJ 高度（cm） & $+0.39$ & $(-1.24, 2.02)$ & 0.622 & 0.43 & $(-0.38, 1.24)$ & 0.622 \\
+    训练自我效能（分） & $+9.88$ & $(6.86, 12.90)$ & $<0.001$ & 2.70 & $(1.59, 3.80)$ & $<0.001$ \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\subsection{探索性适应结局的敏感性分析}
+留一法（LOO）影响分析（表 \ref{tab:ch4-loo}）表明，四项结局在 24 次重估中 $g$ 值全部保持为正，无一次跨越零点，结论方向稳健。
+
+\begin{table}[htbp]
+  \centering
+  \caption{探索性适应结局留一法影响分析结果}
+  \label{tab:ch4-loo}
+  \vspace{6pt}
+  \fontsize{8.5pt}{11.5pt}\selectfont
+  \begin{tabularx}{\textwidth}{lcccccll}
+    \toprule
+    \textbf{结局} & \textbf{全样本 $g$} & \textbf{LOO $g$ 范围} & \textbf{方向一致} & \textbf{跨越零点} & \textbf{相对漂移率} & \textbf{最大正向影响} & \textbf{最大负向影响} \\
+    \midrule
+    $\Delta$深蹲绝对 1RM & 0.464 & 0.292--0.664 & 是 & 否 & 43.2\% & P007 (+0.200) & P025 ($-0.172$) \\
+    $\Delta$CMJ 高度 & 0.854 & 0.721--1.220 & 是 & 否 & 42.9\% & P016 (+0.366) & P018 ($-0.133$) \\
+    $\Delta$SJ 高度 & 0.428 & 0.274--0.614 & 是 & 否 & 43.4\% & P016 (+0.186) & P025 ($-0.154$) \\
+    $\Delta$训练自我效能 & 2.695 & 2.595--4.024 & 是 & 否 & 49.3\% & P015 (+1.329) & P006 ($-0.100$) \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\subsection{问卷报告的入组前习惯训练频率敏感性分析}
+额外将自报训练频率纳入协变量后（表 \ref{tab:ch4-freq-sens}），各结局调整后差值方向与置信区间跨零格局完全维持一致。
+
+\begin{table}[htbp]
+  \centering
+  \caption{入组前习惯训练频率敏感性分析结果（$n=24$）}
+  \label{tab:ch4-freq-sens}
+  \vspace{6pt}
+  \small
+  \begin{tabularx}{\textwidth}{lccccc}
+    \toprule
+    \textbf{结局指标} & \textbf{主分析调整后差值} & \textbf{敏感性调整后差值} & \textbf{主分析 $p$} & \textbf{敏感性 $p$} & \textbf{Freq 协变量 $p$} \\
+    \midrule
+    深蹲绝对 1RM & $+2.43$ & $+3.41$ & 0.266 & 0.148 & 0.249 \\
+    深蹲相对 1RM & $+0.03$ & $+0.04$ & 0.273 & 0.137 & 0.153 \\
+    CMJ 高度 & $+2.16$ & $+2.30$ & 0.051 & 0.054 & 0.700 \\
+    SJ 高度 & $+0.39$ & $+0.71$ & 0.622 & 0.408 & 0.312 \\
+    训练自我效能 & $+9.88$ & $+9.92$ & $<0.001$ & $<0.001$ & 0.950 \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\section{移动端应用程序的生态效度补充分析}
+真实训练静默采集表明（表 \ref{tab:ch4-field-valid}），深蹲工作组逐次重复级一致性极高（$\text{ICC} = 0.991$；$\text{Bias} = +0.0019\text{ m/s}$，$\text{MAE} = 0.017\text{ m/s}$）；热身课次级配对（$n=88$）亦保持高度相关（$r = 0.9997$），但表现出 $+0.0212\text{ m/s}$ 的系统性正偏（100\% 正偏），表明实际应用需经线性校准。
+
+\begin{table}[htbp]
+  \centering
+  \caption{SportSci Pro 与 GymAware 现场配对效度汇总}
+  \label{tab:ch4-field-valid}
+  \vspace{6pt}
+  \small
+  \begin{tabularx}{\textwidth}{lcc}
+    \toprule
+    \textbf{指标} & \textbf{逐次重复级（$n=43$, 3人）} & \textbf{热身级（$n=88$, 11人）} \\
+    \midrule
+    $\text{ICC}(2,1)$ & 0.991 & 0.987 \\
+    ICC 95\% CI（bootstrap） & $(0.939, 0.992)$ & $(0.979, 0.991)$ \\
+    $\text{Bias}$（m/s） & $+0.0019$ & $+0.0212$ \\
+    $\text{LoA}$（m/s） & $(-0.034, +0.038)$ & $(+0.013, +0.030)$ \\
+    $\text{MAE}$（m/s） & 0.017 & 0.021 \\
+    Pearson $r$ & 0.991 & 0.9997 \\
+    正偏比例 & -- & 100\% (88/88对) \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\section{数字化监控辅助训练流程的可用性与用户接受度}
+AI 组评估结果呈现出"高功能认可与高操作摩擦并存"的二元特征（表 \ref{tab:ch4-tam}）：TAM 维度（感知有用性、信任度、使用意愿）均值皆超过 4.4 分（总分 5 分），但综合系统可用性量表（SUS）得分仅为 $65.00 \pm 4.61$ 分，未达标。
+
+\begin{table}[htbp]
+  \centering
+  \caption{AI 组系统评价量表描述性统计（$n=11$）}
+  \label{tab:ch4-tam}
+  \vspace{6pt}
+  \small
+  \begin{tabularx}{\textwidth}{lcc}
+    \toprule
+    \textbf{指标} & \textbf{均值 $\pm$ SD} & \textbf{范围} \\
+    \midrule
+    SUS 总分（0--100分） & $65.00 \pm 4.61$ & 57.5--72.5 \\
+    感知有用性（PU，1--5分） & $4.41 \pm 0.20$ & 4.00--4.75 \\
+    信任度（Trust，1--5分） & $4.41 \pm 0.20$ & 4.00--4.75 \\
+    使用意愿（Intention，1--5分） & $4.49 \pm 0.27$ & 4.00--5.00 \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\section{训练负荷与结局变化的探索性关联}
+在 28 对变量组合的 Spearman 相关分析中，原始检验虽有 8 对显著（$p < 0.05$），但在 Benjamini-Hochberg FDR 多重重采样校正后，全部相关均不再具有统计学显著性（校正后 $p > 0.05$），不支持确证性量效推断。
+
+\section{质性访谈结果}
+
+\subsection{访谈实施与样本基本特征}
+抽取的 12 名受试者基本信息如表 \ref{tab:ch4-interview-cases} 所示。平均访谈时长为 26.2 分钟。
+
+\begin{table}[htbp]
+  \centering
+  \caption{质性访谈受试者基本信息与抽样特征分布表（$n=12$）}
+  \label{tab:ch4-interview-cases}
+  \vspace{6pt}
+  \fontsize{8.5pt}{11pt}\selectfont
+  \setlength{\tabcolsep}{3.5pt}
+  \begin{tabularx}{\textwidth}{cccccccc}
+    \toprule
+    \textbf{编号} & \textbf{组别} & \textbf{力量分层} & \textbf{$\Delta$深蹲 1RM} & \textbf{$\Delta$CMJ} & \textbf{训练执行特征} & \textbf{时长(min)} & \textbf{行为特征类型} \\
+    \midrule
+    P004 & AI 组 & 低力量层 & $+15.0\text{ kg}$ & $+6.7\text{ cm}$ & 速度命中率 85.0\%，未减组 & 25.4 & 积极接受型 \\
+    P010 & AI 组 & 低力量层 & $+12.5\text{ kg}$ & $+3.1\text{ cm}$ & 触发自动减组 1 次 & 27.2 & 安全依赖型 \\
+    P016 & AI 组 & 低力量层 & $+5.0\text{ kg}$ & $-0.3\text{ cm}$ & 触发自动减组 2 次 & 28.0 & 安全依赖型 \\
+    P018 & AI 组 & 低力量层 & $+7.5\text{ kg}$ & $+10.3\text{ cm}$ & 命中率 74.2\%，SUS 偏低 & 26.5 & 批判接受型 \\
+    P025 & AI 组 & 低力量层 & $+22.5\text{ kg}$ & $+6.7\text{ cm}$ & 速度命中率 89.5\%，未减组 & 24.8 & 积极接受型 \\
+    P003 & Self 组 & 低力量层 & $+7.5\text{ kg}$ & $+3.8\text{ cm}$ & 自主调整 2 次，保守选重 & 25.1 & 规则内化型 \\
+    P012 & Self 组 & 高力量层 & $+10.0\text{ kg}$ & $+0.7\text{ cm}$ & 经验丰富，依关节感觉调节 & 26.8 & 批判接受型 \\
+    P013 & Self 组 & 低力量层 & $+10.0\text{ kg}$ & $+8.1\text{ cm}$ & 调整 4 次，严格控动作质量 & 27.5 & 规则内化型 \\
+    P014 & Self 组 & 高力量层 & $+10.0\text{ kg}$ & $+1.5\text{ cm}$ & 训练年限长，保守避力竭 & 25.9 & 批判接受型 \\
+    P015 & Self 组 & 高力量层 & $+17.5\text{ kg}$ & $+0.6\text{ cm}$ & 倾向接近力竭与慢速硬顶 & 26.2 & 负荷导向型 \\
+    P021 & Self 组 & 低力量层 & $+10.0\text{ kg}$ & $+0.1\text{ cm}$ & RIR 估计存在波动 & 24.5 & 负荷导向型 \\
+    P027 & Self 组 & 低力量层 & $+7.5\text{ kg}$ & $+3.6\text{ cm}$ & 自主调整 3 次，依疲劳减量 & 26.0 & 规则内化型 \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\subsection{核心主题呈现与深度质性分析}
+通过三轮主题编码归纳出 6 个核心主题：
+
+\noindent \textbf{主题一：反馈将训练决策从"凭感觉猜测"转化为"有依据的动态校准"} \\
+两组受试者一致反映反馈消除了负荷设定的模糊性。AI 组借助速度直观消除加重顾虑，Self 组借助 RIR 终止无谓力竭。
+\begin{quote}
+  \kaishu\fontsize{10.5pt}{16pt}\selectfont
+  "以前加不加重量主要靠感觉，有时会犹豫。看到速度还在目标区间，就比较敢加重量。"（P025，AI 组，低力量层） \\
+  "训练卡上写了 RIR 2，我就大概知道什么时候该停，不像以前要么练到力竭要么随便做做。"（P003，Self 组，低力量层）
+\end{quote}
+
+\noindent \textbf{主题二：RIR 能否转化为"技术规范边界"决定了自我指导的质量分化} \\
+高经验者（P013、P014）将代偿前兆（躯干过度前倾、膝内扣）严格界定为 RIR 归零；初学者（P015、P021）则易将代偿硬顶误判为有效储备，引发技术变形。
+\begin{quote}
+  \kaishu\fontsize{10.5pt}{16pt}\selectfont
+  "出现躯干前倾或者膝盖内扣，我就算 RIR 归零了，不管还能不能再顶一次。"（P013，Self 组，低力量层） \\
+  "我知道大概还能做几次，但一接近力竭动作就开始变形，这时候其实不知道该算 RIR 几。"（P021，Self 组，低力量层）
+\end{quote}
+
+\noindent \textbf{主题三：算法自动停组在"安全保护感"与"训练刺激削减疑虑"之间形成动态张力} \\
+触发减组初期，受试者伴随计划受阻的挫败感；但隔日恢复良好使受试者最终建立了算法安全信任。
+\begin{quote}
+  \kaishu\fontsize{10.5pt}{16pt}\selectfont
+  "系统让我少做一组时，我当时觉得训练没做够；但第二天恢复确实更轻松。"（P016，AI 组，低力量层）
+\end{quote}
+
+\noindent \textbf{主题四：系统接受度取决于功能价值、操作摩擦与用户自主权的动态平衡} \\
+设备连接与等待数据录入导致了操作摩擦；受试者分化为"渴望完全听从指令以减负"与"坚决捍卫最终决策权"两极。
+\begin{quote}
+  \kaishu\fontsize{10.5pt}{16pt}\selectfont
+  "每次训练要连设备、对拍摄角度，流程上有点繁琐。"（P018，AI 组，低力量层） \\
+  "如果系统直接告诉我要加多少、减多少，比我自己判断更安心。"（P025，AI 组，低力量层）
+\end{quote}
+
+\noindent \textbf{主题五：训练经验与基线能力调节训练者对数字化工具的功能诉求} \\
+初级训练者需要"行动指引与安全刹车"，高水平训练者需要"客观数据验证与长期疲劳诊断"。
+
+\vspace{0.2cm}
+\noindent \textbf{主题六：体能适应增量、主观系统评价与安全体验属于相互独立的证据维度} \\
+个案对照表明，体能增益最高者（P018）给出了最苛刻的系统体验批评，表明人机交互体验与生理适应并无线性因果绑定。
+
+\subsection{跨个案行为类型归纳}
+基于质性资料提炼出 5 种行为特征模式（表 \ref{tab:ch4-behavior-types}）。
+
+\begin{table}[htbp]
+  \centering
+  \caption{抗阻训练行为特征跨个案类型归纳表（$n=12$）}
+  \label{tab:ch4-behavior-types}
+  \vspace{6pt}
+  \small
+  \begin{tabularx}{\textwidth}{|c|m{2.2cm}|X|X|}
+    \hline
+    \textbf{类型} & \textbf{代表个案} & \textbf{核心行为特征} & \textbf{对算法决策态度与启示} \\ \hline
+    积极接受型 & P004, P025 & 严格遵从反馈建议，据数据突破极限 & 高度信任让渡决策权；适合中初级选重犹豫者 \\ \hline
+    安全依赖型 & P010, P016 & 高度重视损伤风险，依赖减组保护 & 视算法为安全刹车；适合伤病顾虑或疲劳耐受差者 \\ \hline
+    批判接受型 & P018, P012 & 训练经验丰富，捍卫本体感觉主权 & 认可数据但拒交控制权；系统应定位为诊断辅助 \\ \hline
+    规则内化型 & P003, P013 & 理解 RIR 逻辑，以动作变形为停组边界 & 依靠高觉知自我调节；为规范化自导的理想受众 \\ \hline
+    负荷导向型 & P015, P021 & 追求大重量与极限试举，易代偿硬顶 & 误判风险高；应优先强制引入客观速度截断 \\ \hline
+  \end{tabularx}
+\end{table}
+
+\section{本章小结}
+本章全面呈现了实验室验证、预试验干预、生态效度与深度访谈结果。自研移动端系统具备优秀的测量学效度（深蹲 MCV $\text{ICC}=0.940$）；4 周干预验证了方案完成率（82.8\%）与安全性，但随访保留率（66.7\%）与可用性（SUS 65.00 分）未达预设推进标准，提示方案暂不可直接推进确证性 RCT，须重构随访流程并削减操作摩擦；在适应效果上，AI 组在 CMJ（$+2.16\text{ cm}$）捕获到中大效应方向性信号，在训练自我效能上展现出巨大增量（$+9.88$ 分）；质性访谈揭示了选重减负、安全张力及五类行为分化机制，为后续理论讨论奠定了多维实证基石。% ---------------- 第 5 章 讨论 ----------------
 \clearpage
 \chapter{讨论}
 讨论内容一般采用漏斗式结构（从具体到一般，再从一般回到具体）
