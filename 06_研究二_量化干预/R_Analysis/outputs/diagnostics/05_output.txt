@@ -1,0 +1,28 @@
+Warning message:
+In normalizePath(path.expand(path), winslash, mustWork) :
+  path[1]="D:/研究生文件/研三/2026年9月/毕业论文重构版/06_研究二_量化干预/R_Analysis/--file=scripts/05_app_ga_agreement.R": 系统找不到指定的路径。
+✓ 核心 R 包已加载
+✓ 全局环境配置完成
+  - R 版本： R version 4.4.3 (2025-02-28 ucrt) 
+  - 随机种子： 20260916 
+  - 原始数据路径： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/data_raw 
+  - 输出路径： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/outputs 
+
+=== 05 App-GA 现场一致性分析 ===
+
+--- 热身课次级 ---
+  有效配对：88对（来自11人）
+  Bootstrap ICC 95% CI（10000次重抽样）...
+  ICC = 0.9600, 95% CI [0.8395, 0.9458]
+  比例偏差检验...
+  Diff ~ GA 斜率 = 0.0174 (p = 0.0000)
+  每人配对数：均值=8.0, 范围=8–8
+
+--- Rep级 ---
+  有效配对：43对（来自3人：P006, P016, P025）
+  ICC = -0.0484, 95% CI [-0.1709, -0.0325]
+  ✓ 表格： table_app_ga_agreement 
+  ✓ 表格： table_pairs_per_subject 
+绑制 Bland-Altman 图...
+  ✓ 图表： fig_ba_combined 
+✓ App-GA 一致性分析完成

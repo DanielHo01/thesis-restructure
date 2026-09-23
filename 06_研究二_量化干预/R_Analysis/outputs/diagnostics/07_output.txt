@@ -1,0 +1,27 @@
+Warning message:
+In normalizePath(path.expand(path), winslash, mustWork) :
+  path[1]="D:/研究生文件/研三/2026年9月/毕业论文重构版/06_研究二_量化干预/R_Analysis/--file=scripts/07_sus_acceptance.R": 系统找不到指定的路径。
+✓ 核心 R 包已加载
+✓ 全局环境配置完成
+  - R 版本： R version 4.4.3 (2025-02-28 ucrt) 
+  - 随机种子： 20260916 
+  - 原始数据路径： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/data_raw 
+  - 输出路径： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/outputs 
+
+=== 07 SUS 与 TAM 接受度 ===
+
+--- SUS 可用性量表 ---
+  SUS重算均值 = 65.0 ± 4.6 (范围 58–72)
+  ≥70分：1/11 (9.1%)
+  ✓ 表格： table_sus_summary 
+  ✓ 表格： table_sus_items 
+
+--- TAM 接受度 ---
+  注意：PU/Trust/Intention仅有均值，无条目级原始分，无法重算Cronbach's α
+  ✓ 表格： table_tam_acceptance 
+  PU均值 = %.2f ± %.2f
+ 4.409 0.2023  Trust均值 = %.2f ± %.2f
+ 4.409 0.2023  Int均值 = %.2f ± %.2f
+ 4.485 0.2734绑制接受度图...
+  ✓ 图表： fig_sus_tam 
+✓ SUS 与接受度分析完成

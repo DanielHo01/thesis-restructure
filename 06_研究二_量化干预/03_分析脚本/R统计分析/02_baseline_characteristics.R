@@ -26,6 +26,7 @@ continuous_vars <- list(
   "体脂率（%）"            = "PBF_pct",
   "骨骼肌量（kg）"         = "SMM_kg",
   "去脂体重（kg）"         = "FFM_kg",
+  "实际出勤（次/周）"      = "Attend_int",
   "基线深蹲 1RM（kg）"   = "Meas1RM",
   "基线相对 1RM（kg/kg）" = "Rel1RM",
   "基线 CMJ 高度（cm）"   = "PreCMJ",
@@ -35,9 +36,9 @@ continuous_vars <- list(
 
 # 分类变量（字符或因子型）
 categorical_vars <- list(
-  "力量分层"    = "Stratum",
-  "抗阻训练年限" = "ResistYears",
-  "每周训练频率" = "Freq_wk"
+  "力量分层"      = "Stratum",
+  "抗阻训练年限"   = "ResistYears",
+  "入组前习惯训练频率"   = "Freq_wk"
 )
 
 # ---- 2. 连续变量的组间比较函数 ----
@@ -179,6 +180,7 @@ cat("• 连续变量：Welch's t 检验（不假设方差齐性）+ Mann-Whitne
 cat("• 分类变量：Fisher 确切检验\n")
 cat("• 效应量：Hedges' g（基于合并标准差，含偏差校正）\n")
 cat("• 95% CI：基于 Welch's t 检验的均值差置信区间\n")
+cat("• 注：入组前习惯训练频率为基线问卷自报入组前习惯训练频率\n")
 sink()
 
 cat("\n✓ 基线特征分析完成\n")

@@ -1,0 +1,594 @@
+
+============================================================
+毕业论文数据分析管线
+研究二 Pilot RCT 量化分析
+============================================================
+加载核心包...
+
+============================================================
+[00] 环境准备
+============================================================  R 版本： R version 4.4.3 (2025-02-28 ucrt) 
+  随机种子： 20260916 
+  输出路径： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/outputs 
+
+============================================================
+[01] 数据导入与清洗
+============================================================✓ 核心 R 包已加载
+✓ 全局环境配置完成
+  - R 版本： R version 4.4.3 (2025-02-28 ucrt) 
+  - 随机种子： 20260916 
+  - 原始数据路径： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/data_raw 
+  - 输出路径： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/outputs 
+
+=== 01 数据导入与清洗 ===
+导入 36人总表...
+Rows: 36 Columns: 16
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (8): ID, Name, Stratum, Group, EnteredPP, DropoutStage, DropoutReason, C...
+dbl (8): Age, Height_cm, BW_kg, SMM_kg, PBF_pct, ResistYears, Meas1RM, Rel1RM
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+  随机化: 36人 (AI=18, Self=18)
+  T0期脱落: 7人
+  干预期脱落: 5人
+  进入干预: ~29人
+  PP: 24人 (AI=11, Self=13)
+导入 PP主表（24人）...
+Rows: 24 Columns: 38
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (8): ID, Name, Group, Stratum, Freq_wk, ResistYears, VBT_exp, MissingSe...
+dbl (30): Age, Height_cm, BW_kg, BMI, SMM_kg, SMMI, FFM_kg, FFMI, PBF_pct, P...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+  ✓ 质量核查通过（ID唯一性、变化量计算）
+导入 训练监控（192课次）...
+Rows: 192 Columns: 17
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (5): ID, Sess, Week, DayType, Group
+dbl (12): Sleep, Stress, Fatigue, Soreness, CMJ1, CMJ2, CMJ3, Trigger, WarmL...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+  ✓ 质量核查通过（192条记录、每人8课次）
+导入 Rep级配对（43对）...
+Rows: 43 Columns: 7
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (2): ID, Session
+dbl (5): Set, Load, Rep, GA, App
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+  43对来自 3 人：P006, P016, P025
+导入 SUS（AI组 11人）...
+Rows: 11 Columns: 12
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (1): ID
+dbl (11): Q1, Q2, Q3, Q4, Q5, Q6, Q7, Q8, Q9, Q10, SUS_score
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+  SUS重算均值 = 65.0 (范围 58–72)
+  预填原表均值 = 65.0 (范围 58–72)
+导入 TAM 接受度（AI组 11人）...
+Rows: 11 Columns: 12
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (1): ID
+dbl (11): PU1, PU2, PU3, PU4, Trust1, Trust2, Trust3, Trust4, Int1, Int2, Int3
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+导入 自我效能T0（24人）...
+Rows: 24 Columns: 8
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (2): ID, Group
+dbl (6): Q1, Q2, Q3, Q4, Q5, Q6
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+导入 自我效能T1（24人）...
+Rows: 24 Columns: 8
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (2): ID, Group
+dbl (6): Q1, Q2, Q3, Q4, Q5, Q6
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+✓ 01 数据导入完成。清洗数据已保存至： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/data_clean 
+  ✓ 表格： diagnostic_import 
+✓ 诊断报告已保存
+Warning messages:
+1: One or more parsing issues, call `problems()` on your data frame for details,
+e.g.:
+  dat <- vroom(...)
+  problems(dat) 
+2: There was 1 warning in `mutate()`.
+ℹ In argument: `CMJ_mean = rowMeans(select(cur_data(), CMJ1, CMJ2, CMJ3), na.rm
+  = TRUE)`.
+Caused by warning:
+! `cur_data()` was deprecated in dplyr 1.1.0.
+ℹ Please use `pick()` instead. 
+
+============================================================
+[02] CONSORT 流程与基线特征
+============================================================✓ 核心 R 包已加载
+✓ 全局环境配置完成
+  - R 版本： R version 4.4.3 (2025-02-28 ucrt) 
+  - 随机种子： 20260916 
+  - 原始数据路径： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/data_raw 
+  - 输出路径： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/outputs 
+
+=== 02 受试者流转与基线特征 ===
+DEBUG: main nrow=24, unique_group=AI组|Self组
+
+--- CONSORT 精确口径 ---
+  随机化: 36人 (AI=18, Self=18)
+  T0期脱落: 7人
+  干预期脱落: 5人
+  进入干预: 29人 (AI=13, Self=16)
+  完成PP: 24人 (AI=11, Self=13)
+  CONSORT闭合: 7 + 5 + 24 = 36 (应=36)
+  ✓ 表格： table_dropout_reasons 
+  ✓ 表格： table_flow 
+  ✓ 表格： table_t0_dropouts 
+  ✓ 表格： table_int_dropouts 
+
+--- P028 专项审计 ---
+  ID: P028
+  组别: AI组
+  脱落阶段: 随机分配后基线测试阶段
+  脱落原因: 腰部损伤
+  是否完成1RM: 是
+  是否进入干预: 否
+
+--- 关键率与 95%CI ---
+  进入干预率: 29/36 = 80.6% [65.0%, 90.2%]
+  主要后测完成率: 24/36 = 66.7% [50.3%, 79.8%]
+  AI组PP率: 11/18 = 61.1%
+  Self组PP率: 13/18 = 72.2%
+
+--- 基线特征表（PP 24人）---
+DEBUG2: main nrow=24, Group class=factor, n_AI=11
+  ✓ 表格： table_baseline 
+✓ CONSORT 流程表和基线特征表已保存
+
+============================================================
+[03] Hooper 主观恢复 LMM
+============================================================✓ 核心 R 包已加载
+✓ 全局环境配置完成
+  - R 版本： R version 4.4.3 (2025-02-28 ucrt) 
+  - 随机种子： 20260916 
+  - 原始数据路径： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/data_raw 
+  - 输出路径： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/outputs 
+
+=== 01 数据导入与清洗 ===
+导入 36人总表...
+Rows: 36 Columns: 16
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (8): ID, Name, Stratum, Group, EnteredPP, DropoutStage, DropoutReason, C...
+dbl (8): Age, Height_cm, BW_kg, SMM_kg, PBF_pct, ResistYears, Meas1RM, Rel1RM
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+  随机化: 36人 (AI=18, Self=18)
+  T0期脱落: 7人
+  干预期脱落: 5人
+  进入干预: ~29人
+  PP: 24人 (AI=11, Self=13)
+导入 PP主表（24人）...
+Rows: 24 Columns: 38
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (8): ID, Name, Group, Stratum, Freq_wk, ResistYears, VBT_exp, MissingSe...
+dbl (30): Age, Height_cm, BW_kg, BMI, SMM_kg, SMMI, FFM_kg, FFMI, PBF_pct, P...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+  ✓ 质量核查通过（ID唯一性、变化量计算）
+导入 训练监控（192课次）...
+Rows: 192 Columns: 17
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (5): ID, Sess, Week, DayType, Group
+dbl (12): Sleep, Stress, Fatigue, Soreness, CMJ1, CMJ2, CMJ3, Trigger, WarmL...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+  ✓ 质量核查通过（192条记录、每人8课次）
+导入 Rep级配对（43对）...
+Rows: 43 Columns: 7
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (2): ID, Session
+dbl (5): Set, Load, Rep, GA, App
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+  43对来自 3 人：P006, P016, P025
+导入 SUS（AI组 11人）...
+Rows: 11 Columns: 12
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (1): ID
+dbl (11): Q1, Q2, Q3, Q4, Q5, Q6, Q7, Q8, Q9, Q10, SUS_score
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+  SUS重算均值 = 65.0 (范围 58–72)
+  预填原表均值 = 65.0 (范围 58–72)
+导入 TAM 接受度（AI组 11人）...
+Rows: 11 Columns: 12
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (1): ID
+dbl (11): PU1, PU2, PU3, PU4, Trust1, Trust2, Trust3, Trust4, Int1, Int2, Int3
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+导入 自我效能T0（24人）...
+Rows: 24 Columns: 8
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (2): ID, Group
+dbl (6): Q1, Q2, Q3, Q4, Q5, Q6
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+导入 自我效能T1（24人）...
+Rows: 24 Columns: 8
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (2): ID, Group
+dbl (6): Q1, Q2, Q3, Q4, Q5, Q6
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+✓ 01 数据导入完成。清洗数据已保存至： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/data_clean 
+  ✓ 表格： diagnostic_import 
+✓ 诊断报告已保存
+
+=== 03 Hooper LMM 分析 ===
+拟合 LMM...
+DEBUG anova cols: Sum Sq, Mean Sq, NumDF, DenDF, F value, Pr(>F) 
+  ✓ 表格： table_hooper_lmm 
+  LMM Type III 方差分析：
+      变异来源  F值 NumDF DenDF   p值
+1        Group 0.67     1    22 0.420
+2       Sess_f 3.09     7   154 0.004
+3 Group:Sess_f 0.32     7   154 0.945
+
+计算边际均值...
+NOTE: Results may be misleading due to involvement in interactions
+  ✓ 表格： table_hooper_sessions 
+绑制 Hooper 轨迹图...
+  ✓ 图表： fig_hooper_trajectory 
+
+LMM 模型摘要：
+组别主效应 F = 0.67 
+ICC（个体间变异比例）≈ 0.304 
+✓ Hooper LMM 分析完成
+Warning message:
+One or more parsing issues, call `problems()` on your data frame for details,
+e.g.:
+  dat <- vroom(...)
+  problems(dat) 
+
+============================================================
+[04] ANCOVA 主要结局分析
+============================================================✓ 核心 R 包已加载
+✓ 全局环境配置完成
+  - R 版本： R version 4.4.3 (2025-02-28 ucrt) 
+  - 随机种子： 20260916 
+  - 原始数据路径： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/data_raw 
+  - 输出路径： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/outputs 
+
+=== 01 数据导入与清洗 ===
+导入 36人总表...
+Rows: 36 Columns: 16
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (8): ID, Name, Stratum, Group, EnteredPP, DropoutStage, DropoutReason, C...
+dbl (8): Age, Height_cm, BW_kg, SMM_kg, PBF_pct, ResistYears, Meas1RM, Rel1RM
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+  随机化: 36人 (AI=18, Self=18)
+  T0期脱落: 7人
+  干预期脱落: 5人
+  进入干预: ~29人
+  PP: 24人 (AI=11, Self=13)
+导入 PP主表（24人）...
+Rows: 24 Columns: 38
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (8): ID, Name, Group, Stratum, Freq_wk, ResistYears, VBT_exp, MissingSe...
+dbl (30): Age, Height_cm, BW_kg, BMI, SMM_kg, SMMI, FFM_kg, FFMI, PBF_pct, P...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+  ✓ 质量核查通过（ID唯一性、变化量计算）
+导入 训练监控（192课次）...
+Rows: 192 Columns: 17
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (5): ID, Sess, Week, DayType, Group
+dbl (12): Sleep, Stress, Fatigue, Soreness, CMJ1, CMJ2, CMJ3, Trigger, WarmL...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+  ✓ 质量核查通过（192条记录、每人8课次）
+导入 Rep级配对（43对）...
+Rows: 43 Columns: 7
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (2): ID, Session
+dbl (5): Set, Load, Rep, GA, App
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+  43对来自 3 人：P006, P016, P025
+导入 SUS（AI组 11人）...
+Rows: 11 Columns: 12
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (1): ID
+dbl (11): Q1, Q2, Q3, Q4, Q5, Q6, Q7, Q8, Q9, Q10, SUS_score
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+  SUS重算均值 = 65.0 (范围 58–72)
+  预填原表均值 = 65.0 (范围 58–72)
+导入 TAM 接受度（AI组 11人）...
+Rows: 11 Columns: 12
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (1): ID
+dbl (11): PU1, PU2, PU3, PU4, Trust1, Trust2, Trust3, Trust4, Int1, Int2, Int3
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+导入 自我效能T0（24人）...
+Rows: 24 Columns: 8
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (2): ID, Group
+dbl (6): Q1, Q2, Q3, Q4, Q5, Q6
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+导入 自我效能T1（24人）...
+Rows: 24 Columns: 8
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (2): ID, Group
+dbl (6): Q1, Q2, Q3, Q4, Q5, Q6
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+✓ 01 数据导入完成。清洗数据已保存至： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/data_clean 
+  ✓ 表格： diagnostic_import 
+✓ 诊断报告已保存
+
+=== 04 ANCOVA 主要结局分析 ===
+拟合 ANCOVA 模型...
+
+  ✓ 表格： table_ancova 
+# A tibble: 5 × 14
+  结局  单位      n  n_AI n_Self AI_T0_mean AI_T1_mean Self_T0_mean Self_T1_mean
+  <chr> <chr> <int> <int>  <int> <chr>      <chr>      <chr>        <chr>       
+1 深蹲绝对… kg       24    11     13 130.68     142.27     130.77       139.81      
+2 深蹲相对… kg/kg    24    11     13 1.70       1.85       1.76         1.88        
+3 CMJ高… cm       24    11     13 59.66      65.06      60.52        63.70       
+4 SJ高度… cm       24    11     13 55.68      59.98      54.81        58.18       
+5 训练自我… 分       24    11     13 65.45      83.18      65.69        73.69       
+# ℹ 5 more variables: 调整后差值 <chr>, 差值_95CI_lo <chr>, 差值_95CI_hi <chr>,
+#   p值 <chr>, R2 <chr>
+
+计算 Hedges' g...
+  ✓ 表格： table_effect_sizes 
+
+模型诊断...
+  ✓ 表格： table_ancova_diagnostics 
+
+BH 多重比较校正...
+  ✓ 表格： table_ancova 
+绑制森林图...
+Note: g_results table contains effect sizes (Hedges g + 95%CI)
+ANCOVA analysis complete - see table_ancova.csv for details
+Warning messages:
+1: One or more parsing issues, call `problems()` on your data frame for details,
+e.g.:
+  dat <- vroom(...)
+  problems(dat) 
+2: In eval(ei, envir) : NAs introduced by coercion
+3: In eval(ei, envir) : NAs introduced by coercion
+
+============================================================
+[05] App-GA 现场一致性
+============================================================✓ 核心 R 包已加载
+✓ 全局环境配置完成
+  - R 版本： R version 4.4.3 (2025-02-28 ucrt) 
+  - 随机种子： 20260916 
+  - 原始数据路径： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/data_raw 
+  - 输出路径： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/outputs 
+
+=== 05 App-GA 现场一致性分析 ===
+
+--- 热身课次级 ---
+  有效配对：88对（来自11人）
+  Bootstrap ICC 95% CI（10000次重抽样）...
+  ICC = 0.9600, 95% CI [0.8395, 0.9458]
+  比例偏差检验...
+  Diff ~ GA 斜率 = 0.0174 (p = 0.0000)
+  每人配对数：均值=8.0, 范围=8–8
+
+--- Rep级 ---
+  有效配对：43对（来自3人：P006, P016, P025）
+  ICC = -0.0484, 95% CI [-0.1709, -0.0325]
+  ✓ 表格： table_app_ga_agreement 
+  ✓ 表格： table_pairs_per_subject 
+绑制 Bland-Altman 图...
+  ✓ 图表： fig_ba_combined 
+✓ App-GA 一致性分析完成
+
+============================================================
+[06] 可行性与训练执行
+============================================================✓ 核心 R 包已加载
+✓ 全局环境配置完成
+  - R 版本： R version 4.4.3 (2025-02-28 ucrt) 
+  - 随机种子： 20260916 
+  - 原始数据路径： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/data_raw 
+  - 输出路径： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/outputs 
+
+=== 06 可行性与训练执行 ===
+
+--- 可行性指标 ---
+  ✓ 表格： table_feasibility 
+
+--- 训练执行组间比较 ---
+  ✓ 表格： table_training_execution 
+
+  总重复次数 Welch t检验：
+# A tibble: 1 × 10
+  变量        n_AI n_Self AI组        Self组    差值  CI_lo CI_hi p值   Hedges_g
+  <chr>      <int>  <int> <chr>       <chr>     <chr> <chr> <chr> <chr> <chr>   
+1 总重复次数    11     13 100.3 ± 6.5 105.5 ± … -5.19 -9.96 -0.41 0.035 -0.94   
+
+--- AI组执行质量 ---
+  ✓ 表格： table_ai_execution 
+✓ 可行性与训练执行分析完成
+
+============================================================
+[07] SUS 与 TAM 接受度
+============================================================✓ 核心 R 包已加载
+✓ 全局环境配置完成
+  - R 版本： R version 4.4.3 (2025-02-28 ucrt) 
+  - 随机种子： 20260916 
+  - 原始数据路径： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/data_raw 
+  - 输出路径： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/outputs 
+
+=== 07 SUS 与 TAM 接受度 ===
+
+--- SUS 可用性量表 ---
+  SUS重算均值 = 65.0 ± 4.6 (范围 58–72)
+  ≥70分：1/11 (9.1%)
+  ✓ 表格： table_sus_summary 
+  ✓ 表格： table_sus_items 
+
+--- TAM 接受度 ---
+  注意：PU/Trust/Intention仅有均值，无条目级原始分，无法重算Cronbach's α
+  ✓ 表格： table_tam_acceptance 
+  PU均值 = 4.41 ± 0.20
+  Trust均值 = 4.41 ± 0.20
+  Int均值 = 4.48 ± 0.27
+绑制接受度图...
+  ✓ 图表： fig_sus_tam 
+✓ SUS 与接受度分析完成
+
+============================================================
+[08] 敏感性分析
+============================================================✓ 核心 R 包已加载
+✓ 全局环境配置完成
+  - R 版本： R version 4.4.3 (2025-02-28 ucrt) 
+  - 随机种子： 20260916 
+  - 原始数据路径： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/data_raw 
+  - 输出路径： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/outputs 
+
+=== 08 敏感性分析 ===
+
+--- 留一法敏感性分析 ---
+  ✓ 表格： table_loo_summary 
+  ✓ 表格： table_loo_detail 
+  LOO敏感性结果：
+# A tibble: 4 × 8
+  结局      g_full g_loo_min g_loo_max 方向改变 相对漂移率 最大下降ID 最大上升ID
+  <chr>      <dbl>     <dbl>     <dbl> <chr>    <chr>      <chr>      <chr>     
+1 ΔCMJ       0.852     0.720     1.22  无       42.8%      P018       P016      
+2 ΔSJ        0.427     0.273     0.613 无       43.4%      P025       P016      
+3 Δ绝对1RM   0.463     0.291     0.663 无       43.1%      P025       P007      
+4 Δ自我效能  2.69      2.59      4.02  无       49.3%      P006       P015      
+
+--- 训练频率敏感性分析 ---
+  ✓ 表格： table_frequency_sensitivity 
+  注意：训练频率存在错填，该分析仅作方向性参考
+✓ 敏感性分析完成
+
+============================================================
+[09] 探索性 Spearman 相关
+============================================================✓ 核心 R 包已加载
+✓ 全局环境配置完成
+  - R 版本： R version 4.4.3 (2025-02-28 ucrt) 
+  - 随机种子： 20260916 
+  - 原始数据路径： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/data_raw 
+  - 输出路径： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/outputs 
+
+=== 09 探索性 Spearman 相关 ===
+  ✓ 表格： table_spearman_sig 
+  ✓ 表格： table_spearman_full 
+绑制相关热图...
+  ✓ 图表： fig_correlation_heatmap 
+  28对中，原始p<0.05：7对
+  FDR校正后p<0.05：0对
+✓ Spearman 相关分析完成
+There were 28 warnings (use warnings() to see them)
+
+============================================================
+✓ 全部分析完成！
+============================================================
+  总耗时：15.4 秒
+  表格输出： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/outputs/tables 
+  图表输出： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/outputs/figures 
+  诊断输出： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/outputs/diagnostics 
+
+输出文件清单：
+  表格（CSV）：
+    diagnostic_import.csv
+   table_ai_execution.csv
+   table_ancova.csv
+   table_ancova_diagnostics.csv
+   table_app_ga_agreement.csv
+   table_baseline.csv
+   table_dropout_reasons.csv
+   table_effect_sizes.csv
+   table_feasibility.csv
+   table_flow.csv
+   table_frequency_sensitivity.csv
+   table_hooper_lmm.csv
+   table_hooper_sessions.csv
+   table_int_dropouts.csv
+   table_loo_detail.csv
+   table_loo_summary.csv
+   table_pairs_per_subject.csv
+   table_spearman_full.csv
+   table_spearman_sig.csv
+   table_sus_items.csv
+   table_sus_summary.csv
+   table_t0_dropouts.csv
+   table_tam_acceptance.csv
+   table_training_execution.csv 
+  图表（PDF/PNG）：
+    fig_ba_combined.pdf
+   fig_ba_combined.png
+   fig_correlation_heatmap.pdf
+   fig_correlation_heatmap.png
+   fig_hooper_trajectory.pdf
+   fig_hooper_trajectory.png
+   fig_outcome_forest.pdf
+   fig_outcome_forest.png
+   fig_sus_tam.pdf
+   fig_sus_tam.png 
+
+============================================================

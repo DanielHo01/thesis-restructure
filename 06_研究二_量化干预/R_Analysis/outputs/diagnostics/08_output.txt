@@ -1,0 +1,28 @@
+Warning message:
+In normalizePath(path.expand(path), winslash, mustWork) :
+  path[1]="D:/研究生文件/研三/2026年9月/毕业论文重构版/06_研究二_量化干预/R_Analysis/--file=scripts/08_sensitivity.R": 系统找不到指定的路径。
+✓ 核心 R 包已加载
+✓ 全局环境配置完成
+  - R 版本： R version 4.4.3 (2025-02-28 ucrt) 
+  - 随机种子： 20260916 
+  - 原始数据路径： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/data_raw 
+  - 输出路径： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/outputs 
+
+=== 08 敏感性分析 ===
+
+--- 留一法敏感性分析 ---
+  ✓ 表格： table_loo_summary 
+  ✓ 表格： table_loo_detail 
+  LOO敏感性结果：
+# A tibble: 4 × 8
+  结局      g_full g_loo_min g_loo_max 方向改变 相对漂移率 最大下降ID 最大上升ID
+  <chr>      <dbl>     <dbl>     <dbl> <chr>    <chr>      <chr>      <chr>     
+1 ΔCMJ       0.852     0.720     1.22  无       42.8%      P018       P016      
+2 ΔSJ        0.427     0.273     0.613 无       43.4%      P025       P016      
+3 Δ绝对1RM   0.463     0.291     0.663 无       43.1%      P025       P007      
+4 Δ自我效能  2.69      2.59      4.02  无       49.3%      P006       P015      
+
+--- 训练频率敏感性分析 ---
+  ✓ 表格： table_frequency_sensitivity 
+  注意：训练频率存在错填，该分析仅作方向性参考
+✓ 敏感性分析完成

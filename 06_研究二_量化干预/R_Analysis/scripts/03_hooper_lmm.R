@@ -67,18 +67,17 @@ emm_group <- emmeans(fit, ~ Group) |>
 # 每课次组间比较
 emm_sess <- emmeans(fit, ~ Group | Sess_f) |>
   contrast(method = "pairwise") |>
-  summary() |>
+  summary(infer = TRUE) |>  # infer = TRUE gives lower.CL/upper.CL
   as.data.frame() |>
   select(-df, -t.ratio) |>
   rename(
-    Sess        = Sess_f,
-    AI组_均值   = AI组,
-    Self组_均值 = Self组,
+    Session     = Sess_f,
+    比较        = contrast,
     差值        = estimate,
-    SE         = SE,
-    CI_lo = lower.CL,
-    CI_hi = upper.CL,
-    p值        = p.value
+    SE          = SE,
+    CI_lo       = lower.CL,
+    CI_hi       = upper.CL,
+    p值         = p.value
   )
 
 # 每课次描述性均值
@@ -91,14 +90,16 @@ desc_sess <- mon |>
     .groups = "drop"
   ) |>
   pivot_wider(names_from = Group, values_from = c(n, 均值, SD)) |>
+  rename(Session = Sess_f) |>
+  mutate(Session = as.character(Session)) |>  # 避免 ordered factor 类型不兼容
   mutate(
     差值 = 均值_AI组 - 均值_Self组
   )
 
 session_results <- desc_sess |>
   left_join(
-    emm_sess |> select(Sess, 差值, `95%CI_lo`, `95%CI_hi`, p值),
-    by = "Sess"
+    emm_sess |> mutate(Session = as.character(Session)) |> select(Session, 差值, CI_lo, CI_hi, p值),
+    by = "Session"
   ) |>
   mutate(
     p值 = fmt_p(as.numeric(p值))

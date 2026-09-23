@@ -30,6 +30,8 @@ ba_rep <- data.frame(
   Bias   = sprintf("%.4f", mean(diff_rep, na.rm=TRUE)),
   LoA_lo = sprintf("%.4f", mean(diff_rep,na.rm=TRUE) - 1.96*sd(diff_rep,na.rm=TRUE)),
   LoA_hi = sprintf("%.4f", mean(diff_rep,na.rm=TRUE) + 1.96*sd(diff_rep,na.rm=TRUE)),
+  SEM    = sprintf("%.4f", sd(diff_rep,na.rm=TRUE) / sqrt(length(diff_rep))),
+  MDC95  = sprintf("%.4f", 1.96 * sd(diff_rep,na.rm=TRUE)),
   MAE    = sprintf("%.4f", mean(abs(diff_rep), na.rm=TRUE)),
   RMSE   = sprintf("%.4f", sqrt(mean(diff_rep^2, na.rm=TRUE))),
   r      = sprintf("%.4f", cor(df_rep$GA, df_rep$App, use="complete.obs")),
@@ -82,6 +84,8 @@ ba_warm <- data.frame(
   Bias   = sprintf("%.4f", mean(diff_warm, na.rm=TRUE)),
   LoA_lo = sprintf("%.4f", mean(diff_warm,na.rm=TRUE) - 1.96*sd(diff_warm,na.rm=TRUE)),
   LoA_hi = sprintf("%.4f", mean(diff_warm,na.rm=TRUE) + 1.96*sd(diff_warm,na.rm=TRUE)),
+  SEM    = sprintf("%.4f", sd(diff_warm,na.rm=TRUE) / sqrt(length(diff_warm))),
+  MDC95  = sprintf("%.4f", 1.96 * sd(diff_warm,na.rm=TRUE)),
   MAE    = sprintf("%.4f", mean(abs(diff_warm), na.rm=TRUE)),
   RMSE   = sprintf("%.4f", sqrt(mean(diff_warm^2, na.rm=TRUE))),
   r      = sprintf("%.4f", cor(ga_vals, app_vals, use="complete.obs")),
@@ -131,7 +135,8 @@ cat("========== App-GA 生态效度分析报告 ==========\n")
 cat("生成时间：", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "\n\n")
 cat("【方法学】\n")
 cat("• ICC(2,1)：双向随机效应，单次测量，绝对一致性\n")
-cat("• Bland-Altman：偏差 = App − GA，95% LoA = mean ± 1.96×SD\n\n")
+cat("* Bland-Altman: Bias = App - GA, 95% LoA = mean +/- 1.96*SD\n")
+cat("* SEM = SD(diff)/sqrt(n), MDC95 = 1.96 * SD(diff) -- computed directly from diff column\n\n")
 print(knitr::kable(agreement_summary, format="pipe"))
 sink()
 

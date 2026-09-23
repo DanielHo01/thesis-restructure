@@ -61,11 +61,11 @@ if (length(missing_optional) > 0) {
 cat("✓ 核心 R 包已加载\n")
 
 # ---- 4. 路径设置 ----
-# 原始数据路径
-PATH_RAW <- here::here("..", "..", "01_原始数据")
+# 原始数据路径（相对于项目根目录）
+PATH_RAW <- here::here("06_研究二_量化干预", "01_原始数据")
 
 # 清洗分析数据路径（权威版本）
-PATH_DATA_CLEAN <- here::here("..", "..", "02_清洗后数据")
+PATH_DATA_CLEAN <- here::here("06_研究二_量化干预", "02_清洗后数据")
 
 # 输出路径
 PATH_OUTPUT  <- here::here("outputs")

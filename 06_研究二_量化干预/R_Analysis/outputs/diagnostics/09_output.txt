@@ -1,0 +1,19 @@
+Warning message:
+In normalizePath(path.expand(path), winslash, mustWork) :
+  path[1]="D:/研究生文件/研三/2026年9月/毕业论文重构版/06_研究二_量化干预/R_Analysis/--file=scripts/09_spearman.R": 系统找不到指定的路径。
+✓ 核心 R 包已加载
+✓ 全局环境配置完成
+  - R 版本： R version 4.4.3 (2025-02-28 ucrt) 
+  - 随机种子： 20260916 
+  - 原始数据路径： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/data_raw 
+  - 输出路径： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/outputs 
+
+=== 09 探索性 Spearman 相关 ===
+There were 28 warnings (use warnings() to see them)
+  ✓ 表格： table_spearman_sig 
+  ✓ 表格： table_spearman_full 
+绑制相关热图...
+  ✓ 图表： fig_correlation_heatmap 
+  28对中，原始p<0.05：7对
+  FDR校正后p<0.05：0对
+✓ Spearman 相关分析完成

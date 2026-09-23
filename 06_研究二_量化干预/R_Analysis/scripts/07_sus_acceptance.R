@@ -3,12 +3,27 @@
 # SUS可用性 + TAM接受度分析（AI组 11人）
 # =============================================================================
 
-# 自动定位脚本目录，加载全局配置
-if (!exists("ROOT")) {
-  script_dir <- if (!is.null(sys.frame(1)$ofile)) dirname(normalizePath(sys.frame(1)$ofile)) else getwd()
-  ROOT <- normalizePath(file.path(script_dir, ".."))
+# =============================================================================
+# =============================================================================
+# Auto-detect script directory for Rscript and RStudio
+# =============================================================================
+n <- sys.nframe()
+if (n == 0L) {
+  # Running via Rscript directly: script path is last arg containing '.R'
+  script_arg <- commandArgs()[max(grep("scripts/", commandArgs()))]
+  script_path <- normalizePath(file.path(getwd(), script_arg))
+} else {
+  # Running via source() in RStudio or another script
+  script_path <- tryCatch(normalizePath(sys.frame(1L)$ofile), error = function(e) NA_character_)
 }
-source(file.path(ROOT, "scripts", "01_import_clean.R"), encoding = "UTF-8")
+script_dir <- dirname(script_path)
+ROOT <- normalizePath(file.path(script_dir, ".."))
+PATH_SCRIPTS <- file.path(ROOT, "scripts")
+PATH_CLEAN   <- file.path(ROOT, "data_clean")
+source(file.path(PATH_SCRIPTS, "00_setup.R"), local = FALSE, encoding = "UTF-8")
+
+
+
 cat("\n=== 07 SUS 与 TAM 接受度 ===\n")
 
 sus <- readRDS(file.path(PATH_CLEAN, "sus.rds"))
@@ -83,7 +98,7 @@ tam_sum <- tibble(
     sprintf("%.0f–%.0f", min(acc$Trust_mean), max(acc$Trust_mean)),
     sprintf("%.0f–%.0f", min(acc$Int_mean), max(acc$Int_mean))
   ),
-  95%CI       = c(
+  `95%CI`     = c(
     sprintf("[%.2f, %.2f]",
             t.test(acc$PU_mean)$conf.int[1],
             t.test(acc$PU_mean)$conf.int[2]),
@@ -98,9 +113,9 @@ tam_sum <- tibble(
 
 save_tbl(tam_sum, "table_tam_acceptance")
 
-cat("  PU均值 = %.2f ± %.2f\n", mean(acc$PU_mean), sd(acc$PU_mean))
-cat("  Trust均值 = %.2f ± %.2f\n", mean(acc$Trust_mean), sd(acc$Trust_mean))
-cat("  Int均值 = %.2f ± %.2f\n", mean(acc$Int_mean), sd(acc$Int_mean))
+cat(sprintf("  PU均值 = %.2f ± %.2f\n", mean(acc$PU_mean), sd(acc$PU_mean)))
+cat(sprintf("  Trust均值 = %.2f ± %.2f\n", mean(acc$Trust_mean), sd(acc$Trust_mean)))
+cat(sprintf("  Int均值 = %.2f ± %.2f\n", mean(acc$Int_mean), sd(acc$Int_mean)))
 
 # ============================================================================
 # C. 综合接受度图
@@ -128,7 +143,7 @@ p_tam <- acc |>
   select(ID, PU_mean, Trust_mean, Int_mean) |>
   pivot_longer(-ID, names_to = "Dimension", values_to = "Score") |>
   mutate(
-    Dimension = recode(Dimension,
+    Dimension = dplyr::recode(Dimension,
       "PU_mean"    = "感知有用性",
       "Trust_mean" = "系统信任度",
       "Int_mean"   = "使用意愿"

@@ -21,9 +21,17 @@ start_time <- Sys.time()
 
 # 设置路径（自动检测脚本所在目录）
 if (!exists("ROOT")) {
-  ROOT     <- here::here()
-  SCRIPT_DIR <- dirname(sys.frame(1)$ofile)
-  if (SCRIPT_DIR == "") SCRIPT_DIR <- getwd()
+  n <- sys.nframe()
+  if (n == 0L) {
+    # Rscript: extract --file= argument and use it directly
+    fa <- commandArgs()[max(grep("^--file=", commandArgs()))]
+    script_path <- sub("^--file=", "", fa)
+    script_path <- if (file.exists(script_path)) normalizePath(script_path) else NA_character_
+  } else {
+    script_path <- tryCatch(normalizePath(sys.frame(1L)$ofile), error = function(e) NA_character_)
+  }
+  SCRIPT_DIR <- if (!is.na(script_path)) dirname(script_path) else getwd()
+  ROOT <- normalizePath(file.path(SCRIPT_DIR, ".."))
 } else {
   SCRIPT_DIR <- file.path(ROOT, "scripts")
 }

@@ -4,12 +4,27 @@
 # 7个训练过程指标 × 4个结局变化量
 # =============================================================================
 
-# 自动定位脚本目录，加载全局配置
-if (!exists("ROOT")) {
-  script_dir <- if (!is.null(sys.frame(1)$ofile)) dirname(normalizePath(sys.frame(1)$ofile)) else getwd()
-  ROOT <- normalizePath(file.path(script_dir, ".."))
+# =============================================================================
+# =============================================================================
+# Auto-detect script directory for Rscript and RStudio
+# =============================================================================
+n <- sys.nframe()
+if (n == 0L) {
+  # Running via Rscript directly: script path is last arg containing '.R'
+  script_arg <- commandArgs()[max(grep("scripts/", commandArgs()))]
+  script_path <- normalizePath(file.path(getwd(), script_arg))
+} else {
+  # Running via source() in RStudio or another script
+  script_path <- tryCatch(normalizePath(sys.frame(1L)$ofile), error = function(e) NA_character_)
 }
-source(file.path(ROOT, "scripts", "01_import_clean.R"), encoding = "UTF-8")
+script_dir <- dirname(script_path)
+ROOT <- normalizePath(file.path(script_dir, ".."))
+PATH_SCRIPTS <- file.path(ROOT, "scripts")
+PATH_CLEAN   <- file.path(ROOT, "data_clean")
+source(file.path(PATH_SCRIPTS, "00_setup.R"), local = FALSE, encoding = "UTF-8")
+
+
+
 cat("\n=== 09 探索性 Spearman 相关 ===\n")
 
 main <- readRDS(file.path(PATH_CLEAN, "main.rds"))
@@ -30,6 +45,12 @@ main <- main |>
 # ============================================================================
 # 7个训练过程指标 × 4个结局变化量
 # ============================================================================
+# 计算衍生变量
+main <- main |> mutate(
+  Load_per_rep = TotalLoad / Reps,  # 每重复平均负荷
+  Hooper_mean  = HooperMean          # 重命名（与原名一致）
+)
+
 cat_vars <- c(
   "TotalLoad",     # 1. 总外部负荷
   "Reps",         # 2. 总重复次数
@@ -63,12 +84,11 @@ spearman_all <- map_dfr(cat_vars, function(cv) {
   map_dfr(delta_vars, function(dv) {
     d <- main |> select(all_of(cv), all_of(dv)) |> drop_na()
     n <- nrow(d)
-    if (n < 6) return(tibble(n = n, rho = NA, p = NA))
+    if (n < 6) return(tibble(n = n, rho = NA, p = NA, 预测变量 = cv, 结局变量 = dv))
 
     res <- cor.test(d[[cv]], d[[dv]], method = "spearman")
-    tibble(n = n, rho = res$estimate, p = res$p.value)
-  }) |>
-    mutate(预测变量 = cv, 结局变量 = dv)
+    tibble(n = n, rho = res$estimate, p = res$p.value, 预测变量 = cv, 结局变量 = dv)
+  })
 }) |>
   mutate(
     预测变量 = factor(预测变量, levels = cat_vars, labels = cat_labels),
@@ -78,8 +98,7 @@ spearman_all <- map_dfr(cat_vars, function(cv) {
   mutate(p_fdr = p.adjust(p, method = "BH"))
 
 # 显著性筛选（p < 0.05）
-sig_pairs <- spearman_all |>
-  filter(p < 0.05) |>
+sig_pairs <- spearman_all |> dplyr::filter(p < 0.05) |>
   mutate(
     rho      = sprintf("%.3f", rho),
     p_raw    = fmt_p(p),

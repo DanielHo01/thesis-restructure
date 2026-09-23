@@ -1,0 +1,27 @@
+Warning message:
+In normalizePath(path.expand(path), winslash, mustWork) :
+  path[1]="D:/研究生文件/研三/2026年9月/毕业论文重构版/06_研究二_量化干预/R_Analysis/--file=scripts/06_feasibility_training.R": 系统找不到指定的路径。
+✓ 核心 R 包已加载
+✓ 全局环境配置完成
+  - R 版本： R version 4.4.3 (2025-02-28 ucrt) 
+  - 随机种子： 20260916 
+  - 原始数据路径： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/data_raw 
+  - 输出路径： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/outputs 
+
+=== 06 可行性与训练执行 ===
+
+--- 可行性指标 ---
+  ✓ 表格： table_feasibility 
+
+--- 训练执行组间比较 ---
+  ✓ 表格： table_training_execution 
+
+  总重复次数 Welch t检验：
+# A tibble: 1 × 10
+  变量        n_AI n_Self AI组        Self组    差值  CI_lo CI_hi p值   Hedges_g
+  <chr>      <int>  <int> <chr>       <chr>     <chr> <chr> <chr> <chr> <chr>   
+1 总重复次数    11     13 100.3 ± 6.5 105.5 ± … -5.19 -9.96 -0.41 0.035 -0.94   
+
+--- AI组执行质量 ---
+  ✓ 表格： table_ai_execution 
+✓ 可行性与训练执行分析完成

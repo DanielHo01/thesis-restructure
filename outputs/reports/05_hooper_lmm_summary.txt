@@ -1,0 +1,54 @@
+========== Hooper LMM 分析报告 ==========
+生成时间： 2026-09-24 00:21:56 
+样本： 24 人 × 8 课次 = 192 行
+
+【方法学】
+• 模型 A：lmer(Hooper_final ~ Group * Sess_factor + (1|ID))
+• 模型 B：lmer(Hooper_final ~ Group * Sess_num + (1|ID))
+• 主检验：Kenward-Roger Type III ANOVA
+• 备选检验：Satterthwaite Type III ANOVA
+• 事后比较：emmeans pairwise (BH 校正)
+
+【模型 A 结果（Sess 因子型，Kenward-Roger）】
+Type III Analysis of Variance Table with Kenward-Roger's method
+                  Sum Sq Mean Sq NumDF DenDF F value Pr(>F)   
+Group                4.1    4.12     1    22    0.67 0.4205   
+Sess_factor        132.3   18.90     7   154    3.09 0.0045 **
+Group:Sess_factor   13.6    1.94     7   154    0.32 0.9454   
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+【模型 B 结果（Sess 数值型，Satterthwaite）】
+Type III Analysis of Variance Table with Satterthwaite's method
+               Sum Sq Mean Sq NumDF DenDF F value Pr(>F)
+Group            15.2    15.2     1    72    2.36   0.13
+Sess_num          8.7     8.7     1   166    1.35   0.25
+Group:Sess_num   12.1    12.1     1   166    1.87   0.17
+
+【各课次组间差异】
+
+
+|contrast      |Sess_factor | estimate|    SE|  df| t.ratio| p.value|p_BH_fmt |
+|:-------------|:-----------|--------:|-----:|---:|-------:|-------:|:--------|
+|AI组 - Self组 |S1          |    1.371| 1.214| 107|   1.129|   0.261|0.261    |
+|AI组 - Self组 |S2          |    1.294| 1.214| 107|   1.066|   0.289|0.289    |
+|AI组 - Self组 |S3          |    0.710| 1.214| 107|   0.585|   0.560|0.560    |
+|AI组 - Self组 |S4          |    0.916| 1.214| 107|   0.755|   0.452|0.452    |
+|AI组 - Self组 |S5          |    0.629| 1.214| 107|   0.518|   0.605|0.605    |
+|AI组 - Self组 |S6          |   -0.028| 1.214| 107|  -0.023|   0.982|0.982    |
+|AI组 - Self组 |S7          |    0.252| 1.214| 107|   0.207|   0.836|0.836    |
+|AI组 - Self组 |S8          |   -0.161| 1.214| 107|  -0.132|   0.895|0.895    |
+
+【跨课次平均组间差异】
+   contrast    estimate     SE df lower.CL upper.CL t.ratio p.value
+ AI组 - Self组   0.6228 0.7587 22  -0.9507    2.196   0.821  0.4205
+
+Results are averaged over the levels of: Sess_factor 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+【模型诊断】
+残差正态性 Shapiro-Wilk p = <0.001 
+       grp        var1 var2  vcov sdcor
+1       ID (Intercept) <NA> 2.666 1.633
+2 Residual        <NA> <NA> 6.117 2.473

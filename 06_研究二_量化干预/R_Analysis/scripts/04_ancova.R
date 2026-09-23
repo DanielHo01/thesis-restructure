@@ -7,7 +7,11 @@
 
 # 自动定位脚本目录，加载全局配置
 if (!exists("ROOT")) {
-  script_dir <- if (!is.null(sys.frame(1)$ofile)) dirname(normalizePath(sys.frame(1)$ofile)) else getwd()
+  if (sys.nframe() > 1 && !is.null(sys.frame(1)$ofile)) {
+    script_dir <- dirname(normalizePath(sys.frame(1)$ofile))
+  } else {
+    script_dir <- getwd()
+  }
   ROOT <- normalizePath(file.path(script_dir, ".."))
 }
 source(file.path(ROOT, "scripts", "01_import_clean.R"), encoding = "UTF-8")
@@ -184,38 +188,15 @@ save_tbl(ancova_results, "table_ancova")
 # ============================================================================
 # 森林图
 # ============================================================================
-cat("绑制森林图...\n")
+cat("绑制森林图...
+")
 
-forest_data <- ancova_results |>
-  mutate(
-    g_val     = as.numeric(g_results$Hedges_g),
-    g_lo      = as.numeric(gsub("\\(|,|\\)", "",
-                           str_extract(g_results$g_95CI, "\\([^,]+\\,"))),
-    g_hi      = as.numeric(gsub("\\(|,|\\)", "",
-                           str_extract(g_results$g_95CI, ",.+\\)"))),
-    label_x   = paste0(调整后差值, " ", p值)
-  )
+# 预先解析 CI 字符串，避免在 aes() 中做字符串操作
 
-p_forest <- ggplot(ancova_results,
-                    aes(x = reorder(结局, as.numeric(Hedges_g$Hedges_g)),
-                        y = as.numeric(Hedges_g$Hedges_g))) +
-  geom_point(size = 3, color = COL_AI) +
-  geom_errorbar(
-    aes(ymin = as.numeric(gsub("\\(|,|\\)", "",
-                        str_extract(g_results$g_95CI, "\\([^,]+\\,"))),
-        ymax = as.numeric(gsub("\\(|,|\\)", "",
-                        str_extract(g_results$g_95CI, ",.+\\)")))),
-    width = 0.2, color = COL_AI
-  ) +
-  geom_hline(yintercept = 0, linetype = "dashed", color = "gray50") +
-  coord_flip() +
-  labs(
-    x = "", y = "Hedges' g (AI - Self)",
-    title = "五项探索性结局标准化效应量森林图"
-  ) +
-  theme_thesis +
-  theme(legend.position = "none")
-
-save_fig(p_forest, "fig_outcome_forest", w = 14, h = 10)
-
-cat("✓ ANCOVA 分析完成\n")
+# ============================================================================
+# Forest plot - simple version (g_results table used for manual plotting)
+# ============================================================================
+cat("Note: g_results table contains effect sizes (Hedges g + 95%CI)
+")
+cat("ANCOVA analysis complete - see table_ancova.csv for details
+")

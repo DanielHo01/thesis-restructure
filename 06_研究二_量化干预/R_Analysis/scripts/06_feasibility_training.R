@@ -3,12 +3,27 @@
 # 可行性指标 + 训练执行组间比较
 # =============================================================================
 
-# 自动定位脚本目录，加载全局配置
-if (!exists("ROOT")) {
-  script_dir <- if (!is.null(sys.frame(1)$ofile)) dirname(normalizePath(sys.frame(1)$ofile)) else getwd()
-  ROOT <- normalizePath(file.path(script_dir, ".."))
+# =============================================================================
+# =============================================================================
+# Auto-detect script directory for Rscript and RStudio
+# =============================================================================
+n <- sys.nframe()
+if (n == 0L) {
+  # Running via Rscript directly: script path is last arg containing '.R'
+  script_arg <- commandArgs()[max(grep("scripts/", commandArgs()))]
+  script_path <- normalizePath(file.path(getwd(), script_arg))
+} else {
+  # Running via source() in RStudio or another script
+  script_path <- tryCatch(normalizePath(sys.frame(1L)$ofile), error = function(e) NA_character_)
 }
-source(file.path(ROOT, "scripts", "01_import_clean.R"), encoding = "UTF-8")
+script_dir <- dirname(script_path)
+ROOT <- normalizePath(file.path(script_dir, ".."))
+PATH_SCRIPTS <- file.path(ROOT, "scripts")
+PATH_CLEAN   <- file.path(ROOT, "data_clean")
+source(file.path(PATH_SCRIPTS, "00_setup.R"), local = FALSE, encoding = "UTF-8")
+
+
+
 cat("\n=== 06 可行性与训练执行 ===\n")
 
 main <- readRDS(file.path(PATH_CLEAN, "main.rds"))
@@ -89,7 +104,7 @@ feasibility <- tibble(
   )
 ) |>
   mutate(
-    95CI = case_when(
+    `95CI` = case_when(
       指标 == "进入干预率"       ~ sprintf("[%.1f%%, %.1f%%]", rate_enter$ci_low*100, rate_enter$ci_high*100),
       指标 == "主要后测完成率"  ~ sprintf("[%.1f%%, %.1f%%]", rate_pp$ci_low*100, rate_pp$ci_high*100),
       指标 == "训练记录完整率"  ~ sprintf("[%.1f%%, %.1f%%]", rate_sessions$ci_low*100, rate_sessions$ci_high*100),
@@ -108,14 +123,16 @@ save_tbl(feasibility, "table_feasibility")
 # ============================================================================
 cat("\n--- 训练执行组间比较 ---\n")
 
+# 派生每课平均负荷
+main <- main |> mutate(LoadPerSess = TotalLoad / Attend_int)
+
 exec_vars <- c(
-  "TotalLoad", "SquatLoad", "LoadPerSess",
-  "Sets", "Reps", "sRPE", "Duration"
+  "TotalLoad", "SquatLoad", "Sets", "Reps", "sRPE", "Duration"
 )
 
 exec_results <- map_dfr(exec_vars, function(v) {
-  ai   <- main |> filter(Group == "AI组")   |> pull(!!sym(v))
-  self <- main |> filter(Group == "Self组") |> pull(!!sym(v))
+  ai   <- main |> dplyr::filter(Group == "AI组")   |> pull(!!sym(v))
+  self <- main |> dplyr::filter(Group == "Self组") |> pull(!!sym(v))
 
   t_res   <- t.test(ai, self, var.equal = FALSE)
   n1 <- length(ai); n2 <- length(self)
@@ -138,10 +155,9 @@ exec_results <- map_dfr(exec_vars, function(v) {
   )
 })
 
-exec_results$变量 <- recode(exec_results$变量,
+exec_results$变量 <- dplyr::recode(exec_results$变量,
   "TotalLoad"   = "全期总负荷（kg）",
   "SquatLoad"   = "深蹲总负荷（kg）",
-  "LoadPerSess" = "每课平均负荷（kg）",
   "Sets"        = "总组数",
   "Reps"        = "总重复次数",
   "sRPE"        = "平均sRPE",
@@ -151,14 +167,14 @@ exec_results$变量 <- recode(exec_results$变量,
 save_tbl(exec_results, "table_training_execution")
 
 cat("\n  总重复次数 Welch t检验：\n")
-print(exec_results |> filter(变量 == "总重复次数"))
+print(exec_results |> dplyr::filter(变量 == "总重复次数"))
 
 # ============================================================================
 # C. AI组专项指标
 # ============================================================================
 cat("\n--- AI组执行质量 ---\n")
 
-ai_main <- main |> filter(Group == "AI组")
+ai_main <- main |> dplyr::filter(Group == "AI组")
 
 ai_stats <- tibble(
   指标          = c(

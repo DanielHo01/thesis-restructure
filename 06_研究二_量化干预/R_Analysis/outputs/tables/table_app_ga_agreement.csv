@@ -1,0 +1,14 @@
+指标,热身级,Rep级
+n_pairs,88,43
+n_subjects,11,3
+Bias_mean,0.0212,0.0019
+Bias_SD,0.0042,0.0182
+LoA_low,0.0129,-0.0337
+LoA_high,0.0296,0.0375
+MAE,0.0212,0.0172
+RMSE,0.0217,0.0180
+Pearson_r,0.9997,0.9907
+ICC_2_1,0.9600,-0.0484
+prop_positive,100.0%,53.5%
+prop_zero,0.0%,4.7%
+prop_negative,0.0%,41.9%
