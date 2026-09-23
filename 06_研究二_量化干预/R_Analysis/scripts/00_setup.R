@@ -3,8 +3,9 @@
 # 全局环境配置、包加载、参数设置
 # ============================================================================
 
-rm(list = ls())
-graphics.off()
+# NOTE: rm(list = ls()) removed to avoid clearing caller environment
+# when this file is sourced by other scripts (local = FALSE).
+# graphics.off()
 
 options(
   digits   = 4,
@@ -16,8 +17,13 @@ options(
 GLOBAL_SEED <- 20260916
 set.seed(GLOBAL_SEED)
 
-# ---- 路径设置（相对于本文件所在目录）----
-ROOT     <- here::here()
+# ---- 路径设置（基于本脚本所在目录自动推断）----
+# 自动识别 scripts/ 的父目录（即 R_Analysis/
+SCRIPT_DIR <- dirname(sys.frame(1)$ofile)
+if (SCRIPT_DIR == "" || is.na(SCRIPT_DIR)) {
+  SCRIPT_DIR <- getwd()  # fallback
+}
+ROOT     <- normalizePath(file.path(SCRIPT_DIR, ".."))
 PATH_RAW <- file.path(ROOT, "data_raw")
 PATH_OUT <- file.path(ROOT, "outputs")
 PATH_TBL <- file.path(PATH_OUT, "tables")

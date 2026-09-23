@@ -5,8 +5,9 @@
 # 输出：data_clean/（自动生成，不修改 data_raw/）
 # =============================================================================
 
-source(file.path(PATH_SCRIPTS, "00_setup.R"))
-
+# 加载全局配置（自动定位到 scripts/ 的父目录）
+# 00_setup.R 会设置 ROOT 指向 R_Analysis/
+source(file.path(dirname(sys.frame(1)$ofile), "00_setup.R"), encoding = "UTF-8")
 PATH_SCRIPTS <- file.path(ROOT, "scripts")
 PATH_CLEAN   <- file.path(ROOT, "data_clean")
 dir.create(PATH_CLEAN, showWarnings = FALSE, recursive = TRUE)
@@ -78,8 +79,6 @@ main <- main |>
     # 训练频率数值化（用于敏感性分析）
     Freq_num = case_when(
       Freq_wk == "≤1次/周" ~ 1,
-      Freq_wk == "1-2年" ~ NA_real_,  # 不是频率，忽略
-      Freq_wk == "1次/周" ~ 1,
       Freq_wk == "2次/周" ~ 2,
       Freq_wk == "3次/周" ~ 3,
       Freq_wk == "≥4次/周" ~ 4,

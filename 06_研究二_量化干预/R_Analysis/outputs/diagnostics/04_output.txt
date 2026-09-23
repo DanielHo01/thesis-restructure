@@ -1,0 +1,174 @@
+✓ 核心 R 包已加载
+✓ 全局环境配置完成
+  - R 版本： R version 4.4.3 (2025-02-28 ucrt) 
+  - 随机种子： 20260916 
+  - 原始数据路径： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/data_raw 
+  - 输出路径： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/outputs 
+
+=== 01 数据导入与清洗 ===
+导入 36人总表...
+Rows: 36 Columns: 16
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (8): ID, Name, Stratum, Group, EnteredPP, DropoutStage, DropoutReason, C...
+dbl (8): Age, Height_cm, BW_kg, SMM_kg, PBF_pct, ResistYears, Meas1RM, Rel1RM
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+  随机化: 36人 (AI=18, Self=18)
+  T0期脱落: 7人
+  干预期脱落: 5人
+  进入干预: ~29人
+  PP: 24人 (AI=11, Self=13)
+导入 PP主表（24人）...
+Rows: 24 Columns: 38
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (8): ID, Name, Group, Stratum, Freq_wk, ResistYears, VBT_exp, MissingSe...
+dbl (30): Age, Height_cm, BW_kg, BMI, SMM_kg, SMMI, FFM_kg, FFMI, PBF_pct, P...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+  ✓ 质量核查通过（ID唯一性、变化量计算）
+导入 训练监控（192课次）...
+Rows: 192 Columns: 17
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (5): ID, Sess, Week, DayType, Group
+dbl (12): Sleep, Stress, Fatigue, Soreness, CMJ1, CMJ2, CMJ3, Trigger, WarmL...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+  ✓ 质量核查通过（192条记录、每人8课次）
+导入 Rep级配对（43对）...
+Rows: 43 Columns: 7
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (2): ID, Session
+dbl (5): Set, Load, Rep, GA, App
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+  43对来自 3 人：P006, P016, P025
+导入 SUS（AI组 11人）...
+Rows: 11 Columns: 12
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (1): ID
+dbl (11): Q1, Q2, Q3, Q4, Q5, Q6, Q7, Q8, Q9, Q10, SUS_score
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+  SUS重算均值 = 65.0 (范围 58–72)
+  预填原表均值 = 65.0 (范围 58–72)
+导入 TAM 接受度（AI组 11人）...
+Rows: 11 Columns: 12
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (1): ID
+dbl (11): PU1, PU2, PU3, PU4, Trust1, Trust2, Trust3, Trust4, Int1, Int2, Int3
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+导入 自我效能T0（24人）...
+Rows: 24 Columns: 8
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (2): ID, Group
+dbl (6): Q1, Q2, Q3, Q4, Q5, Q6
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+导入 自我效能T1（24人）...
+Rows: 24 Columns: 8
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (2): ID, Group
+dbl (6): Q1, Q2, Q3, Q4, Q5, Q6
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+✓ 01 数据导入完成。清洗数据已保存至： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/data_clean 
+  ✓ 表格： diagnostic_import 
+✓ 诊断报告已保存
+
+=== 04 ANCOVA 主要结局分析 ===
+拟合 ANCOVA 模型...
+
+  ✓ 表格： table_ancova 
+# A tibble: 5 × 14
+  结局  单位      n  n_AI n_Self AI_T0_mean AI_T1_mean Self_T0_mean Self_T1_mean
+  <chr> <chr> <int> <int>  <int> <chr>      <chr>      <chr>        <chr>       
+1 深蹲绝对… kg       24    11     13 130.68     142.27     130.77       139.81      
+2 深蹲相对… kg/kg    24    11     13 1.70       1.85       1.76         1.88        
+3 CMJ高… cm       24    11     13 59.66      65.06      60.52        63.70       
+4 SJ高度… cm       24    11     13 55.68      59.98      54.81        58.18       
+5 训练自我… 分       24    11     13 65.45      83.18      65.69        73.69       
+# ℹ 5 more variables: 调整后差值 <chr>, 差值_95CI_lo <chr>, 差值_95CI_hi <chr>,
+#   p值 <chr>, R2 <chr>
+
+计算 Hedges' g...
+  ✓ 表格： table_effect_sizes 
+
+模型诊断...
+  ✓ 表格： table_ancova_diagnostics 
+
+BH 多重比较校正...
+  ✓ 表格： table_ancova 
+绑制森林图...
+Error in `geom_point()`:
+! Problem while computing aesthetics.
+ℹ Error occurred in the 1st layer.
+Caused by error:
+! object 'Hedges_g' not found
+Backtrace:
+     ▆
+  1. ├─base::source("scripts/04_ancova.R")
+  2. │ ├─base::withVisible(eval(ei, envir))
+  3. │ └─base::eval(ei, envir)
+  4. │   └─base::eval(ei, envir)
+  5. ├─global save_fig(p_forest, "fig_outcome_forest", w = 14, h = 10)
+  6. │ └─ggplot2::ggsave(...)
+  7. │   └─base::lapply(plot, grid.draw)
+  8. │     ├─grid (local) FUN(X[[i]], ...)
+  9. │     └─ggplot2 (local) `grid.draw.ggplot2::ggplot`(X[[i]], ...)
+ 10. │       ├─base::print(x)
+ 11. │       └─ggplot2 (local) `print.ggplot2::ggplot`(x)
+ 12. │         ├─ggplot2::ggplot_build(x)
+ 13. │         └─ggplot2 (local) `ggplot_build.ggplot2::ggplot`(x)
+ 14. │           └─ggplot2:::by_layer(...)
+ 15. │             ├─rlang::try_fetch(...)
+ 16. │             │ ├─base::tryCatch(...)
+ 17. │             │ │ └─base (local) tryCatchList(expr, classes, parentenv, handlers)
+ 18. │             │ │   └─base (local) tryCatchOne(expr, names, parentenv, handlers[[1L]])
+ 19. │             │ │     └─base (local) doTryCatch(return(expr), name, parentenv, handler)
+ 20. │             │ └─base::withCallingHandlers(...)
+ 21. │             └─ggplot2 (local) f(l = layers[[i]], d = data[[i]])
+ 22. │               └─l$compute_aesthetics(d, plot)
+ 23. │                 └─ggplot2 (local) compute_aesthetics(..., self = self)
+ 24. │                   └─ggplot2:::eval_aesthetics(aesthetics, data)
+ 25. │                     └─base::lapply(aesthetics, eval_tidy, data = data, env = env)
+ 26. │                       └─rlang (local) FUN(X[[i]], ...)
+ 27. ├─stats::reorder(结局, as.numeric(Hedges_g$Hedges_g))
+ 28. ├─stats:::reorder.default(结局, as.numeric(Hedges_g$Hedges_g))
+ 29. │ └─base::tapply(X = X, INDEX = x, FUN = FUN, ...)
+ 30. └─base::.handleSimpleError(...)
+ 31.   └─rlang (local) h(simpleError(msg, call))
+ 32.     └─handlers[[1L]](cnd)
+ 33.       └─cli::cli_abort(...)
+ 34.         └─rlang::abort(...)
+Warning messages:
+1: One or more parsing issues, call `problems()` on your data frame for details,
+e.g.:
+  dat <- vroom(...)
+  problems(dat) 
+2: There was 1 warning in `mutate()`.
+ℹ In argument: `CMJ_mean = rowMeans(select(cur_data(), CMJ1, CMJ2, CMJ3), na.rm
+  = TRUE)`.
+Caused by warning:
+! `cur_data()` was deprecated in dplyr 1.1.0.
+ℹ Please use `pick()` instead. 
+3: In eval(ei, envir) : NAs introduced by coercion
+4: In eval(ei, envir) : NAs introduced by coercion
+Execution halted

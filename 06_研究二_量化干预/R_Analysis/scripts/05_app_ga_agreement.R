@@ -5,11 +5,12 @@
 # - Rep级：来自 43对配对数据
 # =============================================================================
 
-source(file.path(PATH_SCRIPTS, "00_setup.R"))
-PATH_SCRIPTS <- file.path(ROOT, "scripts")
-PATH_CLEAN   <- file.path(ROOT, "data_clean")
-source(file.path(PATH_SCRIPTS, "01_import_clean.R"))
-
+# 自动定位脚本目录，加载全局配置
+if (!exists("ROOT")) {
+  script_dir <- if (!is.null(sys.frame(1)$ofile)) dirname(normalizePath(sys.frame(1)$ofile)) else getwd()
+  ROOT <- normalizePath(file.path(script_dir, ".."))
+}
+source(file.path(ROOT, "scripts", "01_import_clean.R"), encoding = "UTF-8")
 cat("\n=== 05 App-GA 现场一致性分析 ===\n")
 
 mon <- readRDS(file.path(PATH_CLEAN, "monitor.rds"))

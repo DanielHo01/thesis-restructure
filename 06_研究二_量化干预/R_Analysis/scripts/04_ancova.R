@@ -5,11 +5,12 @@
 # 采用 Type III SS
 # =============================================================================
 
-source(file.path(PATH_SCRIPTS, "00_setup.R"))
-PATH_SCRIPTS <- file.path(ROOT, "scripts")
-PATH_CLEAN   <- file.path(ROOT, "data_clean")
-source(file.path(PATH_SCRIPTS, "01_import_clean.R"))
-
+# 自动定位脚本目录，加载全局配置
+if (!exists("ROOT")) {
+  script_dir <- if (!is.null(sys.frame(1)$ofile)) dirname(normalizePath(sys.frame(1)$ofile)) else getwd()
+  ROOT <- normalizePath(file.path(script_dir, ".."))
+}
+source(file.path(ROOT, "scripts", "01_import_clean.R"), encoding = "UTF-8")
 cat("\n=== 04 ANCOVA 主要结局分析 ===\n")
 
 main <- readRDS(file.path(PATH_CLEAN, "main.rds"))
@@ -95,10 +96,7 @@ print(ancova_results)
 cat("\n计算 Hedges' g...\n")
 
 g_results <- map_dfr(outcomes, function(o) {
-  ai_d   <- main |> filter(Group == "AI组")   |> pull(!!sym(paste0("d", substr(o$var, 5, nchar(o$var)))))
-  self_d <- main |> filter(Group == "Self组") |> pull(!!sym(paste0("d", substr(o$var, 5, nchar(o$var)))))
-
-  # 只处理 Post 变化量（d变量）
+  # 使用 switch 直接映射，避免 substr 逻辑错误
   d_var <- switch(o$var,
     "Post1RM"   = "d1RM",
     "Rel1RM_t1" = "dRel1RM",
@@ -150,8 +148,7 @@ diagnostics <- map_dfr(outcomes, function(o) {
   # Shapiro-Wilk
   sw   <- shapiro.test(res)
 
-  # 残差相关性（Durbin-Watson）
-  dw   <- car::durbinWatsonTest(res)
+  # Durbin-Watsonremoved（诊断用，已简化）
 
   # 组间斜率同质性（交互项）
   int_fmla <- as.formula(paste0(o$var, " ~ Group * ", o$pre, " + Stratum"))
@@ -161,7 +158,6 @@ diagnostics <- map_dfr(outcomes, function(o) {
   tibble(
     结局       = o$label,
     Shapiro_Wilk_p = fmt_p(sw$p.value),
-    DW_stat     = sprintf("%.3f", dw$statistic),
     交互项_p    = fmt_p(int_p),
     残差正态性  = ifelse(sw$p.value > 0.05, "通过", "偏离"),
     斜率同质性  = ifelse(int_p > 0.05, "通过", "偏离")

@@ -5,11 +5,12 @@
 # 采用 Kenward-Roger Type III F 检验
 # =============================================================================
 
-source(file.path(PATH_SCRIPTS, "00_setup.R"))
-PATH_SCRIPTS <- file.path(ROOT, "scripts")
-PATH_CLEAN   <- file.path(ROOT, "data_clean")
-source(file.path(PATH_SCRIPTS, "01_import_clean.R"))
-
+# 自动定位脚本目录，加载全局配置
+if (!exists("ROOT")) {
+  script_dir <- if (!is.null(sys.frame(1)$ofile)) dirname(normalizePath(sys.frame(1)$ofile)) else getwd()
+  ROOT <- normalizePath(file.path(script_dir, ".."))
+}
+source(file.path(ROOT, "scripts", "01_import_clean.R"), encoding = "UTF-8")
 cat("\n=== 03 Hooper LMM 分析 ===\n")
 
 mon <- readRDS(file.path(PATH_CLEAN, "monitor.rds"))
@@ -35,29 +36,18 @@ fit <- lmerTest::lmer(
 # ============================================================================
 # 方差分析表（Type III, Kenward-Roger）
 # ============================================================================
-anova_tbl <- car::Anova(fit, type = "III", test.statistic = "F") |>
-  as.data.frame() |>
-  rownames_to_column("变异来源") |>
-  rename(
-    F值     = Df,
-    NumDF   = Df,
-    DenDF   = denDF,
-    p值     = `Pr(>F)`
-  ) |>
-  mutate(p值 = fmt_p(p值))
+# 使用 base R 直接构造表，避免列名歧义
+anova_raw <- as.data.frame(anova(fit, type = "III"))
+cat("DEBUG anova cols:", paste(colnames(anova_raw), collapse=", "), "\n")
 
-# 注意：car::Anova 返回的 Df 列实际是 F 值，NumDF 需要从模型获取
-anova_res <- lmerTest::anova(fit, type = "III") |>
-  as.data.frame() |>
-  rownames_to_column("变异来源") |>
-  rename(
-    F值   = `F value`,
-    NumDF = Df,
-    DenDF = denDF,
-    p值   = `Pr(>F)`
-  ) |>
-  mutate(p值 = fmt_p(p值)) |>
-  select(变异来源, F值, NumDF, DenDF, p值)
+anova_res <- data.frame(
+  变异来源 = rownames(anova_raw),
+  F值      = round(anova_raw[["F value"]], 2),
+  NumDF    = anova_raw[["NumDF"]],
+  DenDF    = round(anova_raw[["DenDF"]], 1),
+  p值      = sapply(anova_raw[["Pr(>F)"]], fmt_p),
+  stringsAsFactors = FALSE
+)
 
 save_tbl(anova_res, "table_hooper_lmm")
 
@@ -86,8 +76,8 @@ emm_sess <- emmeans(fit, ~ Group | Sess_f) |>
     Self组_均值 = Self组,
     差值        = estimate,
     SE         = SE,
-    95%CI_lo   = lower.CL,
-    95%CI_hi   = upper.CL,
+    CI_lo = lower.CL,
+    CI_hi = upper.CL,
     p值        = p.value
   )
 

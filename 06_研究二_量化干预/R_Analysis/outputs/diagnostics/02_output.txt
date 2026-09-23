@@ -1,0 +1,40 @@
+✓ 核心 R 包已加载
+✓ 全局环境配置完成
+  - R 版本： R version 4.4.3 (2025-02-28 ucrt) 
+  - 随机种子： 20260916 
+  - 原始数据路径： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/data_raw 
+  - 输出路径： D:\研究生文件\研三\2026年9月\毕业论文重构版\06_研究二_量化干预\R_Analysis/outputs 
+
+=== 02 受试者流转与基线特征 ===
+DEBUG: main nrow=24, unique_group=AI组|Self组
+
+--- CONSORT 精确口径 ---
+  随机化: 36人 (AI=18, Self=18)
+  T0期脱落: 7人
+  干预期脱落: 5人
+  进入干预: 29人 (AI=13, Self=16)
+  完成PP: 24人 (AI=11, Self=13)
+  CONSORT闭合: 7 + 5 + 24 = 36 (应=36)
+  ✓ 表格： table_dropout_reasons 
+  ✓ 表格： table_flow 
+  ✓ 表格： table_t0_dropouts 
+  ✓ 表格： table_int_dropouts 
+
+--- P028 专项审计 ---
+  ID: P028
+  组别: AI组
+  脱落阶段: 随机分配后基线测试阶段
+  脱落原因: 腰部损伤
+  是否完成1RM: 是
+  是否进入干预: 否
+
+--- 关键率与 95%CI ---
+  进入干预率: 29/36 = 80.6% [65.0%, 90.2%]
+  主要后测完成率: 24/36 = 66.7% [50.3%, 79.8%]
+  AI组PP率: 11/18 = 61.1%
+  Self组PP率: 13/18 = 72.2%
+
+--- 基线特征表（PP 24人）---
+DEBUG2: main nrow=24, Group class=factor, n_AI=11
+  ✓ 表格： table_baseline 
+✓ CONSORT 流程表和基线特征表已保存

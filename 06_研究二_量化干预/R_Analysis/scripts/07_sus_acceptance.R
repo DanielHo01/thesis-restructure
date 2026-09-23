@@ -3,11 +3,12 @@
 # SUS可用性 + TAM接受度分析（AI组 11人）
 # =============================================================================
 
-source(file.path(PATH_SCRIPTS, "00_setup.R"))
-PATH_SCRIPTS <- file.path(ROOT, "scripts")
-PATH_CLEAN   <- file.path(ROOT, "data_clean")
-source(file.path(PATH_SCRIPTS, "01_import_clean.R"))
-
+# 自动定位脚本目录，加载全局配置
+if (!exists("ROOT")) {
+  script_dir <- if (!is.null(sys.frame(1)$ofile)) dirname(normalizePath(sys.frame(1)$ofile)) else getwd()
+  ROOT <- normalizePath(file.path(script_dir, ".."))
+}
+source(file.path(ROOT, "scripts", "01_import_clean.R"), encoding = "UTF-8")
 cat("\n=== 07 SUS 与 TAM 接受度 ===\n")
 
 sus <- readRDS(file.path(PATH_CLEAN, "sus.rds"))
