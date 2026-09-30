@@ -1,3 +1,66 @@
-*.pdf
+# 操作系统
+.DS_Store
+Thumbs.db
+~$*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# R
+.Rhistory
+.Rapp.history
+.RData
+.Ruserdata
+.Rproj.user/
+*.Rproj
+
+# 图像结果（可保留源数据）
+# *.png
+# *.jpg
+# *.pdf
+
+# LaTeX 编译产物
 *.aux
 *.log
+*.out
+*.toc
+*.bbl
+*.blg
+*.synctex.gz
+
+# 临时文件
+*.tmp
+*.bak
+*.swp
+*.swo
+*nul*
+
+# 隐藏临时文件
+.omo/
+.ruff_cache/
+.pi/
+
+# Office 临时文件
+~$.*
+
+# 大数据文件（研究数据过大不需要git追踪）
+# 04-数据采集/
