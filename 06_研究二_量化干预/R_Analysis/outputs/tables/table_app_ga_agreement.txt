@@ -1,17 +1,17 @@
 
 
-|指标          |热身级 |Rep级   |
-|:-------------|:------|:-------|
-|n_pairs       |88     |43      |
-|n_subjects    |11     |3       |
-|Bias_mean     |0.0212 |0.0019  |
-|Bias_SD       |0.0042 |0.0182  |
-|LoA_low       |0.0129 |-0.0337 |
-|LoA_high      |0.0296 |0.0375  |
-|MAE           |0.0212 |0.0172  |
-|RMSE          |0.0217 |0.0180  |
-|Pearson_r     |0.9997 |0.9907  |
-|ICC_2_1       |0.9600 |-0.0484 |
-|prop_positive |100.0% |53.5%   |
-|prop_zero     |0.0%   |4.7%    |
-|prop_negative |0.0%   |41.9%   |
+|指标          |热身级 |热身级_Bootstrap_95CI |Rep级   |Rep级_Bootstrap_95CI                              |
+|:-------------|:------|:---------------------|:-------|:-------------------------------------------------|
+|n_pairs       |88     |NA                    |43      |NA                                                |
+|n_subjects    |11     |NA                    |3       |NA                                                |
+|Bias_mean     |0.0212 |NA                    |0.0019  |NA                                                |
+|Bias_SD       |0.0042 |NA                    |0.0182  |NA                                                |
+|LoA_low       |0.0129 |NA                    |-0.0337 |NA                                                |
+|LoA_high      |0.0296 |NA                    |0.0375  |NA                                                |
+|MAE           |0.0212 |NA                    |0.0172  |NA                                                |
+|RMSE          |0.0217 |NA                    |0.0180  |NA                                                |
+|Pearson_r     |0.9997 |NA                    |0.9907  |NA                                                |
+|ICC_2_1       |0.3437 |[0.2271, 0.4540]      |0.7603  |N/A (n=3 subjects; insufficient for bootstrap CI) |
+|prop_positive |100.0% |NA                    |53.5%   |NA                                                |
+|prop_zero     |0.0%   |NA                    |4.7%    |NA                                                |
+|prop_negative |0.0%   |NA                    |41.9%   |NA                                                |
